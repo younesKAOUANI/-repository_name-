@@ -1,0 +1,406 @@
+// --------------------------------------------------------
+// Prisma Schema for: NextAuth + Pharmacy Quiz Platform
+// DB: PostgreSQL
+// --------------------------------------------------------
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Seed configuration
+// Run: npm run db:seed
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------
+// Enums
+// ----------------------
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum QuizType {
+  QUIZ
+  EXAM
+  SESSION
+}
+
+enum QuestionType {
+  // QCMA = QCM All-or-nothing, QCMP = QCM Partial
+  QCMA
+  QCMP
+  QCS
+  QROC
+}
+
+enum QuizProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum PlanTypeName {
+  ANNUAL
+  SEMESTRIAL
+  MODULE
+}
+
+// ----------------------
+// NextAuth Core
+// ----------------------
+
+model User {
+  id             String    @id @default(uuid())
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  role           Role      @default(STUDENT)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Authentication fields
+  password                String?   // Hashed password for credentials login
+  resetToken              String?   // Password reset token
+  resetTokenExpiry        DateTime? // Reset token expiration
+  pendingEmail            String?   // New email pending verification
+  emailVerificationToken  String?   // Email verification token
+
+  // Student-specific fields
+  year                    Int?      // Study year (1-6 for pharmacy)
+  university              String?   // University name
+
+  accounts       Account[]
+  sessions       Session[]
+  quizAttempts   QuizAttempt[]
+  quizProgresses QuizProgress[]
+  licenses       License[]
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        BigInt?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ----------------------
+// Academic Structure
+// ----------------------
+
+model StudyYear {
+  id         Int        @id @default(autoincrement())
+  name       String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  semesters  Semester[]
+  licenses   LicenseStudyYear[]
+}
+
+model Semester {
+  id          Int        @id @default(autoincrement())
+  name        String
+  studyYearId Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  studyYear   StudyYear  @relation(fields: [studyYearId], references: [id], onDelete: Cascade)
+  modules     Module[]
+  licenses    LicenseSemester[]
+
+  @@index([studyYearId])
+}
+
+model Module {
+  id          Int        @id @default(autoincrement())
+  name        String
+  semesterId  Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  semester    Semester   @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  lessons     Lesson[]
+  quizzes     Quiz[]     // exam-level quizzes can attach here (type = EXAM)
+  licenseLinks LicenseModule[]
+
+  @@index([semesterId])
+}
+
+model Lesson {
+  id         Int        @id @default(autoincrement())
+  title      String
+  description String?
+  content    String?
+  order      Int        @default(0)
+  moduleId   Int
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  module     Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  pdfs       LessonPDF[]
+  videos     LessonVideo[]
+  quizzes    Quiz[]     // standard lesson quizzes and session quizzes can link here via lessonId
+  sessionLinks SessionQuizLesson[]
+
+  @@index([moduleId])
+  @@index([moduleId, order])
+}
+
+model LessonPDF {
+  id        Int     @id @default(autoincrement())
+  url       String
+  lessonId  Int
+
+  lesson    Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+}
+
+model LessonVideo {
+  id        Int     @id @default(autoincrement())
+  url       String
+  lessonId  Int
+
+  lesson    Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+}
+
+// ----------------------
+// Quizzes, Exams & Sessions
+// ----------------------
+
+model Quiz {
+  id         Int        @id @default(autoincrement())
+  title      String
+  lessonId   Int?       // nullable for EXAM or SESSION as needed
+  moduleId   Int?       // used for EXAMs at module level (optional)
+  type       QuizType
+  order      Int?       // sequence inside module/lesson (for ordered predefined quizzes)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  lesson     Lesson?    @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  module     Module?    @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  questions  Question[]
+  attempts   QuizAttempt[]
+  progresses QuizProgress[]
+  sessionLessons SessionQuizLesson[]
+
+  @@index([lessonId])
+  @@index([moduleId])
+  @@index([type])
+}
+
+model Question {
+  id           Int           @id @default(autoincrement())
+  text         String
+  quizId       Int
+  questionType QuestionType
+  order        Int?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  quiz         Quiz          @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  options      AnswerOption[]
+  attemptAnswers QuizAttemptAnswer[]
+
+  @@index([quizId])
+}
+
+model AnswerOption {
+  id         Int       @id @default(autoincrement())
+  text       String
+  isCorrect  Boolean
+  questionId Int
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  question   Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedBy QuizAttemptAnswer[] // reverse relation
+
+  @@index([questionId])
+}
+
+model QuizAttempt {
+  id         Int       @id @default(autoincrement())
+  userId     String
+  quizId     Int
+  startedAt  DateTime
+  finishedAt DateTime?
+  score      Decimal?  @db.Decimal(5, 2)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz       Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers    QuizAttemptAnswer[]
+
+  @@index([userId])
+  @@index([quizId])
+}
+
+model QuizAttemptAnswer {
+  id                     Int      @id @default(autoincrement())
+  attemptId              Int
+  questionId             Int
+  selectedOptionId       Int?
+  isCorrect              Boolean
+
+  attempt                QuizAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question               Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOption         AnswerOption? @relation(fields: [selectedOptionId], references: [id], onDelete: SetNull)
+
+  @@index([attemptId])
+  @@index([questionId])
+  @@index([selectedOptionId])
+}
+
+model QuizProgress {
+  id        Int                @id @default(autoincrement())
+  userId    String
+  quizId    Int
+  status    QuizProgressStatus @default(NOT_STARTED)
+  unlocked  Boolean            @default(false)
+  updatedAt DateTime           @updatedAt
+
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz      Quiz               @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, quizId]) // one progress row per user+quiz
+  @@index([userId])
+  @@index([quizId])
+}
+
+// Link lessons chosen for a generated SESSION quiz
+model SessionQuizLesson {
+  id       Int    @id @default(autoincrement())
+  quizId   Int
+  lessonId Int
+
+  quiz     Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([quizId, lessonId])
+  @@index([quizId])
+  @@index([lessonId])
+}
+
+// ----------------------
+// Licensing System
+// ----------------------
+
+model PlanType {
+  id       Int           @id @default(autoincrement())
+  name     PlanTypeName
+  duration Int           // in days
+
+  plans    Plan[]
+}
+
+model Plan {
+  id         Int        @id @default(autoincrement())
+  planTypeId Int
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  planType   PlanType   @relation(fields: [planTypeId], references: [id], onDelete: Restrict)
+  licenses   License[]
+
+  @@index([planTypeId])
+}
+
+model License {
+  id         Int        @id @default(autoincrement())
+  userId     String
+  planId     Int
+  startDate  DateTime
+  endDate    DateTime
+  isActive   Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan       Plan       @relation(fields: [planId], references: [id], onDelete: Restrict)
+  yearScope  LicenseStudyYear?
+  semScope   LicenseSemester?
+  modScope   LicenseModule?
+
+  @@index([userId])
+  @@index([planId])
+}
+
+// Scope-specific access (only ONE should exist per license depending on plan type)
+// NOTE: Enforce exclusivity in application/business logic.
+
+model LicenseStudyYear {
+  id          Int       @id @default(autoincrement())
+  licenseId   Int       @unique
+  studyYearId Int
+
+  license     License   @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  studyYear   StudyYear @relation(fields: [studyYearId], references: [id], onDelete: Cascade)
+
+  @@index([studyYearId])
+}
+
+model LicenseSemester {
+  id          Int       @id @default(autoincrement())
+  licenseId   Int       @unique
+  semesterId  Int
+
+  license     License   @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  semester    Semester  @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+
+  @@index([semesterId])
+}
+
+model LicenseModule {
+  id         Int      @id @default(autoincrement())
+  licenseId  Int      @unique
+  moduleId   Int
+
+  license    License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  module     Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@index([moduleId])
+}
