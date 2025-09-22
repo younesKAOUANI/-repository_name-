@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { requireAuth, requireAdmin, unauthorizedResponse, requireRole } from '@/lib/auth-utils';
+import { requireAuth, unauthorizedResponse, requireRole } from '@/lib/auth-utils';
 
 const prisma = new PrismaClient();
 
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const studyYearId = searchParams.get('studyYearId');
     const semesterId = searchParams.get('semesterId');
 
-    let whereClause: any = {};
+    const whereClause: any = {};
     
     if (semesterId) {
       whereClause.semesterId = parseInt(semesterId);
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const module = await prisma.module.create({
+    const newModule = await prisma.module.create({
       data: {
         name,
         semesterId: parseInt(semesterId),
@@ -122,13 +122,14 @@ export async function POST(request: NextRequest) {
         },
         _count: {
           select: {
+            lessons: true,
             quizzes: true
           }
         }
       }
     });
 
-    return NextResponse.json({ module }, { status: 201 });
+    return NextResponse.json(newModule, { status: 201 });
   } catch (error) {
     console.error('Error creating module:', error);
     

@@ -132,7 +132,7 @@ class LicenseAdminService {
       const response = await fetch(`${this.baseUrl}?${params}`);
       
       if (!response.ok) {
-        throw new Error('Failed to fetch licenses');
+        throw new Error('Échec de la récupération des licences');
       }
 
       const data = await response.json();
@@ -154,7 +154,7 @@ class LicenseAdminService {
       const response = await fetch(`${this.baseUrl}/stats`);
       
       if (!response.ok) {
-        throw new Error('Failed to fetch license statistics');
+        throw new Error('Échec de la récupération des statistiques des licences');
       }
 
       const data = await response.json();
@@ -173,7 +173,7 @@ class LicenseAdminService {
       const response = await fetch(`${this.baseUrl}/resources`);
       
       if (!response.ok) {
-        throw new Error('Failed to fetch resources');
+        throw new Error('Échec de la récupération des ressources');
       }
 
       const data = await response.json();
@@ -213,7 +213,7 @@ class LicenseAdminService {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create license');
+        throw new Error(errorData.error || 'Échec de la création de la licence');
       }
     } catch (error) {
       console.error('Error creating license:', error);
@@ -236,7 +236,7 @@ class LicenseAdminService {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update license status');
+        throw new Error('Échec de la mise à jour du statut de la licence');
       }
     } catch (error) {
       console.error('Error updating license status:', error);
@@ -259,7 +259,7 @@ class LicenseAdminService {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to extend license');
+        throw new Error('Échec de l\'extension de la licence');
       }
     } catch (error) {
       console.error('Error extending license:', error);
@@ -277,7 +277,7 @@ class LicenseAdminService {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete license');
+        throw new Error('Échec de la suppression de la licence');
       }
     } catch (error) {
       console.error('Error deleting license:', error);

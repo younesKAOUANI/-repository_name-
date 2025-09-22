@@ -18,8 +18,7 @@ import {
 const teacherMenuItems = [
   { label: 'Tableau de bord', href: '/teacher/dashboard', icon: MdHome },
   { label: 'Modules', href: '/teacher/modules', icon: MdMenuBook },
-  { label: 'Créer un quiz', href: '/teacher/quiz/create', icon: MdAdd },
-  { label: 'Mes quiz', href: '/teacher/quizzes', icon: MdQuiz },
+  { label: 'Quiz', href: '/teacher/quizzes', icon: MdQuiz },
   { label: 'Mes cours', href: '/teacher/courses', icon: MdLibraryBooks },
   { label: 'Étudiants', href: '/teacher/students', icon: MdPeople },
   { label: 'Résultats', href: '/teacher/results', icon: MdBarChart },

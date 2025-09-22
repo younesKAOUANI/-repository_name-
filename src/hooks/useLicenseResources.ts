@@ -49,7 +49,7 @@ export function useLicenseResources() {
       ]);
 
       if (!studyYearsResponse.ok || !studentsResponse.ok) {
-        throw new Error('Failed to fetch resources');
+        throw new Error('Échec de la récupération des ressources');
       }
 
       const studyYearsData = await studyYearsResponse.json();
@@ -60,7 +60,7 @@ export function useLicenseResources() {
         students: studentsData.students
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load resources');
+      setError(err instanceof Error ? err.message : 'Échec du chargement des ressources');
     } finally {
       setLoading(false);
     }

@@ -161,6 +161,7 @@ model Module {
   lessons     Lesson[]
   quizzes     Quiz[]     // exam-level quizzes can attach here (type = EXAM)
   licenseLinks LicenseModule[]
+  questionBankItems QuestionBank[] // Questions in the question bank for this module
 
   @@index([semesterId])
 }
@@ -180,6 +181,7 @@ model Lesson {
   videos     LessonVideo[]
   quizzes    Quiz[]     // standard lesson quizzes and session quizzes can link here via lessonId
   sessionLinks SessionQuizLesson[]
+  questionBankItems QuestionBank[] // Questions in the question bank for this lesson
 
   @@index([moduleId])
   @@index([moduleId, order])
@@ -210,14 +212,17 @@ model LessonVideo {
 // ----------------------
 
 model Quiz {
-  id         Int        @id @default(autoincrement())
-  title      String
-  lessonId   Int?       // nullable for EXAM or SESSION as needed
-  moduleId   Int?       // used for EXAMs at module level (optional)
-  type       QuizType
-  order      Int?       // sequence inside module/lesson (for ordered predefined quizzes)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id           Int        @id @default(autoincrement())
+  title        String
+  description  String?    // optional description
+  lessonId     Int?       // nullable for EXAM or SESSION as needed
+  moduleId     Int?       // used for EXAMs at module level (optional)
+  type         QuizType
+  order        Int?       // sequence inside module/lesson (for ordered predefined quizzes)
+  questionCount Int?      // for SESSION quizzes: how many questions to generate (15-50)
+  timeLimit    Int?       // time limit in minutes (optional)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
   lesson     Lesson?    @relation(fields: [lessonId], references: [id], onDelete: SetNull)
   module     Module?    @relation(fields: [moduleId], references: [id], onDelete: SetNull)
@@ -225,6 +230,7 @@ model Quiz {
   attempts   QuizAttempt[]
   progresses QuizProgress[]
   sessionLessons SessionQuizLesson[]
+  generatedQuestions GeneratedQuizQuestion[] // For revision quizzes
 
   @@index([lessonId])
   @@index([moduleId])
@@ -245,6 +251,57 @@ model Question {
   attemptAnswers QuizAttemptAnswer[]
 
   @@index([quizId])
+}
+
+// Question Bank for revision quizzes - standalone questions tagged to lessons/modules
+model QuestionBank {
+  id           Int           @id @default(autoincrement())
+  text         String
+  questionType QuestionType
+  lessonId     Int?          // Optional: question specific to a lesson
+  moduleId     Int?          // Optional: question specific to a module (broader scope)
+  difficulty   String?       // Optional: EASY, MEDIUM, HARD
+  explanation  String?       // Optional: explanation for the answer
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  lesson       Lesson?       @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  module       Module?       @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  options      QuestionBankOption[]
+  usedInQuizzes GeneratedQuizQuestion[]
+
+  @@index([lessonId])
+  @@index([moduleId])
+  @@index([isActive])
+}
+
+model QuestionBankOption {
+  id               Int          @id @default(autoincrement())
+  text             String
+  isCorrect        Boolean
+  questionBankId   Int
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  questionBank     QuestionBank @relation(fields: [questionBankId], references: [id], onDelete: Cascade)
+
+  @@index([questionBankId])
+}
+
+// Track which questions were used in generated revision quizzes
+model GeneratedQuizQuestion {
+  id               Int          @id @default(autoincrement())
+  quizId           Int
+  questionBankId   Int
+  order            Int?
+
+  quiz             Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  questionBank     QuestionBank @relation(fields: [questionBankId], references: [id], onDelete: Cascade)
+
+  @@unique([quizId, questionBankId]) // Prevent duplicate questions in same quiz
+  @@index([quizId])
+  @@index([questionBankId])
 }
 
 model AnswerOption {

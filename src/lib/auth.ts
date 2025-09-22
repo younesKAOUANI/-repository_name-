@@ -8,7 +8,7 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-  adapter: PrismaAdapter(db),
+  // adapter: PrismaAdapter(db), // Temporarily disabled due to type compatibility issue
   providers: [
     // TODO: Add authentication providers (Google, GitHub, etc.)
   ],

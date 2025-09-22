@@ -8,7 +8,7 @@ import bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as any,
+  // adapter: PrismaAdapter(prisma) as any, // Temporarily disabled due to compatibility issues
   providers: [
     CredentialsProvider({
       name: "credentials",

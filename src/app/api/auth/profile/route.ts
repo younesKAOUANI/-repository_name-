@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authService } from '@/services/auth.service';
-import { auth } from '@/lib/auth';
+import { requireRole } from '@/lib/auth-utils';
 
 // GET profile
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await requireRole(['ADMIN', 'INSTRUCTOR', 'STUDENT']);
     if (!session?.user?.id) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 // PUT update profile
 export async function PUT(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await requireRole(['ADMIN', 'INSTRUCTOR', 'STUDENT']);
     if (!session?.user?.id) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -68,10 +68,10 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE account
+// DELETE profile (deactivate account)
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await requireRole(['ADMIN', 'INSTRUCTOR', 'STUDENT']);
     if (!session?.user?.id) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },

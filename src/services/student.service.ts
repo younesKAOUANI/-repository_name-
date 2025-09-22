@@ -110,7 +110,7 @@ export class StudentService {
       };
     } catch (error) {
       logger.error('Error fetching students', { error });
-      throw new Error('Failed to fetch students');
+      throw new Error('Échec de la récupération des étudiants');
     }
   }
 
@@ -204,7 +204,7 @@ export class StudentService {
       return updatedStudent;
     } catch (error) {
       logger.error('Error updating student', { studentId: id, error });
-      throw new Error('Failed to update student');
+      throw new Error('Échec de la mise à jour de l\'étudiant');
     }
   }
 
@@ -225,7 +225,7 @@ export class StudentService {
       return true;
     } catch (error) {
       logger.error('Error deleting student', { studentId: id, error });
-      throw new Error('Failed to delete student');
+      throw new Error('Échec de la suppression de l\'étudiant');
     }
   }
 
@@ -277,7 +277,7 @@ export class StudentService {
       };
     } catch (error) {
       logger.error('Error fetching student statistics', { error });
-      throw new Error('Failed to fetch student statistics');
+      throw new Error('Échec de la récupération des statistiques des étudiants');
     }
   }
 }

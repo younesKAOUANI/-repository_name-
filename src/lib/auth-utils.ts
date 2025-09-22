@@ -11,11 +11,6 @@ import { getServerSession } from 'next-auth';
 export async function getCurrentUser() {
   try {
     const session = await getServerSession(authOptions);
-    console.log('=== getCurrentUser Debug ===');
-    console.log('Session exists:', !!session);
-    console.log('User exists:', !!session?.user);
-    console.log('User role:', session?.user?.role);
-    console.log('Full session:', JSON.stringify(session, null, 2));
     
     return session;
   } catch (error) {
@@ -76,7 +71,6 @@ export async function hasRole(roles: Array<'STUDENT' | 'INSTRUCTOR' | 'ADMIN'>) 
   const userRole = session?.user?.role;
   const hasRequiredRole = userRole && roles.includes(userRole);
   
-  console.log(`🎭 Role check: ${hasRequiredRole ? '✅ Has required role' : '❌ Missing required role'} (User: ${userRole || 'undefined'}, Required: ${roles.join(', ')})`);
   return hasRequiredRole;
 }
 

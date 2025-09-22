@@ -2,16 +2,11 @@
 
 import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
-import StudentLayout from '@/components/layouts/StudentLayout';
 
 export default function StudentDashboard() {
   const { data: session } = useSession();
 
   return (
-    <StudentLayout
-      title="Tableau de bord étudiant"
-      subtitle={`Bienvenue, ${session?.user?.name || 'Étudiant'}`}
-    >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* User Info Card */}
         <div className="bg-white rounded-lg shadow p-6">
@@ -59,6 +54,5 @@ export default function StudentDashboard() {
           </p>
         </div>
       </div>
-    </StudentLayout>
   );
 }

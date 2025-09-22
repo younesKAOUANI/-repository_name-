@@ -10,6 +10,7 @@ import {
   MdSchool,
   MdPerson,
   MdMenuBook,
+  MdQuiz,
   MdCardMembership,
   MdBarChart,
   MdSettings
@@ -21,6 +22,7 @@ const adminMenuItems = [
   { label: 'Enseignants', href: '/admin/teachers', icon: MdSchool },
   { label: 'Étudiants', href: '/admin/students', icon: MdPerson },
   { label: 'Modules', href: '/admin/modules', icon: MdMenuBook },
+  { label: 'Quiz', href: '/admin/quizzes', icon: MdQuiz },
   { label: 'Licences', href: '/admin/licenses', icon: MdCardMembership },
   { label: 'Statistiques', href: '/admin/stats', icon: MdBarChart },
   { label: 'Paramètres', href: '/admin/settings', icon: MdSettings },

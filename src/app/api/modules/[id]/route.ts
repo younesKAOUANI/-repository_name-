@@ -16,7 +16,7 @@ export async function GET(
     const { id } = await params;
     const moduleId = parseInt(id);
 
-    const module = await prisma.module.findUnique({
+    const moduleData = await prisma.module.findUnique({
       where: { id: moduleId },
       include: {
         semester: {
@@ -24,45 +24,18 @@ export async function GET(
             studyYear: true
           }
         },
-        lessons: {
-          include: {
-            _count: {
-              select: {
-                pdfs: true,
-                videos: true,
-                quizzes: true
-              }
-            }
-          },
-          orderBy: { createdAt: 'asc' }
-        },
-        quizzes: {
-          include: {
-            _count: {
-              select: {
-                questions: true
-              }
-            }
-          },
-          orderBy: { createdAt: 'desc' }
-        },
-        _count: {
-          select: {
-            lessons: true,
-            quizzes: true
-          }
-        }
+        lessons: true
       }
     });
 
-    if (!module) {
+    if (!moduleData) {
       return NextResponse.json(
         { error: 'Module non trouvé' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ module });
+    return NextResponse.json({ module: moduleData });
   } catch (error) {
     console.error('Error fetching module:', error);
     
@@ -125,7 +98,7 @@ export async function PUT(
       }
     }
 
-    const module = await prisma.module.update({
+    const updatedModule = await prisma.module.update({
       where: { id: moduleId },
       data: {
         name,
@@ -146,7 +119,7 @@ export async function PUT(
       }
     });
 
-    return NextResponse.json({ module });
+    return NextResponse.json({ module: updatedModule });
   } catch (error) {
     console.error('Error updating module:', error);
     

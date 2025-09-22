@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authService } from '@/services/auth.service';
-import { auth } from '@/lib/auth';
+import { requireRole } from '@/lib/auth-utils';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await requireRole(['ADMIN', 'INSTRUCTOR', 'STUDENT']);
     if (!session?.user?.id) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },

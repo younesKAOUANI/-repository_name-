@@ -179,7 +179,7 @@ export class LicenseService {
       return await this.getLicenseById(license.id);
     } catch (error) {
       logger.error('Error creating license', { error, data });
-      throw new Error('Failed to create license');
+      throw new Error('Échec de la création de la licence');
     }
   }
 
@@ -361,7 +361,7 @@ export class LicenseService {
       };
     } catch (error) {
       logger.error('Error fetching licenses', { error });
-      throw new Error('Failed to fetch licenses');
+      throw new Error('Échec de la récupération des licences');
     }
   }
 
@@ -380,7 +380,7 @@ export class LicenseService {
       return await this.getLicenseById(id);
     } catch (error) {
       logger.error('Error updating license status', { error, id });
-      throw new Error('Failed to update license status');
+      throw new Error('Échec de la mise à jour du statut de la licence');
     }
   }
 
@@ -410,7 +410,7 @@ export class LicenseService {
       return await this.getLicenseById(id);
     } catch (error) {
       logger.error('Error extending license', { error, id });
-      throw new Error('Failed to extend license');
+      throw new Error('Échec de l\'extension de la licence');
     }
   }
 
@@ -427,7 +427,7 @@ export class LicenseService {
       });
     } catch (error) {
       logger.error('Error deleting license', { error, id });
-      throw new Error('Failed to delete license');
+      throw new Error('Échec de la suppression de la licence');
     }
   }
 
@@ -542,7 +542,7 @@ export class LicenseService {
       return result.licenses;
     } catch (error) {
       logger.error('Error fetching user licenses', { error, userId });
-      throw new Error('Failed to fetch user licenses');
+      throw new Error('Échec de la récupération des licences utilisateur');
     }
   }
 
@@ -614,7 +614,7 @@ export class LicenseService {
       };
     } catch (error) {
       logger.error('Error fetching license statistics', { error });
-      throw new Error('Failed to fetch license statistics');
+      throw new Error('Échec de la récupération des statistiques des licences');
     }
   }
 
@@ -639,7 +639,7 @@ export class LicenseService {
       return result.count;
     } catch (error) {
       logger.error('Error updating expired licenses', { error });
-      throw new Error('Failed to update expired licenses');
+      throw new Error('Échec de la mise à jour des licences expirées');
     }
   }
 }
