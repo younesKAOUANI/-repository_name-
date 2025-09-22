@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth-config';
 
 const prisma = new PrismaClient();
 
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const moduleId = searchParams.get('moduleId');
 
-    const where = moduleId ? { moduleId: parseInt(moduleId) } : {};
+    const where = moduleId ? { moduleId } : {};
 
     const lessons = await prisma.lesson.findMany({
       where,

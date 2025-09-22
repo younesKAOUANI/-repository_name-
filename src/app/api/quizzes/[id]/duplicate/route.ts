@@ -10,7 +10,7 @@ export async function POST(
     await requireRole(['ADMIN', 'INSTRUCTOR']);
     
     const { id } = await params;
-    const quizId = parseInt(id);
+    const quizId = id;
 
     // Find the original quiz with all its data
     const originalQuiz = await db.quiz.findUnique({

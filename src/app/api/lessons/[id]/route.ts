@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth-config';
 
 const prisma = new PrismaClient();
 
@@ -17,10 +17,9 @@ export async function GET(
     }
 
     const { id } = await params;
-    const lessonId = parseInt(id);
     
     const lesson = await prisma.lesson.findUnique({
-      where: { id: lessonId },
+      where: { id },
       include: {
         module: {
           select: {
@@ -59,11 +58,10 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const lessonId = parseInt(id);
     const { title, description, content, order } = await request.json();
 
     const lesson = await prisma.lesson.update({
-      where: { id: lessonId },
+      where: { id },
       data: {
         ...(title !== undefined && { title }),
         ...(description !== undefined && { description }),
@@ -101,10 +99,9 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const lessonId = parseInt(id);
 
     await prisma.lesson.delete({
-      where: { id: lessonId },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Leçon supprimée avec succès' });

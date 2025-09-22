@@ -4,13 +4,13 @@ import { db } from '@/lib/db';
 import { QuestionType } from '@prisma/client';
 
 interface ExamAnswer {
-  questionId: number;
-  selectedOptionIds: number[];
+  questionId: string;
+  selectedOptions: string[];
   textAnswer?: string;
 }
 
 interface SubmitExamRequest {
-  attemptId: number;
+  attemptId: string;
   answers: ExamAnswer[];
 }
 
@@ -30,8 +30,8 @@ export async function POST(
       );
     }
 
-    const examId = parseInt(id);
-    if (isNaN(examId)) {
+    const examId = id;
+    if (!examId) {
       return NextResponse.json(
         { message: 'ID d\'examen invalide' },
         { status: 400 }
@@ -97,8 +97,8 @@ export async function POST(
       body.answers.flatMap(answer => {
         const questionResult = questionResults.find(qr => qr.questionId === answer.questionId);
         
-        if (answer.selectedOptionIds && answer.selectedOptionIds.length > 0) {
-          return answer.selectedOptionIds.map(optionId => 
+        if (answer.selectedOptions && answer.selectedOptions.length > 0) {
+          return answer.selectedOptions.map(optionId => 
             db.quizAttemptAnswer.create({
               data: {
                 attemptId: attempt.id,
@@ -217,7 +217,7 @@ function calculateQuestionScore(question: any, userAnswer?: ExamAnswer): {
 
   switch (question.questionType) {
     case 'QCMA': // All-or-nothing
-      const userSelectedQCMA = new Set(userAnswer.selectedOptionIds || []);
+      const userSelectedQCMA = new Set(userAnswer.selectedOptions || []);
       const correctSelectedQCMA = new Set(correctOptions.map((opt: any) => opt.id));
       
       const isExactMatch = userSelectedQCMA.size === correctSelectedQCMA.size &&
@@ -229,7 +229,7 @@ function calculateQuestionScore(question: any, userAnswer?: ExamAnswer): {
       };
 
     case 'QCMP': // Partial credit
-      const userSelectedQCMP = new Set(userAnswer.selectedOptionIds || []);
+      const userSelectedQCMP = new Set(userAnswer.selectedOptions || []);
       const correctSelectedQCMP = new Set(correctOptions.map((opt: any) => opt.id));
 
       let correctCount = 0;
@@ -252,7 +252,7 @@ function calculateQuestionScore(question: any, userAnswer?: ExamAnswer): {
       };
 
     case 'QCS': // Single choice
-      const userSelectedQCS = userAnswer.selectedOptionIds?.[0];
+      const userSelectedQCS = userAnswer.selectedOptions?.[0];
       const correctOptionQCS = correctOptions[0];
       const isCorrectQCS = userSelectedQCS === correctOptionQCS?.id;
       
@@ -284,7 +284,7 @@ function formatUserAnswer(question: any, userAnswer?: ExamAnswer): string[] {
     return [userAnswer.textAnswer || 'Pas de réponse'];
   }
 
-  return (userAnswer.selectedOptionIds || []).map(optionId => {
+  return (userAnswer.selectedOptions || []).map(optionId => {
     const option = question.options.find((opt: any) => opt.id === optionId);
     return option?.text || 'Option inconnue';
   });

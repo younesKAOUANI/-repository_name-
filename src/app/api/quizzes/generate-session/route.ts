@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Build lesson IDs from selected items
-    let lessonIds: number[] = [...(selectedLessons || [])];
+    let lessonIds: string[] = [...(selectedLessons || [])];
 
     // Add lessons from selected modules
     if (selectedModules && selectedModules.length > 0) {

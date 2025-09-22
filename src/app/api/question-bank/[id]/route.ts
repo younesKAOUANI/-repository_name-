@@ -10,12 +10,7 @@ export async function GET(
     await requireRole(['ADMIN', 'INSTRUCTOR']);
     
     const { id } = await params;
-    const questionId = parseInt(id);    if (isNaN(questionId)) {
-      return NextResponse.json(
-        { message: 'Invalid question ID' },
-        { status: 400 }
-      );
-    }
+    const questionId = id;
 
     const question = await db.questionBank.findUnique({
       where: { id: questionId },
@@ -71,14 +66,7 @@ export async function PUT(
   try {
     await requireRole(['ADMIN', 'INSTRUCTOR']);
 
-    const questionId = parseInt(id);
-    
-    if (isNaN(questionId)) {
-      return NextResponse.json(
-        { message: 'Invalid question ID' },
-        { status: 400 }
-      );
-    }
+    const questionId = id;
 
     const body = await request.json();
     const { text, questionType, lessonId, moduleId, difficulty, explanation, options } = body;
@@ -182,14 +170,7 @@ export async function DELETE(
   try {
     await requireRole(['ADMIN', 'INSTRUCTOR']);
 
-    const questionId = parseInt(id);
-    
-    if (isNaN(questionId)) {
-      return NextResponse.json(
-        { message: 'Invalid question ID' },
-        { status: 400 }
-      );
-    }
+    const questionId = id;
 
     // Check if question exists
     const existingQuestion = await db.questionBank.findUnique({

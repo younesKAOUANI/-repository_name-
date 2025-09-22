@@ -14,10 +14,9 @@ export async function GET(
     await requireAuth();
 
     const { id } = await params;
-    const moduleId = parseInt(id);
 
     const moduleData = await prisma.module.findUnique({
-      where: { id: moduleId },
+      where: { id },
       include: {
         semester: {
           include: {
@@ -61,7 +60,6 @@ export async function PUT(
     await requireAdmin();
 
     const { id } = await params;
-    const moduleId = parseInt(id);
     const body = await request.json();
     const { name, semesterId } = body;
 
@@ -74,7 +72,7 @@ export async function PUT(
 
     // Check if module exists
     const existingModule = await prisma.module.findUnique({
-      where: { id: moduleId }
+      where: { id }
     });
 
     if (!existingModule) {
@@ -87,7 +85,7 @@ export async function PUT(
     // If semesterId is being changed, check if new semester exists
     if (semesterId && semesterId !== existingModule.semesterId) {
       const semester = await prisma.semester.findUnique({
-        where: { id: parseInt(semesterId) }
+        where: { id: semesterId }
       });
 
       if (!semester) {
@@ -99,10 +97,10 @@ export async function PUT(
     }
 
     const updatedModule = await prisma.module.update({
-      where: { id: moduleId },
+      where: { id },
       data: {
         name,
-        ...(semesterId && { semesterId: parseInt(semesterId) }),
+        ...(semesterId && { semesterId }),
       },
       include: {
         semester: {
@@ -150,11 +148,10 @@ export async function DELETE(
     await requireAdmin();
 
     const { id } = await params;
-    const moduleId = parseInt(id);
 
     // Check if module exists
     const existingModule = await prisma.module.findUnique({
-      where: { id: moduleId },
+      where: { id },
       include: {
         _count: {
           select: {
@@ -181,7 +178,7 @@ export async function DELETE(
     }
 
     await prisma.module.delete({
-      where: { id: moduleId }
+      where: { id }
     });
 
     return NextResponse.json({ success: true });

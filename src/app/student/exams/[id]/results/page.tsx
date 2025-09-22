@@ -41,13 +41,14 @@ interface ExamResult {
 }
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default function ExamResultsPage({ params }: Props) {
   const router = useRouter();
   const [results, setResults] = useState<ExamResult[]>([]);
   const [selectedResult, setSelectedResult] = useState<ExamResult | null>(null);
+  const [examId, setExamId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,7 +56,9 @@ export default function ExamResultsPage({ params }: Props) {
     const fetchResults = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/student/exams/${params.id}/results`);
+        const resolvedParams = await params;
+        setExamId(resolvedParams.id);
+        const response = await fetch(`/api/student/exams/${resolvedParams.id}/results`);
         
         if (!response.ok) {
           throw new Error('Échec de la récupération des résultats');
@@ -74,7 +77,7 @@ export default function ExamResultsPage({ params }: Props) {
     };
 
     fetchResults();
-  }, [params.id]);
+  }, [params]);
 
   const getScoreColor = (percentage: number) => {
     if (percentage >= 80) return 'text-green-600';

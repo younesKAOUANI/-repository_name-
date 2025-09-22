@@ -20,10 +20,11 @@ export async function GET(request: NextRequest) {
     const whereClause: any = {};
     
     if (semesterId) {
-      whereClause.semesterId = parseInt(semesterId);
-    } else if (studyYearId) {
+      whereClause.semesterId = semesterId;
+    }
+    if (studyYearId) {
       whereClause.semester = {
-        studyYearId: parseInt(studyYearId)
+        studyYearId: studyYearId
       };
     }
 
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
     await requireRole(['ADMIN', 'INSTRUCTOR']);
 
     const body = await request.json();
-    const { name, semesterId } = body;
+    const { name, semesterId, description = '' } = body;
 
     if (!name || !semesterId) {
       return NextResponse.json(
@@ -82,12 +83,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if semester exists
-    const semester = await prisma.semester.findUnique({
-      where: { id: parseInt(semesterId) }
+    // Verify semester exists
+    const existingSemester = await prisma.semester.findUnique({
+      where: { id: semesterId }
     });
 
-    if (!semester) {
+    if (!existingSemester) {
       return NextResponse.json(
         { error: 'Semestre non trouvé' },
         { status: 404 }
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
     const existingModule = await prisma.module.findFirst({
       where: {
         name,
-        semesterId: parseInt(semesterId)
+        semesterId: semesterId
       }
     });
 
@@ -112,7 +113,8 @@ export async function POST(request: NextRequest) {
     const newModule = await prisma.module.create({
       data: {
         name,
-        semesterId: parseInt(semesterId),
+        description,
+        semesterId: semesterId,
       },
       include: {
         semester: {

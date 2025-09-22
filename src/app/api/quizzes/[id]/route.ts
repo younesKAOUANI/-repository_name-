@@ -10,7 +10,7 @@ export async function GET(
     await requireRole(['ADMIN', 'INSTRUCTOR']);
     
     const { id } = await params;
-    const quizId = parseInt(id);
+    const quizId = id;
 
     const quiz = await db.quiz.findUnique({
       where: { id: quizId },
@@ -84,7 +84,7 @@ export async function PUT(
     await requireRole(['ADMIN', 'INSTRUCTOR']);
     
     const { id } = await params;
-    const quizId = parseInt(id);
+    const quizId = id;
     const body = await request.json();
 
     const {
@@ -208,7 +208,7 @@ export async function DELETE(
     await requireRole(['ADMIN', 'INSTRUCTOR']);
     
     const { id } = await params;
-    const quizId = parseInt(id);
+    const quizId = id;
 
     await db.quiz.delete({
       where: { id: quizId },

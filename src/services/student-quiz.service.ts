@@ -29,7 +29,6 @@ export interface LessonWithQuizzes {
 export interface ModuleWithQuizzes {
   id: number;
   name: string;
-  description?: string;
   studyYear?: {
     id: number;
     name: string;

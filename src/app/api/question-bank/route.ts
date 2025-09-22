@@ -34,12 +34,12 @@ export async function GET(request: NextRequest) {
 
     // Module filter
     if (moduleId) {
-      where.moduleId = parseInt(moduleId);
+      where.moduleId = moduleId;
     }
 
     // Lesson filter
     if (lessonId) {
-      where.lessonId = parseInt(lessonId);
+      where.lessonId = lessonId;
     }
 
     // Difficulty filter

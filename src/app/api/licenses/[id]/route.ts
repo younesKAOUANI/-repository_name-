@@ -1,130 +1,145 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth, requireAdmin, unauthorizedResponse } from '@/lib/auth-utils';
-import { licenseService } from '@/services/license.service';
+import { requireRole } from '@/lib/auth-utils';
+import { db } from '@/lib/db';
 
-// GET /api/licenses/[id]
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAuth();
-    await requireAdmin();
-
-    const { id } = await params;
-    const licenseId = parseInt(id);
-    if (isNaN(licenseId)) {
-      return NextResponse.json(
-        { error: 'Invalid license ID' },
-        { status: 400 }
-      );
-    }
-
-    const license = await licenseService.getLicenseById(licenseId);
+    await requireRole(['ADMIN']);
     
-    return NextResponse.json({ license });
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('required')) {
-      return unauthorizedResponse(error.message);
-    }
-    if (error instanceof Error && error.message.includes('not found')) {
+    const { id } = await params;
+    const licenseId = id;
+
+    const license = await db.license.findUnique({
+      where: { id: licenseId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            createdAt: true
+          }
+        },
+        plan: true,
+        yearScope: {
+          include: {
+            studyYear: true
+          }
+        },
+        semScope: {
+          include: {
+            semester: true
+          }
+        },
+        modScope: {
+          include: {
+            module: true
+          }
+        }
+      }
+    });    if (!license) {
       return NextResponse.json(
         { error: 'License not found' },
         { status: 404 }
       );
     }
+
+    return NextResponse.json(license);
+  } catch (error) {
     console.error('Error fetching license:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch license' }, 
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
 
-// PUT /api/licenses/[id]
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAuth();
-    await requireAdmin();
-
+    await requireRole(['ADMIN']);
+    
     const { id } = await params;
-    const licenseId = parseInt(id);
-    if (isNaN(licenseId)) {
-      return NextResponse.json(
-        { error: 'Invalid license ID' },
-        { status: 400 }
-      );
-    }
+    const licenseId = id;
 
     const body = await request.json();
-    let updatedLicense;
+    const { endDate, isActive } = body;
 
-    if (body.action === 'updateStatus') {
-      updatedLicense = await licenseService.updateLicenseStatus(licenseId, body.isActive);
-    } else if (body.action === 'extend') {
-      if (!body.additionalDays || body.additionalDays <= 0) {
-        return NextResponse.json(
-          { error: 'additionalDays must be a positive number' },
-          { status: 400 }
-        );
-      }
-      updatedLicense = await licenseService.extendLicense(licenseId, body.additionalDays);
-    } else {
+    // Validation
+    if (!endDate) {
       return NextResponse.json(
-        { error: 'Invalid action. Use "updateStatus" or "extend"' },
+        { error: 'End date is required' },
         { status: 400 }
       );
     }
-    
-    return NextResponse.json({ 
-      message: 'License updated successfully',
-      license: updatedLicense 
+
+    const license = await db.license.update({
+      where: { id: licenseId },
+      data: {
+        endDate: new Date(endDate),
+        isActive: isActive !== undefined ? isActive : true,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            createdAt: true
+          }
+        },
+        plan: true
+      }
     });
+
+    return NextResponse.json(license);
   } catch (error) {
-    if (error instanceof Error && error.message.includes('required')) {
-      return unauthorizedResponse(error.message);
-    }
     console.error('Error updating license:', error);
+    if (error instanceof Error && 'code' in error && error.code === 'P2025') {
+      return NextResponse.json(
+        { error: 'License not found' },
+        { status: 404 }
+      );
+    }
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to update license' }, 
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
 
-// DELETE /api/licenses/[id]
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAuth();
-    await requireAdmin();
-
+    await requireRole(['ADMIN']);
+    
     const { id } = await params;
-    const licenseId = parseInt(id);
-    if (isNaN(licenseId)) {
+    const licenseId = id;
+
+    await db.license.delete({
+      where: { id: licenseId },
+    });
+
+    return NextResponse.json({ message: 'License deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting license:', error);
+    if (error instanceof Error && 'code' in error && error.code === 'P2025') {
       return NextResponse.json(
-        { error: 'Invalid license ID' },
-        { status: 400 }
+        { error: 'License not found' },
+        { status: 404 }
       );
     }
-
-    await licenseService.deleteLicense(licenseId);
-    
-    return NextResponse.json({ 
-      message: 'License deleted successfully'
-    });
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('required')) {
-      return unauthorizedResponse(error.message);
-    }
-    console.error('Error deleting license:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to delete license' }, 
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

@@ -9,7 +9,7 @@ export async function GET(
   const { id } = await params;
   try {
     const session = await requireRole(['STUDENT']);
-    const resultId = parseInt(id);
+    const resultId = id;
 
     if (!session?.user?.id) {
       return NextResponse.json(

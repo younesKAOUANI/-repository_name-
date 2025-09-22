@@ -4,13 +4,13 @@ import { db } from '@/lib/db';
 import { QuestionType } from '@prisma/client';
 
 interface StudentAnswer {
-  questionId: number;
-  selectedOptions: number[];
+  questionId: string;
+  selectedOptions: string[];
   textAnswer?: string;
 }
 
 interface ExamSubmission {
-  examSessionId: number;
+  examSessionId: string;
   answers: StudentAnswer[];
   completedAt: string;
 }

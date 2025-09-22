@@ -16,7 +16,9 @@ import {
   Award,
   ChevronDown,
   ChevronRight,
-  GraduationCap
+  GraduationCap,
+  ClipboardList,
+  History
 } from 'lucide-react';
 import { useStudentQuiz } from '@/hooks/useStudentQuiz';
 import { ModuleWithQuizzes, LessonWithQuizzes, QuizItem } from '@/services/student-quiz.service';
@@ -34,7 +36,7 @@ export default function StudentQuizInterface() {
   } = useStudentQuiz();
 
   const [selectedStudyYear, setSelectedStudyYear] = useState<number | undefined>();
-  const [expandedModules, setExpandedModules] = useState<Set<number>>(new Set());
+  const [activeTab, setActiveTab] = useState<'available' | 'history'>('available');
 
   // Load data on component mount
   useEffect(() => {
@@ -48,16 +50,6 @@ export default function StudentQuizInterface() {
     } catch (error) {
       console.error('Failed to start quiz:', error);
     }
-  };
-
-  const toggleModuleExpansion = (moduleId: number) => {
-    const newExpanded = new Set(expandedModules);
-    if (newExpanded.has(moduleId)) {
-      newExpanded.delete(moduleId);
-    } else {
-      newExpanded.add(moduleId);
-    }
-    setExpandedModules(newExpanded);
   };
 
   const formatDuration = (minutes?: number) => {
@@ -174,100 +166,146 @@ export default function StudentQuizInterface() {
           </div>
         )}
 
-        {/* Filters */}
-        <div className="mb-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <Filter className="h-5 w-5 text-gray-600" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900">Filtres</h3>
+        {/* Tabs */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="flex">
+              <button
+                onClick={() => setActiveTab('available')}
+                className={`flex-1 px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
+                  activeTab === 'available'
+                    ? 'border-blue-500 text-blue-600 bg-blue-50'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <ClipboardList className="h-4 w-4" />
+                  Quiz Disponibles ({totalQuizzes})
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`flex-1 px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
+                  activeTab === 'history'
+                    ? 'border-blue-500 text-blue-600 bg-blue-50'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <History className="h-4 w-4" />
+                  Historique ({completedQuizzes})
+                </div>
+              </button>
+            </nav>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Année d'étude
-              </label>
-              <select
-                value={selectedStudyYear || ''}
-                onChange={(e) => {
-                  const yearId = e.target.value ? parseInt(e.target.value) : undefined;
-                  setSelectedStudyYear(yearId);
-                  updateFilters({ studyYearId: yearId });
-                }}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Toutes les années</option>
-                <option value="1">1ère Année</option>
-                <option value="2">2ème Année</option>
-                <option value="3">3ème Année</option>
-                <option value="4">4ème Année</option>
-                <option value="5">5ème Année</option>
-              </select>
-            </div>
-            <div className="flex items-end">
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  resetFilters();
-                  setSelectedStudyYear(undefined);
-                }}
-                className="flex items-center gap-2 px-6 py-3"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Réinitialiser
-              </Button>
-            </div>
-            <div className="flex items-end">
-              <Button
-                variant="secondary"
-                onClick={loadQuizzes}
-                disabled={loading}
-                className="flex items-center gap-2 px-6 py-3"
-              >
-                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                Actualiser
-              </Button>
+
+          {/* Filters */}
+          <div className="p-6 border-b border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Année d'étude
+                </label>
+                <select
+                  value={selectedStudyYear || ''}
+                  onChange={(e) => {
+                    const yearId = e.target.value ? parseInt(e.target.value) : undefined;
+                    setSelectedStudyYear(yearId);
+                    updateFilters({ studyYearId: yearId });
+                  }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Toutes les années</option>
+                  <option value="1">1ère Année</option>
+                  <option value="2">2ème Année</option>
+                  <option value="3">3ème Année</option>
+                  <option value="4">4ème Année</option>
+                  <option value="5">5ème Année</option>
+                </select>
+              </div>
+              <div className="flex items-end">
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    resetFilters();
+                    setSelectedStudyYear(undefined);
+                  }}
+                  className="flex items-center gap-2 px-4 py-3"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Réinitialiser
+                </Button>
+              </div>
+              <div className="flex items-end">
+                <Button
+                  variant="secondary"
+                  onClick={loadQuizzes}
+                  disabled={loading}
+                  className="flex items-center gap-2 px-4 py-3"
+                >
+                  <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                  Actualiser
+                </Button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Content */}
-        {loading ? (
-          <div className="text-center py-16">
-            <div className="p-4 bg-blue-50 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-              <RefreshCw className="h-10 w-10 animate-spin text-blue-600" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Chargement des quiz</h3>
-            <p className="text-gray-600">Veuillez patienter...</p>
+        {/* Tab Content */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 min-h-[500px]">
+          <div className="p-6">
+            {activeTab === 'available' ? (
+              // Available Quizzes Tab
+              loading ? (
+                <div className="text-center py-16">
+                  <div className="p-4 bg-blue-50 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                    <RefreshCw className="h-10 w-10 animate-spin text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Chargement des quiz</h3>
+                  <p className="text-gray-600">Veuillez patienter...</p>
+                </div>
+              ) : modules.length === 0 ? (
+                <div className="text-center py-16">
+                  <div className="p-4 bg-gray-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                    <GraduationCap className="h-10 w-10 text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                    Aucun quiz disponible
+                  </h3>
+                  <p className="text-gray-600 max-w-md mx-auto">
+                    Il n'y a actuellement aucun quiz disponible pour votre année d'étude. 
+                    Vérifiez plus tard ou contactez votre enseignant.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {modules.map((module) => (
+                    <ModuleCard
+                      key={module.id}
+                      module={module}
+                      onStartQuiz={handleStartQuiz}
+                      getQuizStatusBadge={getQuizStatusBadge}
+                      formatDuration={formatDuration}
+                    />
+                  ))}
+                </div>
+              )
+            ) : (
+              // History Tab
+              <div className="text-center py-16">
+                <div className="p-4 bg-gray-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                  <History className="h-10 w-10 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                  Historique des quiz
+                </h3>
+                <p className="text-gray-600 max-w-md mx-auto">
+                  L'historique des quiz sera bientôt disponible.
+                </p>
+              </div>
+            )}
           </div>
-        ) : modules.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="p-4 bg-gray-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-              <GraduationCap className="h-10 w-10 text-gray-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">
-              Aucun quiz disponible
-            </h3>
-            <p className="text-gray-600 max-w-md mx-auto">
-              Il n'y a actuellement aucun quiz disponible pour votre année d'étude. 
-              Vérifiez plus tard ou contactez votre enseignant.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {modules.map((module) => (
-              <ModuleCard
-                key={module.id}
-                module={module}
-                isExpanded={expandedModules.has(module.id)}
-                onToggleExpansion={() => toggleModuleExpansion(module.id)}
-                onStartQuiz={handleStartQuiz}
-                getQuizStatusBadge={getQuizStatusBadge}
-                formatDuration={formatDuration}
-              />
-            ))}
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -276,8 +314,6 @@ export default function StudentQuizInterface() {
 // Module Card Component
 interface ModuleCardProps {
   module: ModuleWithQuizzes;
-  isExpanded: boolean;
-  onToggleExpansion: () => void;
   onStartQuiz: (quizId: number) => void;
   getQuizStatusBadge: (quiz: QuizItem) => React.ReactElement;
   formatDuration: (minutes?: number) => string;
@@ -285,8 +321,6 @@ interface ModuleCardProps {
 
 function ModuleCard({ 
   module, 
-  isExpanded, 
-  onToggleExpansion, 
   onStartQuiz, 
   getQuizStatusBadge, 
   formatDuration 
@@ -297,12 +331,9 @@ function ModuleCard({
   );
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+    <div className="bg-gray-50 rounded-xl border border-gray-200">
       {/* Module Header */}
-      <div 
-        className="p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
-        onClick={onToggleExpansion}
-      >
+      <div className="p-6 border-b border-gray-200 bg-white rounded-t-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="p-2 bg-blue-100 rounded-lg">
@@ -310,9 +341,6 @@ function ModuleCard({
             </div>
             <div>
               <h2 className="text-xl font-semibold text-gray-900">{module.name}</h2>
-              {module.description && (
-                <p className="text-sm text-gray-600 mt-1">{module.description}</p>
-              )}
               {module.studyYear && (
                 <div className="flex items-center gap-2 mt-2">
                   <GraduationCap className="h-4 w-4 text-gray-500" />
@@ -337,29 +365,22 @@ function ModuleCard({
                 {totalQuizzes > 0 ? Math.round((completedQuizzes / totalQuizzes) * 100) : 0}%
               </div>
             </div>
-            {isExpanded ? (
-              <ChevronDown className="h-5 w-5 text-gray-400" />
-            ) : (
-              <ChevronRight className="h-5 w-5 text-gray-400" />
-            )}
           </div>
         </div>
       </div>
 
       {/* Module Content */}
-      {isExpanded && (
-        <div className="border-t border-gray-200">
-          {module.lessons.map((lesson) => (
-            <LessonSection
-              key={lesson.id}
-              lesson={lesson}
-              onStartQuiz={onStartQuiz}
-              getQuizStatusBadge={getQuizStatusBadge}
-              formatDuration={formatDuration}
-            />
-          ))}
-        </div>
-      )}
+      <div className="p-6 space-y-4">
+        {module.lessons.map((lesson) => (
+          <LessonSection
+            key={lesson.id}
+            lesson={lesson}
+            onStartQuiz={onStartQuiz}
+            getQuizStatusBadge={getQuizStatusBadge}
+            formatDuration={formatDuration}
+          />
+        ))}
+      </div>
     </div>
   );
 }

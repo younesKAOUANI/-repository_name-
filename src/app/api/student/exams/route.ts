@@ -120,13 +120,13 @@ export async function GET(request: NextRequest) {
 
     // Apply filters
     if (moduleId) {
-      where.moduleId = parseInt(moduleId);
-      console.log('📚 Filtering by moduleId:', parseInt(moduleId));
+      where.moduleId = moduleId;
+      console.log('📚 Filtering by moduleId:', moduleId);
     }
 
     if (lessonId) {
-      where.lessonId = parseInt(lessonId);
-      console.log('📖 Filtering by lessonId:', parseInt(lessonId));
+      where.lessonId = lessonId;
+      console.log('📖 Filtering by lessonId:', lessonId);
     }
 
     if (studyYearId) {
@@ -136,7 +136,7 @@ export async function GET(request: NextRequest) {
           lesson: {
             module: {
               semester: {
-                studyYearId: parseInt(studyYearId)
+                studyYearId: studyYearId
               }
             }
           }
@@ -144,12 +144,12 @@ export async function GET(request: NextRequest) {
         {
           module: {
             semester: {
-              studyYearId: parseInt(studyYearId)
+              studyYearId: studyYearId
             }
           }
         }
       ];
-      console.log('🎓 Filtering by studyYearId:', parseInt(studyYearId));
+      console.log('🎓 Filtering by studyYearId:', studyYearId);
     }
 
     console.log('📋 Final where clause:', JSON.stringify(where, null, 2));

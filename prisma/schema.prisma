@@ -127,33 +127,37 @@ model VerificationToken {
 // ----------------------
 
 model StudyYear {
-  id         Int        @id @default(autoincrement())
-  name       String
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id        String     @id @default(cuid())
+  name      String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
-  semesters  Semester[]
-  licenses   LicenseStudyYear[]
+  semesters Semester[]
+  licenseStudyYears LicenseStudyYear[]
+
+  @@index([name])
 }
 
 model Semester {
-  id          Int        @id @default(autoincrement())
+  id          String     @id @default(cuid())
   name        String
-  studyYearId Int
+  studyYearId String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
   studyYear   StudyYear  @relation(fields: [studyYearId], references: [id], onDelete: Cascade)
   modules     Module[]
-  licenses    LicenseSemester[]
+  licenseSemesters LicenseSemester[]
 
   @@index([studyYearId])
+  @@index([name])
 }
 
 model Module {
-  id          Int        @id @default(autoincrement())
+  id          String     @id @default(cuid())
   name        String
-  semesterId  Int
+  description String?
+  semesterId  String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
@@ -167,12 +171,12 @@ model Module {
 }
 
 model Lesson {
-  id         Int        @id @default(autoincrement())
+  id         String     @id @default(cuid())
   title      String
   description String?
   content    String?
   order      Int        @default(0)
-  moduleId   Int
+  moduleId   String
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
@@ -188,9 +192,9 @@ model Lesson {
 }
 
 model LessonPDF {
-  id        Int     @id @default(autoincrement())
+  id        String  @id @default(cuid())
   url       String
-  lessonId  Int
+  lessonId  String
 
   lesson    Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
@@ -198,9 +202,9 @@ model LessonPDF {
 }
 
 model LessonVideo {
-  id        Int     @id @default(autoincrement())
+  id        String  @id @default(cuid())
   url       String
-  lessonId  Int
+  lessonId  String
 
   lesson    Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
@@ -212,11 +216,11 @@ model LessonVideo {
 // ----------------------
 
 model Quiz {
-  id           Int        @id @default(autoincrement())
+  id           String     @id @default(cuid())
   title        String
   description  String?    // optional description
-  lessonId     Int?       // nullable for EXAM or SESSION as needed
-  moduleId     Int?       // used for EXAMs at module level (optional)
+  lessonId     String?    // nullable for EXAM or SESSION as needed
+  moduleId     String?    // used for EXAMs at module level (optional)
   type         QuizType
   order        Int?       // sequence inside module/lesson (for ordered predefined quizzes)
   questionCount Int?      // for SESSION quizzes: how many questions to generate (15-50)
@@ -238,9 +242,9 @@ model Quiz {
 }
 
 model Question {
-  id           Int           @id @default(autoincrement())
+  id           String        @id @default(cuid())
   text         String
-  quizId       Int
+  quizId       String
   questionType QuestionType
   order        Int?
   createdAt    DateTime      @default(now())
@@ -255,11 +259,11 @@ model Question {
 
 // Question Bank for revision quizzes - standalone questions tagged to lessons/modules
 model QuestionBank {
-  id           Int           @id @default(autoincrement())
+  id           String        @id @default(cuid())
   text         String
   questionType QuestionType
-  lessonId     Int?          // Optional: question specific to a lesson
-  moduleId     Int?          // Optional: question specific to a module (broader scope)
+  lessonId     String?       // Optional: question specific to a lesson
+  moduleId     String?       // Optional: question specific to a module (broader scope)
   difficulty   String?       // Optional: EASY, MEDIUM, HARD
   explanation  String?       // Optional: explanation for the answer
   isActive     Boolean       @default(true)
@@ -277,10 +281,10 @@ model QuestionBank {
 }
 
 model QuestionBankOption {
-  id               Int          @id @default(autoincrement())
+  id               String       @id @default(cuid())
   text             String
   isCorrect        Boolean
-  questionBankId   Int
+  questionBankId   String
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
 
@@ -291,9 +295,9 @@ model QuestionBankOption {
 
 // Track which questions were used in generated revision quizzes
 model GeneratedQuizQuestion {
-  id               Int          @id @default(autoincrement())
-  quizId           Int
-  questionBankId   Int
+  id               String       @id @default(cuid())
+  quizId           String
+  questionBankId   String
   order            Int?
 
   quiz             Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
@@ -305,10 +309,10 @@ model GeneratedQuizQuestion {
 }
 
 model AnswerOption {
-  id         Int       @id @default(autoincrement())
+  id         String    @id @default(cuid())
   text       String
   isCorrect  Boolean
-  questionId Int
+  questionId String
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
@@ -319,9 +323,9 @@ model AnswerOption {
 }
 
 model QuizAttempt {
-  id         Int       @id @default(autoincrement())
+  id         String    @id @default(cuid())
   userId     String
-  quizId     Int
+  quizId     String
   startedAt  DateTime
   finishedAt DateTime?
   score      Decimal?  @db.Decimal(5, 2)
@@ -337,10 +341,10 @@ model QuizAttempt {
 }
 
 model QuizAttemptAnswer {
-  id                     Int      @id @default(autoincrement())
-  attemptId              Int
-  questionId             Int
-  selectedOptionId       Int?
+  id                     String   @id @default(cuid())
+  attemptId              String
+  questionId             String
+  selectedOptionId       String?
   isCorrect              Boolean
 
   attempt                QuizAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
@@ -353,9 +357,9 @@ model QuizAttemptAnswer {
 }
 
 model QuizProgress {
-  id        Int                @id @default(autoincrement())
+  id        String             @id @default(cuid())
   userId    String
-  quizId    Int
+  quizId    String
   status    QuizProgressStatus @default(NOT_STARTED)
   unlocked  Boolean            @default(false)
   updatedAt DateTime           @updatedAt
@@ -370,9 +374,9 @@ model QuizProgress {
 
 // Link lessons chosen for a generated SESSION quiz
 model SessionQuizLesson {
-  id       Int    @id @default(autoincrement())
-  quizId   Int
-  lessonId Int
+  id       String @id @default(cuid())
+  quizId   String
+  lessonId String
 
   quiz     Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
   lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
@@ -387,7 +391,7 @@ model SessionQuizLesson {
 // ----------------------
 
 model PlanType {
-  id       Int           @id @default(autoincrement())
+  id       String        @id @default(cuid())
   name     PlanTypeName
   duration Int           // in days
 
@@ -395,8 +399,8 @@ model PlanType {
 }
 
 model Plan {
-  id         Int        @id @default(autoincrement())
-  planTypeId Int
+  id         String     @id @default(cuid())
+  planTypeId String
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
@@ -407,9 +411,9 @@ model Plan {
 }
 
 model License {
-  id         Int        @id @default(autoincrement())
+  id         String     @id @default(cuid())
   userId     String
-  planId     Int
+  planId     String
   startDate  DateTime
   endDate    DateTime
   isActive   Boolean    @default(true)
@@ -430,9 +434,9 @@ model License {
 // NOTE: Enforce exclusivity in application/business logic.
 
 model LicenseStudyYear {
-  id          Int       @id @default(autoincrement())
-  licenseId   Int       @unique
-  studyYearId Int
+  id          String    @id @default(cuid())
+  licenseId   String    @unique
+  studyYearId String
 
   license     License   @relation(fields: [licenseId], references: [id], onDelete: Cascade)
   studyYear   StudyYear @relation(fields: [studyYearId], references: [id], onDelete: Cascade)
@@ -441,9 +445,9 @@ model LicenseStudyYear {
 }
 
 model LicenseSemester {
-  id          Int       @id @default(autoincrement())
-  licenseId   Int       @unique
-  semesterId  Int
+  id          String    @id @default(cuid())
+  licenseId   String    @unique
+  semesterId  String
 
   license     License   @relation(fields: [licenseId], references: [id], onDelete: Cascade)
   semester    Semester  @relation(fields: [semesterId], references: [id], onDelete: Cascade)
@@ -452,9 +456,9 @@ model LicenseSemester {
 }
 
 model LicenseModule {
-  id         Int      @id @default(autoincrement())
-  licenseId  Int      @unique
-  moduleId   Int
+  id         String   @id @default(cuid())
+  licenseId  String   @unique
+  moduleId   String
 
   license    License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
   module     Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)

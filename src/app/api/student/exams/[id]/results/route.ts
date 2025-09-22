@@ -9,7 +9,7 @@ export async function GET(
   const { id } = await params;
   try {
     const session = await requireRole(['STUDENT']);
-    const examId = parseInt(id);
+    const examId = id;
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -18,7 +18,7 @@ export async function GET(
       );
     }
 
-    if (isNaN(examId)) {
+    if (!examId) {
       return NextResponse.json(
         { message: 'ID d\'examen invalide' },
         { status: 400 }

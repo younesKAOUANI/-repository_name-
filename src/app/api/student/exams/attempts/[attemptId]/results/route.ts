@@ -20,7 +20,7 @@ export async function GET(
     // Get the specific attempt with all related data
     const attempt = await db.quizAttempt.findFirst({
       where: {
-        id: parseInt(attemptId),
+        id: attemptId,
         userId: session.user.id, // Ensure user can only access their own attempts
       },
       include: {

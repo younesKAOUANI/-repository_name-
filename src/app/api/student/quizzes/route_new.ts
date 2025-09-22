@@ -77,7 +77,7 @@ export async function GET(
         },
         attempts: {
           where: {
-            userId: session.user.id
+            studentId: session.user.id
           },
           orderBy: {
             createdAt: 'desc'

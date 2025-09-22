@@ -3,9 +3,9 @@ import { logger } from '@/lib/logger';
 import { PlanTypeName } from '@prisma/client';
 
 export interface LicenseData {
-  id: number;
+  id: string;
   userId: string;
-  planId: number;
+  planId: string;
   startDate: Date;
   endDate: Date;
   isActive: boolean;
@@ -18,9 +18,9 @@ export interface LicenseData {
     university: string | null;
   };
   plan: {
-    id: number;
+    id: string;
     planType: {
-      id: number;
+      id: string;
       name: PlanTypeName;
       duration: number;
     };
@@ -28,29 +28,29 @@ export interface LicenseData {
   // Scope-specific data
   yearScope?: {
     studyYear: {
-      id: number;
+      id: string;
       name: string;
     };
   };
   semScope?: {
     semester: {
-      id: number;
+      id: string;
       name: string;
       studyYear: {
-        id: number;
+        id: string;
         name: string;
       };
     };
   };
   modScope?: {
     module: {
-      id: number;
+      id: string;
       name: string;
       semester: {
-        id: number;
+        id: string;
         name: string;
         studyYear: {
-          id: number;
+          id: string;
           name: string;
         };
       };
@@ -63,9 +63,9 @@ export interface CreateLicenseData {
   planType: PlanTypeName;
   startDate?: Date;
   // Scope-specific fields (only one should be provided)
-  studyYearId?: number;
-  semesterId?: number;
-  moduleId?: number;
+  studyYearId?: string;
+  semesterId?: string;
+  moduleId?: string;
 }
 
 export interface LicenseFilters {
@@ -186,7 +186,7 @@ export class LicenseService {
   /**
    * Get license by ID with all relations
    */
-  async getLicenseById(id: number): Promise<LicenseData> {
+  async getLicenseById(id: string): Promise<LicenseData> {
     try {
       const license = await db.license.findUnique({
         where: { id },
@@ -368,7 +368,7 @@ export class LicenseService {
   /**
    * Update license status
    */
-  async updateLicenseStatus(id: number, isActive: boolean): Promise<LicenseData> {
+  async updateLicenseStatus(id: string, isActive: boolean): Promise<LicenseData> {
     try {
       logger.info('Updating license status', { id, isActive });
 
@@ -387,7 +387,7 @@ export class LicenseService {
   /**
    * Extend license duration
    */
-  async extendLicense(id: number, additionalDays: number): Promise<LicenseData> {
+  async extendLicense(id: string, additionalDays: number): Promise<LicenseData> {
     try {
       logger.info('Extending license', { id, additionalDays });
 
@@ -417,7 +417,7 @@ export class LicenseService {
   /**
    * Delete a license
    */
-  async deleteLicense(id: number): Promise<void> {
+  async deleteLicense(id: string): Promise<void> {
     try {
       logger.info('Deleting license', { id });
 
@@ -434,7 +434,7 @@ export class LicenseService {
   /**
    * Check if user has access to specific content
    */
-  async checkUserAccess(userId: string, resourceType: 'studyYear' | 'semester' | 'module', resourceId: number): Promise<boolean> {
+  async checkUserAccess(userId: string, resourceType: 'studyYear' | 'semester' | 'module', resourceId: string): Promise<boolean> {
     try {
       const now = new Date();
 

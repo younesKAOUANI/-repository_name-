@@ -30,11 +30,11 @@ export async function GET(request: NextRequest) {
     };
 
     if (moduleId) {
-      quizWhere.moduleId = parseInt(moduleId);
+      quizWhere.moduleId = moduleId;
     }
 
     if (lessonId) {
-      quizWhere.lessonId = parseInt(lessonId);
+      quizWhere.lessonId = lessonId;
     }
 
     if (studyYearId) {
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
           lesson: {
             module: {
               semester: {
-                studyYearId: parseInt(studyYearId)
+                studyYearId: studyYearId
               }
             }
           }
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
         {
           module: {
             semester: {
-              studyYearId: parseInt(studyYearId)
+              studyYearId: studyYearId
             }
           }
         }

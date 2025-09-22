@@ -12,11 +12,11 @@ export const metadata: Metadata = {
 };
 
 interface Props {
-  params: Promise<{ examId: string }>;
+  params: Promise<{ id: string }>;
 }
 
 export default async function StudentExamSessionPage({ params }: Props) {
-  const { examId } = await params;
+  const { id } = await params;
   
-  return <ExamSessionView examId={parseInt(examId)} />;
+  return <ExamSessionView examId={parseInt(id)} />;
 }

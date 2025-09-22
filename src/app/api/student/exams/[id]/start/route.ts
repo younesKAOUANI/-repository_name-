@@ -9,7 +9,7 @@ export async function POST(
   const { id } = await params;
   try {
     const session = await requireRole(['STUDENT']);
-    const examId = parseInt(id);
+    const examId = id;
 
     if (!session?.user?.id) {
       return NextResponse.json(
