@@ -525,6 +525,9 @@ async function main() {
   const oneYearLater = new Date(today.getTime() + 365 * 24 * 60 * 60 * 1000);
 
   for (const student of students) {
+    // Skip if student doesn't have a year assigned
+    if (!student.year) continue;
+    
     // Find the student's study year (index based on year number)
     const studentStudyYear = studyYears[student.year - 1]; // Array is 0-indexed, years start at 1
     
