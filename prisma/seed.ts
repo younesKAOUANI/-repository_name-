@@ -482,6 +482,78 @@ async function main() {
     }
   }
 
+  // 7. Create Plan Types and Student Licenses
+  console.log('\n🎫 Creating plan types and student licenses...');
+
+  // Create Plan Types
+  const annualPlanTypeId = createId();
+  const annualPlanType = await prisma.planType.upsert({
+    where: { id: annualPlanTypeId },
+    update: {},
+    create: {
+      id: annualPlanTypeId,
+      name: 'ANNUAL',
+      duration: 365, // 1 year in days
+    },
+  });
+
+  const semestrialPlanTypeId = createId();
+  const semestrialPlanType = await prisma.planType.upsert({
+    where: { id: semestrialPlanTypeId },
+    update: {},
+    create: {
+      id: semestrialPlanTypeId,
+      name: 'SEMESTRIAL',
+      duration: 180, // 6 months in days
+    },
+  });
+
+  console.log(`✅ Plan Types: ANNUAL (365 days), SEMESTRIAL (180 days)`);
+
+  // Create Plans
+  const annualPlan = await prisma.plan.create({
+    data: {
+      id: createId(),
+      planTypeId: annualPlanType.id,
+    },
+  });
+
+  console.log(`✅ Annual Plan created`);
+
+  // Create licenses for each student based on their study year
+  const today = new Date();
+  const oneYearLater = new Date(today.getTime() + 365 * 24 * 60 * 60 * 1000);
+
+  for (const student of students) {
+    // Find the student's study year (index based on year number)
+    const studentStudyYear = studyYears[student.year - 1]; // Array is 0-indexed, years start at 1
+    
+    if (studentStudyYear) {
+      // Create license for the student
+      const license = await prisma.license.create({
+        data: {
+          id: createId(),
+          userId: student.id,
+          planId: annualPlan.id,
+          startDate: today,
+          endDate: oneYearLater,
+          isActive: true,
+        },
+      });
+
+      // Create license study year scope (gives access to their year)
+      await prisma.licenseStudyYear.create({
+        data: {
+          id: createId(),
+          licenseId: license.id,
+          studyYearId: studentStudyYear.id,
+        },
+      });
+
+      console.log(`✅ License: ${student.name} - Access to ${studentStudyYear.name} (${today.toLocaleDateString()} to ${oneYearLater.toLocaleDateString()})`);
+    }
+  }
+
   // Summary
   console.log('\n🎉 Comprehensive database seeding completed!');
   console.log('\n📊 Database Summary:');
@@ -493,6 +565,7 @@ async function main() {
   console.log(`📝 Lessons: ${lessons.length}`);
   console.log(`❓ Question Bank: ${questionBank.length} questions`);
   console.log(`🧭 Quizzes/Exams: ${quizzes.length} (lessons + exams + session)`);
+  console.log(`🎫 Student Licenses: ${students.length} (Annual - Study Year Access)`);
   console.log('\n🔑 Test Account Credentials:');
   console.log('==========================================');
   console.log('Password for all accounts: "password123"');

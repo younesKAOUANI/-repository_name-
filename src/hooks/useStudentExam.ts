@@ -22,7 +22,7 @@ interface UseStudentExamState {
   // Current exam session
   currentSession: ExamSession | null;
   currentExam: StudentExam | null;
-  currentExamId: number | null;
+  currentExamId: string | null;
   currentAnswers: ExamAnswer[];
   timeRemaining: number; // in seconds
   
@@ -45,16 +45,16 @@ interface UseStudentExamActions {
   loadExamHistory: () => Promise<void>;
   
   // Exam session management
-  startExam: (examId: number) => Promise<void>;
+  startExam: (examId: string) => Promise<void>;
   startTimer: () => void;
   submitExam: () => Promise<void>;
   
   // Answer management
-  updateAnswer: (questionId: number, selectedOptions: number[], textAnswer?: string) => void;
-  clearAnswer: (questionId: number) => void;
+  updateAnswer: (questionId: string, selectedOptions: string[], textAnswer?: string) => void;
+  clearAnswer: (questionId: string) => void;
   
   // Results
-  loadExamResult: (resultId: number) => Promise<void>;
+    loadExamResult: (examId: string) => Promise<void>;
   
   // Filters
   updateFilters: (newFilters: Partial<ExamFilters>) => void;
@@ -161,7 +161,7 @@ export function useStudentExam(): UseStudentExamReturn {
   }, [state.filters]);
 
   // Start an exam
-  const startExam = useCallback(async (examId: number) => {
+  const startExam = useCallback(async (examId: string) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     try {
       // Find the exam in available exams
@@ -234,7 +234,7 @@ export function useStudentExam(): UseStudentExamReturn {
   }, [state.currentSession, state.currentExamId, state.currentAnswers]);
 
   // Update answer
-  const updateAnswer = useCallback((questionId: number, selectedOptions: number[], textAnswer?: string) => {
+  const updateAnswer = useCallback((questionId: string, selectedOptions: string[], textAnswer?: string) => {
     setState(prev => {
       const existingAnswerIndex = prev.currentAnswers.findIndex(a => a.questionId === questionId);
       const newAnswer: ExamAnswer = {
@@ -258,7 +258,7 @@ export function useStudentExam(): UseStudentExamReturn {
   }, []);
 
   // Clear answer
-  const clearAnswer = useCallback((questionId: number) => {
+  const clearAnswer = useCallback((questionId: string) => {
     setState(prev => ({
       ...prev,
       currentAnswers: prev.currentAnswers.filter(a => a.questionId !== questionId),
@@ -266,11 +266,11 @@ export function useStudentExam(): UseStudentExamReturn {
   }, []);
 
   // Load exam result
-  const loadExamResult = useCallback(async (resultId: number) => {
+  const loadExamResult = useCallback(async (examId: string) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     try {
-      const results = await studentExamService.getExamResults(resultId);
-      // getExamResults returns an array, we take the first result
+      const results = await studentExamService.getExamResults(examId);
+      // getExamResults returns an array, we take the first result (most recent)
       const result = results[0];
       setState(prev => ({
         ...prev,

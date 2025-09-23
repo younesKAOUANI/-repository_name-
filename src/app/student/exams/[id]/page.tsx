@@ -18,5 +18,5 @@ interface Props {
 export default async function StudentExamSessionPage({ params }: Props) {
   const { id } = await params;
   
-  return <ExamSessionView examId={parseInt(id)} />;
+  return <ExamSessionView examId={id} />;
 }

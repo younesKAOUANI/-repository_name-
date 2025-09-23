@@ -51,7 +51,7 @@ export default function StudentExamInterface() {
   } = useStudentExam();
 
   const [activeTab, setActiveTab] = useState<'available' | 'history'>('available');
-  const [selectedStudyYear, setSelectedStudyYear] = useState<number | undefined>();
+  const [selectedStudyYear, setSelectedStudyYear] = useState<string | undefined>();
 
   // Load data on component mount
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function StudentExamInterface() {
     return <ExamResultView onBack={resetSession} />;
   }
 
-    const handleStartExam = async (examId: number) => {
+  const handleStartExam = async (examId: string) => {
     try {
       // Navigate to the exam session page
       router.push(`/student/exams/${examId}`);
@@ -206,18 +206,19 @@ export default function StudentExamInterface() {
               <select
                 value={selectedStudyYear || ''}
                 onChange={(e) => {
-                  const yearId = e.target.value ? parseInt(e.target.value) : undefined;
+                  const yearId = e.target.value || undefined;
                   setSelectedStudyYear(yearId);
                   updateFilters({ studyYearId: yearId });
                 }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Toutes les années</option>
-                <option value="1">1ère Année</option>
-                <option value="2">2ème Année</option>
-                <option value="3">3ème Année</option>
-                <option value="4">4ème Année</option>
-                <option value="5">5ème Année</option>
+                <option value="year-1">1ère Année</option>
+                <option value="year-2">2ème Année</option>
+                <option value="year-3">3ème Année</option>
+                <option value="year-4">4ème Année</option>
+                <option value="year-5">5ème Année</option>
+                <option value="year-6">6ème Année</option>
               </select>
             </div>
             <div className="flex items-end">

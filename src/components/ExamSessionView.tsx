@@ -26,7 +26,7 @@ import { ExamQuestion, ExamAnswer } from '@/services/student-exam.service';
 import ExamResultView from '@/components/ExamResultView';
 
 interface Props {
-  examId?: number;
+  examId?: string;
 }
 
 export default function ExamSessionView({ examId }: Props) {
@@ -208,7 +208,7 @@ export default function ExamSessionView({ examId }: Props) {
   const totalQuestions = currentSession.questions.length;
   const answeredCount = currentAnswers.length;
 
-  const handleAnswerChange = (questionId: number, selectedOptions: number[], textAnswer?: string) => {
+  const handleAnswerChange = (questionId: string, selectedOptions: string[], textAnswer?: string) => {
     updateAnswer(questionId, selectedOptions, textAnswer);
   };
 
@@ -452,15 +452,15 @@ export default function ExamSessionView({ examId }: Props) {
 interface QuestionAnswerInputProps {
   question: ExamQuestion;
   currentAnswer?: ExamAnswer;
-  onAnswerChange: (questionId: number, selectedOptions: number[], textAnswer?: string) => void;
+  onAnswerChange: (questionId: string, selectedOptions: string[], textAnswer?: string) => void;
 }
 
 function QuestionAnswerInput({ question, currentAnswer, onAnswerChange }: QuestionAnswerInputProps) {
   const selectedOptions = currentAnswer?.selectedOptionIds || [];
   const textAnswer = currentAnswer?.textAnswer || '';
 
-  const handleOptionToggle = (optionId: number) => {
-    let newSelectedOptions: number[];
+  const handleOptionToggle = (optionId: string) => {
+    let newSelectedOptions: string[];
 
     if (question.questionType === 'QCS') {
       // Single choice - replace selection
@@ -468,7 +468,7 @@ function QuestionAnswerInput({ question, currentAnswer, onAnswerChange }: Questi
     } else {
       // Multiple choice - toggle selection
       if (selectedOptions.includes(optionId)) {
-        newSelectedOptions = selectedOptions.filter((id: number) => id !== optionId);
+        newSelectedOptions = selectedOptions.filter((id: string) => id !== optionId);
       } else {
         newSelectedOptions = [...selectedOptions, optionId];
       }

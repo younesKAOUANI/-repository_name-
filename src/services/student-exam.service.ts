@@ -4,7 +4,7 @@
  */
 
 export interface StudentExam {
-  id: number;
+  id: string;
   title: string;
   description?: string;
   timeLimit?: number;
@@ -17,22 +17,22 @@ export interface StudentExam {
   completedAt?: string;
   createdAt: string;
   studyYear?: {
-    id: number;
+    id: string;
     name: string;
   };
   module?: {
-    id: number;
+    id: string;
     name: string;
   };
   lesson?: {
-    id: number;
+    id: string;
     title: string;
   };
 }
 
 export interface ExamHistory {
-  id: number;              // Quiz ID
-  attemptId: number;       // Specific attempt ID (from QuizAttempt)
+  id: string;              // Quiz ID
+  attemptId: string;       // Specific attempt ID (from QuizAttempt)
   title: string;
   description?: string;
   timeLimit?: number;
@@ -45,44 +45,44 @@ export interface ExamHistory {
   completedAt: string;     // When this attempt was completed
   createdAt: string;       // When the quiz was created
   studyYear?: {
-    id: number;
+    id: string;
     name: string;
   };
   module?: {
-    id: number;
+    id: string;
     name: string;
   };
   lesson?: {
-    id: number;
+    id: string;
     title: string;
   };
 }
 
 export interface ExamQuestion {
-  id: number;
+  id: string;
   text: string;
   questionType: string;
   options: {
-    id: number;
+    id: string;
     text: string;
   }[];
 }
 
 export interface ExamSession {
-  attemptId: number;
+  attemptId: string;
   startedAt: string;
   timeLimit?: number; // in minutes
   questions: ExamQuestion[];
 }
 
 export interface ExamAnswer {
-  questionId: number;
-  selectedOptionIds: number[];
+  questionId: string;
+  selectedOptionIds: string[];
   textAnswer?: string;
 }
 
 export interface QuestionResult {
-  questionId: number;
+  questionId: string;
   questionText: string;
   questionType: string;
   userAnswer: string[];
@@ -94,8 +94,8 @@ export interface QuestionResult {
 }
 
 export interface ExamResult {
-  id: number;
-  examId: number;
+  id: string;
+  examId: string;
   title: string;
   score: number;
   maxScore: number;
@@ -106,9 +106,9 @@ export interface ExamResult {
 }
 
 export interface ExamFilters {
-  moduleId?: number;
-  lessonId?: number;
-  studyYearId?: number;
+  moduleId?: string;
+  lessonId?: string;
+  studyYearId?: string;
   isCompleted?: boolean;
 }
 
@@ -137,7 +137,7 @@ class StudentExamService {
   /**
    * Start an exam session
    */
-  async startExam(examId: number): Promise<ExamSession> {
+  async startExam(examId: string): Promise<ExamSession> {
     const response = await fetch(`${this.baseUrl}/${examId}/start`, {
       method: 'POST',
       headers: {
@@ -155,7 +155,7 @@ class StudentExamService {
   /**
    * Submit exam answers
    */
-  async submitExam(examId: number, attemptId: number, answers: ExamAnswer[]): Promise<ExamResult> {
+  async submitExam(examId: string, attemptId: string, answers: ExamAnswer[]): Promise<ExamResult> {
     const response = await fetch(`${this.baseUrl}/${examId}/submit`, {
       method: 'POST',
       headers: {
@@ -195,8 +195,8 @@ class StudentExamService {
   /**
    * Get exam results/history
    */
-  async getExamResults(attemptId?: number): Promise<any[]> {
-    const url = attemptId ? `${this.baseUrl}/results/${attemptId}` : `${this.baseUrl}/results`;
+  async getExamResults(examId: string): Promise<ExamResult[]> {
+    const url = `${this.baseUrl}/${examId}/results`;
     const response = await fetch(url);
     
     if (!response.ok) {
