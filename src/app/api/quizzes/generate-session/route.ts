@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     // Validate question count
     if (!questionCount || questionCount < 15 || questionCount > 50) {
       return NextResponse.json(
-        { error: 'Question count must be between 15 and 50' },
+        { error: 'Le nombre de questions doit être entre 15 et 50' },
         { status: 400 }
       );
     }
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     if (lessonIds.length === 0) {
       return NextResponse.json(
-        { error: 'No lessons found for the selected criteria' },
+        { error: 'Aucune leçon trouvée pour les critères sélectionnés' },
         { status: 400 }
       );
     }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     if (allQuestions.length === 0) {
       return NextResponse.json(
-        { error: 'No questions found in the selected lessons' },
+        { error: 'Aucune question trouvée dans les leçons sélectionnées' },
         { status: 400 }
       );
     }
@@ -90,9 +90,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(selectedQuestions);
   } catch (error) {
-    console.error('Error generating session quiz:', error);
+    console.error('Erreur lors de la génération du quiz de session:', error);
     return NextResponse.json(
-      { error: 'Failed to generate session quiz' },
+      { error: 'Échec de la génération du quiz de session' },
       { status: 500 }
     );
   }

@@ -1,288 +1,192 @@
+// app/api/exams/route.ts (Next.js /app router) OR pages/api/exams.ts (adapt export if using pages)
+// Lightweight exam list endpoint — optimized for high concurrent read traffic
+
 import { NextRequest, NextResponse } from 'next/server';
-import { requireRole } from '@/lib/auth-utils';
+import { requireRole, getStudentAccessibleModules } from '@/lib/auth-utils';
 import { db } from '@/lib/db';
+
+// Simple in-memory cache for accessible modules per-user (TTL in ms)
+const accessibleModulesCache = new Map<string, { ts: number; data: any[] }>();
+const CACHE_TTL = 60_000; // 60s
+
+async function cachedGetStudentAccessibleModules(userId: string) {
+  const entry = accessibleModulesCache.get(userId);
+  const now = Date.now();
+  if (entry && now - entry.ts < CACHE_TTL) {
+    return entry.data;
+  }
+
+  const modules = await getStudentAccessibleModules(userId);
+  accessibleModulesCache.set(userId, { ts: now, data: modules });
+  return modules;
+}
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('Student exams API called');
-    
-    // For testing, let's make this more permissive
+    // authorize (will throw if role not allowed)
     const session = await requireRole(['STUDENT', 'INSTRUCTOR', 'ADMIN']);
-    console.log('Session obtained:', session?.user?.id, session?.user?.role);
-    
-    const { searchParams } = new URL(request.url);
-    
-    const moduleId = searchParams.get('moduleId');
-    const lessonId = searchParams.get('lessonId');
-    const isCompleted = searchParams.get('isCompleted');
-    const studyYearId = searchParams.get('studyYearId');
-
     if (!session?.user?.id) {
-      console.log('No user ID in session');
-      return NextResponse.json(
-        { message: 'User ID not found in session' },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: 'ID utilisateur non trouvé dans la session' }, { status: 400 });
     }
 
-    // Get student with licenses
-    console.log('🔍 Fetching student data for user ID:', session.user.id);
-    
-    const student = await db.user.findUnique({
-      where: { id: session.user.id },
-      include: {
-        licenses: {
-          where: {
-            isActive: true,
-            endDate: { gt: new Date() }
-          },
-          include: {
-            yearScope: {
-              include: {
-                studyYear: true
-              }
-            },
-            plan: true
-          }
+    const url = new URL(request.url);
+    const moduleId = url.searchParams.get('moduleId') ?? undefined;
+    const lessonId = url.searchParams.get('lessonId') ?? undefined;
+    const isCompletedParam = url.searchParams.get('isCompleted') ?? undefined;
+    const studyYearId = url.searchParams.get('studyYearId') ?? undefined;
+
+    // Fetch accessible modules (cached)
+    const accessibleModules = await cachedGetStudentAccessibleModules(session.user.id);
+    const accessibleModuleIds = accessibleModules.map(m => m.id);
+
+    if (accessibleModuleIds.length === 0) {
+      // return early with no results
+      return NextResponse.json(
+        [],
+        {
+          status: 200,
+          headers: { 'Cache-Control': 'public, max-age=30, stale-while-revalidate=60' }
         }
+      );
+    }
+
+    // If studyYearId filter requested — restrict accessible modules to that study year
+    let filteredModuleIds = accessibleModuleIds;
+    if (studyYearId) {
+      const allowedForYear = accessibleModules
+        .filter(m => m.semester?.studyYearId === studyYearId)
+        .map(m => m.id);
+      if (allowedForYear.length === 0) {
+        return NextResponse.json([], { status: 200 });
       }
-    });
-
-    console.log('📊 Student query result:', {
-      found: !!student,
-      studentId: student?.id,
-      studentName: student?.name,
-      studentRole: student?.role,
-      studentYear: student?.year,
-      studentUniversity: student?.university,
-      licensesCount: student?.licenses?.length || 0
-    });
-
-    if (!student) {
-      console.log('❌ Student not found in database');
-      return NextResponse.json(
-        { message: 'Student not found' },
-        { status: 404 }
-      );
+      filteredModuleIds = allowedForYear;
     }
 
-    // Detailed license inspection
-    console.log('🔐 License inspection:');
-    console.log('Current date:', new Date().toISOString());
-    
-    student.licenses.forEach((license, index) => {
-      console.log(`📜 License ${index + 1}:`, {
-        id: license.id,
-        planId: license.planId,
-        startDate: license.startDate,
-        endDate: license.endDate,
-        isActive: license.isActive,
-        isExpired: license.endDate <= new Date(),
-        plan: license.plan ? {
-          id: license.plan.id,
-          planTypeId: license.plan.planTypeId,
-          createdAt: license.plan.createdAt
-        } : null,
-        yearScope: license.yearScope ? {
-          id: license.yearScope.id,
-          studyYearId: license.yearScope.studyYearId,
-          studyYear: license.yearScope.studyYear ? {
-            id: license.yearScope.studyYear.id,
-            name: license.yearScope.studyYear.name
-          } : null
-        } : null
-      });
-    });
-
-    // For now, let's be permissive with licenses for testing
-    // In production, you'd want to enforce license validation
-    console.log('📈 Total valid licenses found:', student.licenses.length);
-    
-    if (student.licenses.length === 0) {
-      console.log('⚠️ No valid licenses found - returning 403');
-      return NextResponse.json(
-        { message: 'No valid license found. Please contact administration to activate your license.' },
-        { status: 403 }
-      );
+    // If moduleId filter was provided, ensure it's accessible
+    if (moduleId) {
+      if (!filteredModuleIds.includes(moduleId)) {
+        return NextResponse.json([], { status: 200 });
+      }
+      // restrict to just that module
+      filteredModuleIds = [moduleId];
     }
 
-    // Build where clause for exams
-    console.log('🎯 Building exam query with filters:', {
-      moduleId,
-      lessonId,
-      isCompleted,
-      studyYearId
-    });
-
+    // Build where clause for quizzes: type is QUIZ or EXAM, and either moduleId in filtered set OR lesson.moduleId in filtered set
     const where: any = {
       type: { in: ['QUIZ', 'EXAM'] },
+      OR: [
+        { moduleId: { in: filteredModuleIds } },
+        { lesson: { moduleId: { in: filteredModuleIds } } }
+      ]
     };
 
-    // Apply filters
-    if (moduleId) {
-      where.moduleId = moduleId;
-      console.log('📚 Filtering by moduleId:', moduleId);
-    }
-
+    // If lessonId provided — ensure it's inside an accessible module and filter
     if (lessonId) {
-      where.lessonId = lessonId;
-      console.log('📖 Filtering by lessonId:', lessonId);
-    }
+      // quick DB check to confirm lesson belongs to an allowed module (avoid exposing other lessons)
+      const lesson = await db.lesson.findUnique({
+        where: { id: lessonId },
+        select: { id: true, moduleId: true }
+      });
 
-    if (studyYearId) {
-      // Filter by specific study year if provided
+      if (!lesson || !filteredModuleIds.includes(lesson.moduleId)) {
+        return NextResponse.json([], { status: 200 });
+      }
+
+      // require quizzes to be either attached to that lesson OR have lessonId equal
       where.OR = [
-        { 
-          lesson: {
-            module: {
-              semester: {
-                studyYearId: studyYearId
-              }
-            }
-          }
-        },
-        {
-          module: {
-            semester: {
-              studyYearId: studyYearId
-            }
-          }
-        }
+        { lessonId: lessonId },
+        // still allow module-level quizzes for the module containing the lesson
+        { moduleId: lesson.moduleId }
       ];
-      console.log('🎓 Filtering by studyYearId:', studyYearId);
     }
 
-    console.log('📋 Final where clause:', JSON.stringify(where, null, 2));
-
-    // Get exams
-    console.log('🔍 Executing exam query...');
-    
+    // Query: lightweight projection (no full question/options load)
     const exams = await db.quiz.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        timeLimit: true,
+        questionCount: true,
+        createdAt: true,
+        moduleId: true,
+        lessonId: true,
+        // counts instead of loading questions rows
+        _count: {
+          select: { questions: true }
+        },
+        // minimal module & lesson info for display
         module: {
-          include: {
-            semester: {
-              include: {
-                studyYear: true
-              }
-            }
+          select: {
+            id: true,
+            name: true,
+            semester: { select: { studyYear: { select: { id: true, name: true } }, studyYearId: true } }
           }
         },
         lesson: {
-          include: {
+          select: {
+            id: true,
+            title: true,
             module: {
-              include: {
-                semester: {
-                  include: {
-                    studyYear: true
-                  }
-                }
+              select: {
+                id: true,
+                name: true,
+                semester: { select: { studyYear: { select: { id: true, name: true } }, studyYearId: true } }
               }
             }
           }
         },
-        questions: {
-          include: {
-            options: true
-          }
-        },
-        // Get student's attempts for this exam
+        // only the latest attempt for this user
         attempts: {
-          where: {
-            userId: session.user.id
-          },
-          orderBy: {
-            createdAt: 'desc'
-          }
+          where: { userId: session.user.id },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          select: { id: true, startedAt: true, finishedAt: true, score: true, createdAt: true }
         }
       },
       orderBy: { createdAt: 'desc' }
     });
 
-    console.log(`📊 Found ${exams.length} exams`);
-    
-    exams.forEach((exam, index) => {
-      console.log(`📝 Exam ${index + 1}:`, {
-        id: exam.id,
-        title: exam.title,
-        type: exam.type,
-        questionsCount: exam.questions.length,
-        attemptsCount: exam.attempts.length,
-        module: exam.module ? {
-          id: exam.module.id,
-          name: exam.module.name,
-          studyYear: exam.module.semester?.studyYear ? {
-            id: exam.module.semester.studyYear.id,
-            name: exam.module.semester.studyYear.name
-          } : null
-        } : null,
-        lesson: exam.lesson ? {
-          id: exam.lesson.id,
-          title: exam.lesson.title,
-          moduleStudyYear: exam.lesson.module?.semester?.studyYear ? {
-            id: exam.lesson.module.semester.studyYear.id,
-            name: exam.lesson.module.semester.studyYear.name
-          } : null
-        } : null,
-        latestAttempt: exam.attempts[0] ? {
-          id: exam.attempts[0].id,
-          startedAt: exam.attempts[0].startedAt,
-          finishedAt: exam.attempts[0].finishedAt,
-          score: exam.attempts[0].score
-        } : null
-      });
-    });
-
-    // Transform exams for student view
-    console.log('🔄 Transforming exams for student view...');
-    
-    const studentExams = exams.map((exam, index) => {
+    // Map exams to UI-friendly structure (compute question count from _count or questionCount if provided)
+    const studentExams = exams.map(exam => {
       const latestAttempt = exam.attempts[0];
-      const hasCompleted = latestAttempt && latestAttempt.finishedAt !== null;
-      
-      console.log(`🔄 Processing exam ${index + 1} (ID: ${exam.id}):`, {
-        title: exam.title,
-        hasLatestAttempt: !!latestAttempt,
-        attemptFinishedAt: latestAttempt?.finishedAt,
-        hasCompleted,
-        rawScore: latestAttempt?.score
-      });
-      
-      // Calculate score if completed
-      let score = 0;
-      const maxScore = exam.questions.length;
-      let percentage = 0;
+      const hasCompleted = !!(latestAttempt && latestAttempt.finishedAt);
+      const maxScore = (exam._count?.questions ?? exam.questionCount ?? 0);
+      let score: number | undefined = undefined;
+      let percentage: number | undefined = undefined;
 
-      if (hasCompleted && latestAttempt?.score) {
-        score = Number(latestAttempt.score);
-        percentage = maxScore > 0 ? (score / maxScore) * 100 : 0;
-        console.log(`📊 Score calculation for exam ${exam.id}:`, {
-          rawScore: latestAttempt.score,
-          convertedScore: score,
-          maxScore,
-          percentage
-        });
+      if (hasCompleted && latestAttempt?.score != null) {
+        // Prisma Decimal -> string | number
+        const scoreNumber = typeof latestAttempt.score === 'string' ? parseFloat(latestAttempt.score) : Number(latestAttempt.score);
+        score = Number.isFinite(scoreNumber) ? scoreNumber : undefined;
+        percentage = maxScore > 0 && score != null ? (score / maxScore) * 100 : 0;
       }
 
-      // Determine study year from module or lesson
-      let studyYear = null;
+      // derive studyYear from lesson.module OR module
+      let studyYear: { id: string; name: string } | undefined = undefined;
       if (exam.lesson?.module?.semester?.studyYear) {
-        studyYear = exam.lesson.module.semester.studyYear;
-        console.log(`🎓 Study year from lesson->module for exam ${exam.id}:`, studyYear);
+        studyYear = {
+          id: exam.lesson.module.semester.studyYear.id,
+          name: exam.lesson.module.semester.studyYear.name
+        };
       } else if (exam.module?.semester?.studyYear) {
-        studyYear = exam.module.semester.studyYear;
-        console.log(`🎓 Study year from module for exam ${exam.id}:`, studyYear);
-      } else {
-        console.log(`⚠️ No study year found for exam ${exam.id}`);
+        studyYear = {
+          id: exam.module.semester.studyYear.id,
+          name: exam.module.semester.studyYear.name
+        };
       }
+
+      const module = exam.module ? { id: exam.module.id, name: exam.module.name } :
+                     exam.lesson?.module ? { id: exam.lesson.module.id, name: exam.lesson.module.name } :
+                     undefined;
 
       return {
         id: exam.id,
         title: exam.title,
         description: exam.description,
         timeLimit: exam.timeLimit,
-        questionsCount: exam.questions.length,
+        questionsCount: maxScore,
         isCompleted: hasCompleted,
         score: hasCompleted ? score : undefined,
         maxScore,
@@ -290,68 +194,29 @@ export async function GET(request: NextRequest) {
         startedAt: latestAttempt?.startedAt,
         completedAt: latestAttempt?.finishedAt,
         createdAt: exam.createdAt,
-        studyYear: studyYear ? {
-          id: studyYear.id,
-          name: studyYear.name
-        } : undefined,
-        module: exam.module ? {
-          id: exam.module.id,
-          name: exam.module.name
-        } : exam.lesson?.module ? {
-          id: exam.lesson.module.id,
-          name: exam.lesson.module.name
-        } : undefined,
-        lesson: exam.lesson ? {
-          id: exam.lesson.id,
-          title: exam.lesson.title
-        } : undefined
+        studyYear,
+        module,
+        lesson: exam.lesson ? { id: exam.lesson.id, title: exam.lesson.title } : undefined
       };
     });
 
-    // Filter by completion status if requested
-    console.log('🔍 Applying completion filter:', {
-      isCompletedParam: isCompleted,
-      shouldFilter: isCompleted !== null && isCompleted !== undefined,
-      filterValue: isCompleted === 'true'
-    });
-    
-    const filteredExams = (isCompleted !== null && isCompleted !== undefined)
-      ? studentExams.filter(exam => {
-          const matches = exam.isCompleted === (isCompleted === 'true');
-          console.log(`📋 Exam ${exam.id} completion filter:`, {
-            examCompleted: exam.isCompleted,
-            filterValue: isCompleted === 'true',
-            matches
-          });
-          return matches;
-        })
+    // Optionally filter by completion status param
+    const filteredExams = (isCompletedParam !== undefined && isCompletedParam !== null)
+      ? studentExams.filter(e => e.isCompleted === (isCompletedParam === 'true'))
       : studentExams;
 
-    console.log(`✅ Returning ${filteredExams.length} exams after filtering`);
-    console.log('📤 Final response summary:', filteredExams.map(exam => ({
-      id: exam.id,
-      title: exam.title,
-      isCompleted: exam.isCompleted,
-      studyYear: exam.studyYear?.name,
-      module: exam.module?.name,
-      lesson: exam.lesson?.title
-    })));
 
-    return NextResponse.json(filteredExams);
-  } catch (error) {
-    console.error('❌ Error fetching student exams:', error);
-    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-    console.error('❌ Error details:', {
-      name: error instanceof Error ? error.name : 'Unknown',
-      message: error instanceof Error ? error.message : String(error),
-      cause: error instanceof Error ? error.cause : undefined
-    });
-    
     return NextResponse.json(
-      { 
-        message: 'Failed to fetch exams',
-        error: error instanceof Error ? error.message : String(error)
-      },
+      filteredExams,
+      {
+        status: 200,
+        headers: { 'Cache-Control': 'public, max-age=30, stale-while-revalidate=60' }
+      }
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json(
+      { message: 'Échec du chargement des examens', error: message },
       { status: 500 }
     );
   }

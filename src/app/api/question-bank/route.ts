@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get('pageSize') || '10');
     const search = searchParams.get('search') || '';
     const questionType = searchParams.get('questionType') as QuestionType;
+    const studyYearId = searchParams.get('studyYearId');
     const moduleId = searchParams.get('moduleId');
     const lessonId = searchParams.get('lessonId');
     const difficulty = searchParams.get('difficulty');
@@ -30,6 +31,11 @@ export async function GET(request: NextRequest) {
     // Question type filter
     if (questionType) {
       where.questionType = questionType;
+    }
+
+    // Study year filter
+    if (studyYearId) {
+      where.studyYearId = studyYearId;
     }
 
     // Module filter
@@ -99,9 +105,9 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching question bank:', error);
+    console.error('Erreur lors de la récupération de la banque de questions:', error);
     return NextResponse.json(
-      { message: 'Failed to fetch question bank items' },
+      { error: 'Échec de la récupération des éléments de la banque de questions' },
       { status: 500 }
     );
   }
@@ -112,12 +118,12 @@ export async function POST(request: NextRequest) {
     await requireRole(['ADMIN', 'INSTRUCTOR']);
 
     const body = await request.json();
-    const { text, questionType, lessonId, moduleId, difficulty, explanation, options } = body;
+    const { text, questionType, studyYearId, lessonId, moduleId, difficulty, explanation, options } = body;
 
     // Validation
     if (!text || !questionType || !options || options.length < 2) {
       return NextResponse.json(
-        { message: 'Question text, type, and at least 2 options are required' },
+        { error: 'Le texte de la question, le type et au moins 2 options sont requis' },
         { status: 400 }
       );
     }
@@ -126,7 +132,7 @@ export async function POST(request: NextRequest) {
     const correctOptions = options.filter((opt: any) => opt.isCorrect);
     if (correctOptions.length === 0) {
       return NextResponse.json(
-        { message: 'At least one option must be marked as correct' },
+        { error: 'Au moins une option doit être marquée comme correcte' },
         { status: 400 }
       );
     }
@@ -136,6 +142,7 @@ export async function POST(request: NextRequest) {
       data: {
         text,
         questionType,
+        studyYearId: studyYearId || null,
         lessonId: lessonId || null,
         moduleId: moduleId || null,
         difficulty: difficulty || null,
@@ -176,9 +183,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(question, { status: 201 });
   } catch (error) {
-    console.error('Error creating question bank item:', error);
+    console.error('Erreur lors de la création de la question:', error);
     return NextResponse.json(
-      { message: 'Failed to create question bank item' },
+      { error: 'Échec de la création de la question' },
       { status: 500 }
     );
   }

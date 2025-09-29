@@ -134,6 +134,7 @@ model StudyYear {
 
   semesters Semester[]
   licenseStudyYears LicenseStudyYear[]
+  questionBank QuestionBank[]
 
   @@index([name])
 }
@@ -262,6 +263,7 @@ model QuestionBank {
   id           String        @id @default(cuid())
   text         String
   questionType QuestionType
+  studyYearId  String?       // Optional: question specific to a study year
   lessonId     String?       // Optional: question specific to a lesson
   moduleId     String?       // Optional: question specific to a module (broader scope)
   difficulty   String?       // Optional: EASY, MEDIUM, HARD
@@ -270,11 +272,13 @@ model QuestionBank {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
+  studyYear    StudyYear?    @relation(fields: [studyYearId], references: [id], onDelete: SetNull)
   lesson       Lesson?       @relation(fields: [lessonId], references: [id], onDelete: SetNull)
   module       Module?       @relation(fields: [moduleId], references: [id], onDelete: SetNull)
   options      QuestionBankOption[]
   usedInQuizzes GeneratedQuizQuestion[]
 
+  @@index([studyYearId])
   @@index([lessonId])
   @@index([moduleId])
   @@index([isActive])

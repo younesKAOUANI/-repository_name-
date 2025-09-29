@@ -4,7 +4,7 @@
  */
 
 export interface QuizItem {
-  id: number;
+  id: string;
   title: string;
   description?: string;
   timeLimit?: number;
@@ -16,10 +16,12 @@ export interface QuizItem {
   percentage: number;
   completedAt?: string;
   createdAt: string;
+  // Whether the student is allowed to start this quiz (sequential gating)
+  canStart?: boolean;
 }
 
 export interface LessonWithQuizzes {
-  id: number;
+  id: string;
   title: string;
   description?: string;
   order: number;
@@ -27,17 +29,23 @@ export interface LessonWithQuizzes {
 }
 
 export interface ModuleWithQuizzes {
-  id: number;
+  id: string;
   name: string;
   studyYear?: {
-    id: number;
+    id: string;
     name: string;
   };
   lessons: LessonWithQuizzes[];
 }
 
 export interface QuizFilters {
-  studyYearId?: number;
+  studyYearId?: string;
+}
+
+export interface QuizAnswer {
+  questionId: string;
+  selectedOptionIds: string[];
+  textAnswer?: string;
 }
 
 class StudentQuizService {
@@ -49,7 +57,7 @@ class StudentQuizService {
   async getQuizzes(filters: QuizFilters = {}): Promise<ModuleWithQuizzes[]> {
     const params = new URLSearchParams();
     
-    if (filters.studyYearId) params.append('studyYearId', filters.studyYearId.toString());
+    if (filters.studyYearId) params.append('studyYearId', filters.studyYearId);
 
     const response = await fetch(`${this.baseUrl}?${params.toString()}`);
     
@@ -63,7 +71,7 @@ class StudentQuizService {
   /**
    * Start a quiz session
    */
-  async startQuiz(quizId: number) {
+  async startQuiz(quizId: string) {
     const response = await fetch(`/api/student/exams/${quizId}/start`, {
       method: 'POST',
       headers: {
@@ -82,7 +90,7 @@ class StudentQuizService {
   /**
    * Submit quiz answers
    */
-  async submitQuiz(quizId: number, attemptId: number, answers: any[]) {
+  async submitQuiz(quizId: string, attemptId: string, answers: QuizAnswer[]) {
     const response = await fetch(`/api/student/exams/${quizId}/submit`, {
       method: 'POST',
       headers: {

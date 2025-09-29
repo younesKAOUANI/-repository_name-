@@ -11,8 +11,9 @@ import { formatDate } from '@/utils/date.utils';
 export interface QuestionBankCreate {
   text: string;
   questionType: QuestionType;
-  lessonId?: number;
-  moduleId?: number;
+  studyYearId?: string;
+  lessonId?: string;
+  moduleId?: string;
   difficulty?: string;
   explanation?: string;
   options: {
@@ -22,7 +23,7 @@ export interface QuestionBankCreate {
 }
 
 export interface QuestionBankUpdate extends QuestionBankCreate {
-  id: number;
+  id: string;
 }
 
 interface UseQuestionBankAdminState {
@@ -46,12 +47,12 @@ interface UseQuestionBankAdminState {
 interface UseQuestionBankAdminActions {
   // Data loading
   loadQuestions: () => Promise<void>;
-  loadQuestion: (id: number) => Promise<void>;
+  loadQuestion: (id: string) => Promise<void>;
   
   // CRUD operations
   createQuestion: (data: QuestionBankCreate) => Promise<void>;
   updateQuestion: (data: QuestionBankUpdate) => Promise<void>;
-  deleteQuestion: (id: number) => Promise<void>;
+  deleteQuestion: (id: string) => Promise<void>;
   
   // Modal management
   openCreateModal: () => void;
@@ -74,6 +75,7 @@ interface UseQuestionBankAdminReturn extends UseQuestionBankAdminState, UseQuest
 const initialFilters: QuestionBankFilters = {
   search: '',
   questionType: undefined,
+  studyYearId: undefined,
   moduleId: undefined,
   lessonId: undefined,
   difficulty: undefined,
@@ -127,7 +129,7 @@ export function useQuestionBankAdmin(): UseQuestionBankAdminReturn {
     }
   }, [state.pagination.currentPage, state.pagination.pageSize, state.filters]);
 
-  const loadQuestion = useCallback(async (id: number) => {
+  const loadQuestion = useCallback(async (id: string) => {
     setState(prev => ({ ...prev, loading: true }));
     try {
       const question = await questionBankService.getQuestionById(id);
@@ -173,7 +175,7 @@ export function useQuestionBankAdmin(): UseQuestionBankAdminReturn {
     }
   }, [loadQuestions]);
 
-  const deleteQuestion = useCallback(async (id: number) => {
+  const deleteQuestion = useCallback(async (id: string) => {
     setState(prev => ({ ...prev, loading: true }));
     try {
       await questionBankService.deleteQuestion(id);

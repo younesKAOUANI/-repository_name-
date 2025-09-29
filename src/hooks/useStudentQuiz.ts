@@ -9,20 +9,23 @@ import {
   ModuleWithQuizzes,
   QuizFilters 
 } from '@/services/student-quiz.service';
+import { studentExamService, ExamHistory } from '@/services/student-exam.service';
 
 interface UseStudentQuizState {
   modules: ModuleWithQuizzes[];
   loading: boolean;
   error: string | null;
   filters: QuizFilters;
+  history: ExamHistory[];
 }
 
 interface UseStudentQuizActions {
   loadQuizzes: () => Promise<void>;
+  loadHistory: () => Promise<void>;
   updateFilters: (newFilters: Partial<QuizFilters>) => void;
   resetFilters: () => void;
   clearError: () => void;
-  startQuiz: (quizId: number) => Promise<void>;
+  startQuiz: (quizId: string) => Promise<void>;
 }
 
 interface UseStudentQuizReturn extends UseStudentQuizState, UseStudentQuizActions {}
@@ -37,6 +40,7 @@ export function useStudentQuiz(): UseStudentQuizReturn {
     loading: false,
     error: null,
     filters: initialFilters,
+    history: [],
   });
 
   // Load quizzes organized by modules
@@ -59,8 +63,31 @@ export function useStudentQuiz(): UseStudentQuizReturn {
     }
   }, [state.filters]);
 
+  // Load quiz history (attempts of type QUIZ)
+  const loadHistory = useCallback(async () => {
+    setState(prev => ({ ...prev, loading: true, error: null }));
+    try {
+      const history = await studentExamService.getExamHistory({
+        studyYearId: state.filters.studyYearId,
+        type: 'QUIZ',
+      });
+      setState(prev => ({
+        ...prev,
+        history,
+        loading: false,
+      }));
+    } catch (error) {
+      console.error('Error loading quiz history:', error);
+      setState(prev => ({
+        ...prev,
+        loading: false,
+        error: error instanceof Error ? error.message : 'Échec du chargement de l\'historique des quiz'
+      }));
+    }
+  }, [state.filters.studyYearId]);
+
   // Start a quiz
-  const startQuiz = useCallback(async (quizId: number) => {
+  const startQuiz = useCallback(async (quizId: string) => {
     try {
       await studentQuizService.startQuiz(quizId);
       // Navigation will be handled by the component
@@ -97,6 +124,7 @@ export function useStudentQuiz(): UseStudentQuizReturn {
   return {
     ...state,
     loadQuizzes,
+    loadHistory,
     updateFilters,
     resetFilters,
     clearError,

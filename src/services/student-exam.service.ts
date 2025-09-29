@@ -110,6 +110,8 @@ export interface ExamFilters {
   lessonId?: string;
   studyYearId?: string;
   isCompleted?: boolean;
+  // Added type to allow filtering history for QUIZ vs EXAM vs ALL
+  type?: 'QUIZ' | 'EXAM' | 'ALL';
 }
 
 class StudentExamService {
@@ -149,7 +151,18 @@ class StudentExamService {
       const error = await response.json();
       throw new Error(error.message || 'Échec du démarrage de l\'examen');
     }
-    return response.json();
+    
+    const data = await response.json();
+    
+    // Transform the API response to match ExamSession interface
+    const examSession: ExamSession = {
+      attemptId: data.attemptId,
+      startedAt: data.startedAt,
+      timeLimit: data.timeLimit,
+      questions: data.quiz?.questions || []
+    };
+    
+    return examSession;
   }
 
   /**
@@ -183,6 +196,8 @@ class StudentExamService {
     if (filters.moduleId) params.append('moduleId', filters.moduleId.toString());
     if (filters.lessonId) params.append('lessonId', filters.lessonId.toString());
     if (filters.studyYearId) params.append('studyYearId', filters.studyYearId.toString());
+    // Pass through type filter when provided (defaults to ALL on server)
+    if (filters.type) params.append('type', filters.type);
 
     const response = await fetch(`${this.baseUrl}/history?${params}`);
     if (!response.ok) {

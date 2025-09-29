@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
     const moduleId = searchParams.get('moduleId');
     const lessonId = searchParams.get('lessonId');
     const studyYearId = searchParams.get('studyYearId');
+    const type = (searchParams.get('type') || 'ALL').toUpperCase(); // QUIZ | EXAM | ALL
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -25,9 +26,15 @@ export async function GET(request: NextRequest) {
     };
 
     // Apply filters to the quiz
-    const quizWhere: any = {
-      type: { in: ['QUIZ', 'EXAM'] },
-    };
+    const quizWhere: any = {};
+
+    if (type === 'QUIZ') {
+      quizWhere.type = 'QUIZ';
+    } else if (type === 'EXAM') {
+      quizWhere.type = 'EXAM';
+    } else {
+      quizWhere.type = { in: ['QUIZ', 'EXAM'] };
+    }
 
     if (moduleId) {
       quizWhere.moduleId = moduleId;

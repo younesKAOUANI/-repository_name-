@@ -5,7 +5,7 @@ import { QuestionType } from '@prisma/client';
 
 interface ExamAnswer {
   questionId: string;
-  selectedOptions: string[];
+  selectedOptionIds: string[];
   textAnswer?: string;
 }
 
@@ -97,8 +97,8 @@ export async function POST(
       body.answers.flatMap(answer => {
         const questionResult = questionResults.find(qr => qr.questionId === answer.questionId);
         
-        if (answer.selectedOptions && answer.selectedOptions.length > 0) {
-          return answer.selectedOptions.map(optionId => 
+        if (answer.selectedOptionIds && answer.selectedOptionIds.length > 0) {
+          return answer.selectedOptionIds.map((optionId: string) => 
             db.quizAttemptAnswer.create({
               data: {
                 attemptId: attempt.id,
@@ -217,7 +217,7 @@ function calculateQuestionScore(question: any, userAnswer?: ExamAnswer): {
 
   switch (question.questionType) {
     case 'QCMA': // All-or-nothing
-      const userSelectedQCMA = new Set(userAnswer.selectedOptions || []);
+      const userSelectedQCMA = new Set(userAnswer.selectedOptionIds || []);
       const correctSelectedQCMA = new Set(correctOptions.map((opt: any) => opt.id));
       
       const isExactMatch = userSelectedQCMA.size === correctSelectedQCMA.size &&
@@ -229,7 +229,7 @@ function calculateQuestionScore(question: any, userAnswer?: ExamAnswer): {
       };
 
     case 'QCMP': // Partial credit
-      const userSelectedQCMP = new Set(userAnswer.selectedOptions || []);
+      const userSelectedQCMP = new Set(userAnswer.selectedOptionIds || []);
       const correctSelectedQCMP = new Set(correctOptions.map((opt: any) => opt.id));
 
       let correctCount = 0;
@@ -252,7 +252,7 @@ function calculateQuestionScore(question: any, userAnswer?: ExamAnswer): {
       };
 
     case 'QCS': // Single choice
-      const userSelectedQCS = userAnswer.selectedOptions?.[0];
+      const userSelectedQCS = userAnswer.selectedOptionIds?.[0];
       const correctOptionQCS = correctOptions[0];
       const isCorrectQCS = userSelectedQCS === correctOptionQCS?.id;
       
@@ -284,7 +284,7 @@ function formatUserAnswer(question: any, userAnswer?: ExamAnswer): string[] {
     return [userAnswer.textAnswer || 'Pas de réponse'];
   }
 
-  return (userAnswer.selectedOptions || []).map(optionId => {
+  return (userAnswer.selectedOptionIds || []).map((optionId: string) => {
     const option = question.options.find((opt: any) => opt.id === optionId);
     return option?.text || 'Option inconnue';
   });

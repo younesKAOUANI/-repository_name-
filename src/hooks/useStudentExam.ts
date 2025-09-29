@@ -125,6 +125,7 @@ export function useStudentExam(): UseStudentExamReturn {
     setState(prev => ({ ...prev, loading: true, error: null }));
     try {
       const exams = await studentExamService.getExams(state.filters);
+      console.log('Fetched exams:', exams);
       setState(prev => ({
         ...prev,
         availableExams: exams,

@@ -264,11 +264,17 @@ async function main() {
   ];
 
   for (const bankQ of bankQuestions) {
+    // Find the study year for this question based on its module
+    const module = modules.find(m => m.id === bankQ.moduleId);
+    const semester = semesters.find(s => s.id === module?.semesterId);
+    const studyYearId = semester?.studyYearId;
+
     const question = await prisma.questionBank.create({
       data: {
         id: createId(),
         text: bankQ.text,
         questionType: QuestionType.QCMA,
+        studyYearId: studyYearId,
         moduleId: bankQ.moduleId,
         lessonId: bankQ.lessonId,
         difficulty: bankQ.difficulty,

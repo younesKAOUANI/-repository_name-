@@ -30,12 +30,14 @@ export default function StudentQuizInterface() {
     loading,
     error,
     loadQuizzes,
+    loadHistory,
     updateFilters,
     resetFilters,
     clearError,
+    history,
   } = useStudentQuiz();
 
-  const [selectedStudyYear, setSelectedStudyYear] = useState<number | undefined>();
+  const [selectedStudyYear, setSelectedStudyYear] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState<'available' | 'history'>('available');
 
   // Load data on component mount
@@ -43,10 +45,17 @@ export default function StudentQuizInterface() {
     loadQuizzes();
   }, [loadQuizzes]);
 
-  const handleStartQuiz = async (quizId: number) => {
+  // Load history when switching to history tab
+  useEffect(() => {
+    if (activeTab === 'history') {
+      loadHistory();
+    }
+  }, [activeTab, loadHistory]);
+
+  const handleStartQuiz = async (quizId: string) => {
     try {
-      // Navigate to the quiz session page
-      router.push(`/student/exams/${quizId}`);
+      // Navigate to the unified assessment session page
+      router.push(`/student/assessments/${quizId}`);
     } catch (error) {
       console.error('Failed to start quiz:', error);
     }
@@ -105,10 +114,10 @@ export default function StudentQuizInterface() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div>
       {/* Header */}
-      <div className="bg-white shadow-lg border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-white rounded-md">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-6">
               <div className="p-3 bg-blue-100 rounded-xl">
@@ -145,7 +154,7 @@ export default function StudentQuizInterface() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="container mx-auto px-4 py-8">
         {/* Error Message */}
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
@@ -209,18 +218,19 @@ export default function StudentQuizInterface() {
                 <select
                   value={selectedStudyYear || ''}
                   onChange={(e) => {
-                    const yearId = e.target.value ? parseInt(e.target.value) : undefined;
+                    const yearId = e.target.value || undefined;
                     setSelectedStudyYear(yearId);
                     updateFilters({ studyYearId: yearId });
                   }}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Toutes les années</option>
-                  <option value="1">1ère Année</option>
-                  <option value="2">2ème Année</option>
-                  <option value="3">3ème Année</option>
-                  <option value="4">4ème Année</option>
-                  <option value="5">5ème Année</option>
+                  {/* TODO: replace hardcoded options with real study years if available */}
+                  <option value="year-1">1ère Année</option>
+                  <option value="year-2">2ème Année</option>
+                  <option value="year-3">3ème Année</option>
+                  <option value="year-4">4ème Année</option>
+                  <option value="year-5">5ème Année</option>
                 </select>
               </div>
               <div className="flex items-end">
@@ -292,16 +302,69 @@ export default function StudentQuizInterface() {
               )
             ) : (
               // History Tab
-              <div className="text-center py-16">
-                <div className="p-4 bg-gray-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-                  <History className="h-10 w-10 text-gray-400" />
+              <div>
+                <div className="mb-6 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-100 rounded-lg">
+                      <History className="h-5 w-5 text-gray-600" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-semibold text-gray-900">Historique des quiz</h2>
+                      <p className="text-sm text-gray-600">Vos derniers résultats de quiz</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    onClick={loadHistory}
+                    disabled={loading}
+                    className="flex items-center gap-2 px-4 py-2"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                    Actualiser
+                  </Button>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  Historique des quiz
-                </h3>
-                <p className="text-gray-600 max-w-md mx-auto">
-                  L'historique des quiz sera bientôt disponible.
-                </p>
+
+                {loading ? (
+                  <div className="text-center py-16">
+                    <div className="p-4 bg-blue-50 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                      <RefreshCw className="h-10 w-10 animate-spin text-blue-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Chargement de l'historique</h3>
+                    <p className="text-gray-600">Veuillez patienter...</p>
+                  </div>
+                ) : history.length === 0 ? (
+                  <div className="text-center py-16">
+                    <div className="p-4 bg-gray-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                      <History className="h-10 w-10 text-gray-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                      Aucun historique de quiz
+                    </h3>
+                    <p className="text-gray-600 max-w-md mx-auto">
+                      Vous n'avez pas encore complété de quiz.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {history.map((attempt) => (
+                      <div key={attempt.attemptId} className="border rounded-xl p-4 bg-white">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="text-sm text-gray-500">{attempt.module?.name || attempt.lesson?.title || 'Quiz'}</div>
+                            <div className="text-base font-semibold text-gray-900">{attempt.title}</div>
+                            <div className="text-xs text-gray-500">
+                              Terminé le {attempt.completedAt ? new Date(attempt.completedAt).toLocaleDateString('fr-FR') : '-'}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-blue-600">{Math.round(attempt.percentage)}%</div>
+                            <div className="text-xs text-gray-500">Score: {attempt.score}/{attempt.maxScore}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -314,7 +377,7 @@ export default function StudentQuizInterface() {
 // Module Card Component
 interface ModuleCardProps {
   module: ModuleWithQuizzes;
-  onStartQuiz: (quizId: number) => void;
+  onStartQuiz: (quizId: string) => void;
   getQuizStatusBadge: (quiz: QuizItem) => React.ReactElement;
   formatDuration: (minutes?: number) => string;
 }
@@ -388,7 +451,7 @@ function ModuleCard({
 // Lesson Section Component
 interface LessonSectionProps {
   lesson: LessonWithQuizzes;
-  onStartQuiz: (quizId: number) => void;
+  onStartQuiz: (quizId: string) => void;
   getQuizStatusBadge: (quiz: QuizItem) => React.ReactElement;
   formatDuration: (minutes?: number) => string;
 }
@@ -429,6 +492,8 @@ interface QuizCardProps {
 }
 
 function QuizCard({ quiz, onStart, statusBadge, formatDuration }: QuizCardProps) {
+  const locked = quiz.canStart === false;
+  const label = quiz.isCompleted ? 'Refaire' : (locked ? 'Verrouillé' : 'Commencer');
   return (
     <div className="bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-200 hover:shadow-md transition-all duration-200 group">
       <div className="p-4">
@@ -437,7 +502,12 @@ function QuizCard({ quiz, onStart, statusBadge, formatDuration }: QuizCardProps)
           <h4 className="text-sm font-medium text-gray-900 line-clamp-2 group-hover:text-blue-900 transition-colors">
             {quiz.title}
           </h4>
-          {statusBadge}
+          <div className="flex items-center gap-2">
+            {quiz.isCompleted && (
+              <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Fait</span>
+            )}
+            {statusBadge}
+          </div>
         </div>
 
         {/* Description */}
@@ -478,14 +548,17 @@ function QuizCard({ quiz, onStart, statusBadge, formatDuration }: QuizCardProps)
         <Button
           onClick={onStart}
           size="sm"
+          disabled={locked}
           className={`w-full flex items-center justify-center gap-2 text-xs font-medium transition-all duration-200 ${
-            quiz.isCompleted 
-              ? 'bg-orange-600 hover:bg-orange-700 text-white' 
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
+            locked
+              ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+              : quiz.isCompleted 
+                ? 'bg-orange-600 hover:bg-orange-700 text-white' 
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
           }`}
         >
           <Play className="h-3 w-3" />
-          {quiz.isCompleted ? 'Refaire' : 'Commencer'}
+          {label}
         </Button>
       </div>
     </div>

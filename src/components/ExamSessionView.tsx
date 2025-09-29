@@ -140,7 +140,7 @@ export default function ExamSessionView({ examId }: Props) {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-blue-600 mb-1">
-                      {currentSession.questions.length}
+                      {currentSession.questions?.length || 0}
                     </div>
                     <div className="text-sm text-gray-600">Questions</div>
                   </div>
@@ -203,9 +203,9 @@ export default function ExamSessionView({ examId }: Props) {
     );
   }
 
-  const currentQuestion = currentSession.questions[currentQuestionIndex];
-  const currentAnswer = currentAnswers.find(a => a.questionId === currentQuestion.id);
-  const totalQuestions = currentSession.questions.length;
+  const currentQuestion = currentSession.questions?.[currentQuestionIndex];
+  const currentAnswer = currentAnswers.find(a => a.questionId === currentQuestion?.id);
+  const totalQuestions = currentSession.questions?.length || 0;
   const answeredCount = currentAnswers.length;
 
   const handleAnswerChange = (questionId: string, selectedOptions: string[], textAnswer?: string) => {
@@ -223,6 +223,22 @@ export default function ExamSessionView({ examId }: Props) {
   };
 
   const allQuestionsAnswered = answeredCount === totalQuestions;
+
+  // Guard clause for missing questions
+  if (!currentQuestion || !currentSession.questions || totalQuestions === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg font-medium text-gray-900 mb-2">
+            Préparation de l'examen...
+          </div>
+          <div className="text-sm text-gray-600">
+            Chargement des questions en cours...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

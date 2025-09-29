@@ -1,15 +1,9 @@
 /**
- * Student Exam Session Page
- * Page for students to take a specific exam
+ * Student Exam Session Page (Legacy)
+ * Redirects to the unified assessment session page
  */
 
-import { Metadata } from 'next';
-import ExamSessionView from '@/components/ExamSessionView';
-
-export const metadata: Metadata = {
-  title: 'Session d\'Examen - Pharmapedia',
-  description: 'Passez votre examen',
-};
+import { redirect } from 'next/navigation';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -17,6 +11,5 @@ interface Props {
 
 export default async function StudentExamSessionPage({ params }: Props) {
   const { id } = await params;
-  
-  return <ExamSessionView examId={id} />;
+  redirect(`/student/assessments/${id}`);
 }

@@ -7,33 +7,38 @@ import { QuestionType } from '@prisma/client';
 
 // Types for Question Bank
 export interface QuestionBankItem {
-  id: number;
+  id: string;
   text: string;
   questionType: QuestionType;
-  lessonId?: number;
-  moduleId?: number;
+  studyYearId?: string;
+  lessonId?: string;
+  moduleId?: string;
   difficulty?: string;
   explanation?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  studyYear?: {
+    id: string;
+    name: string;
+  };
   lesson?: {
-    id: number;
+    id: string;
     title: string;
     module: {
-      id: number;
+      id: string;
       name: string;
     };
   };
   module?: {
-    id: number;
+    id: string;
     name: string;
   };
   options: QuestionBankOption[];
 }
 
 export interface QuestionBankOption {
-  id: number;
+  id: string;
   text: string;
   isCorrect: boolean;
 }
@@ -41,8 +46,9 @@ export interface QuestionBankOption {
 export interface QuestionBankCreate {
   text: string;
   questionType: QuestionType;
-  lessonId?: number;
-  moduleId?: number;
+  studyYearId?: string;
+  lessonId?: string;
+  moduleId?: string;
   difficulty?: string;
   explanation?: string;
   options: QuestionBankOptionCreate[];
@@ -56,8 +62,9 @@ export interface QuestionBankOptionCreate {
 export interface QuestionBankFilters {
   search: string;
   questionType?: QuestionType;
-  moduleId?: number;
-  lessonId?: number;
+  studyYearId?: string;
+  moduleId?: string;
+  lessonId?: string;
   difficulty?: string;
   isActive?: boolean;
 }
@@ -75,8 +82,8 @@ export interface QuestionBankListResponse {
 }
 
 export interface RevisionQuizRequest {
-  selectedLessons: number[];
-  selectedModules: number[];
+  selectedLessons: string[];
+  selectedModules: string[];
   questionCount: number;
   timeLimit?: number;
   difficulty?: string;
@@ -84,21 +91,21 @@ export interface RevisionQuizRequest {
 }
 
 export interface GeneratedRevisionQuiz {
-  id: number;
+  id: string;
   title: string;
   description: string;
   type: 'SESSION';
   questionCount: number;
   timeLimit?: number;
   questions: QuestionBankItem[];
-  selectedLessons: number[];
-  selectedModules: number[];
+  selectedLessons: string[];
+  selectedModules: string[];
   createdAt: string;
 }
 
 class QuestionBankService {
   private baseUrl = '/api/question-bank';
-  private revisionUrl = '/api/revision-quiz';
+  private revisionUrl = '/api/question-bank';
 
   /**
    * Get all question bank items with pagination and filters
@@ -113,8 +120,8 @@ class QuestionBankService {
       pageSize: pageSize.toString(),
       search: filters.search,
       ...(filters.questionType && { questionType: filters.questionType }),
-      ...(filters.moduleId && { moduleId: filters.moduleId.toString() }),
-      ...(filters.lessonId && { lessonId: filters.lessonId.toString() }),
+      ...(filters.moduleId && { moduleId: filters.moduleId }),
+      ...(filters.lessonId && { lessonId: filters.lessonId }),
       ...(filters.difficulty && { difficulty: filters.difficulty }),
       ...(filters.isActive !== undefined && { isActive: filters.isActive.toString() }),
     });
@@ -129,7 +136,7 @@ class QuestionBankService {
   /**
    * Get question bank item by ID
    */
-  async getQuestionById(id: number): Promise<QuestionBankItem> {
+  async getQuestionById(id: string): Promise<QuestionBankItem> {
     const response = await fetch(`${this.baseUrl}/${id}`);
     if (!response.ok) {
       throw new Error('Échec de la récupération de la question');
@@ -159,7 +166,7 @@ class QuestionBankService {
   /**
    * Update a question bank item
    */
-  async updateQuestion(id: number, questionData: Partial<QuestionBankCreate>): Promise<QuestionBankItem> {
+  async updateQuestion(id: string, questionData: Partial<QuestionBankCreate>): Promise<QuestionBankItem> {
     const response = await fetch(`${this.baseUrl}/${id}`, {
       method: 'PUT',
       headers: {
@@ -178,7 +185,7 @@ class QuestionBankService {
   /**
    * Delete a question bank item
    */
-  async deleteQuestion(id: number): Promise<void> {
+  async deleteQuestion(id: string): Promise<void> {
     const response = await fetch(`${this.baseUrl}/${id}`, {
       method: 'DELETE',
     });
@@ -192,7 +199,7 @@ class QuestionBankService {
   /**
    * Toggle question active status
    */
-  async toggleQuestionStatus(id: number): Promise<QuestionBankItem> {
+  async toggleQuestionStatus(id: string): Promise<QuestionBankItem> {
     const response = await fetch(`${this.baseUrl}/${id}/toggle`, {
       method: 'PATCH',
     });
@@ -208,7 +215,7 @@ class QuestionBankService {
    * Generate a revision quiz based on selected lessons/modules
    */
   async generateRevisionQuiz(request: RevisionQuizRequest): Promise<GeneratedRevisionQuiz> {
-    const response = await fetch(`${this.revisionUrl}/generate`, {
+    const response = await fetch(`${this.revisionUrl}/generate-revision`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -226,16 +233,16 @@ class QuestionBankService {
   /**
    * Get available questions count for given lessons/modules
    */
-  async getAvailableQuestionsCount(lessonIds: number[], moduleIds: number[]): Promise<{
+  async getAvailableQuestionsCount(lessonIds: string[], moduleIds: string[]): Promise<{
     totalQuestions: number;
     byDifficulty: Record<string, number>;
     byType: Record<QuestionType, number>;
   }> {
     const params = new URLSearchParams();
-    lessonIds.forEach(id => params.append('lessonIds', id.toString()));
-    moduleIds.forEach(id => params.append('moduleIds', id.toString()));
+    lessonIds.forEach(id => params.append('lessonIds', id));
+    moduleIds.forEach(id => params.append('moduleIds', id));
 
-    const response = await fetch(`${this.revisionUrl}/count?${params}`);
+    const response = await fetch(`${this.baseUrl}/count?${params}`);
     if (!response.ok) {
       throw new Error('Échec de la récupération du nombre de questions disponibles');
     }

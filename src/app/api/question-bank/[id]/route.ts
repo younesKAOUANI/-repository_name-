@@ -43,16 +43,16 @@ export async function GET(
 
     if (!question) {
       return NextResponse.json(
-        { message: 'Question not found' },
+        { error: 'Question non trouvée' },
         { status: 404 }
       );
     }
 
     return NextResponse.json(question);
   } catch (error) {
-    console.error('Error fetching question:', error);
+    console.error('Erreur lors de la récupération de la question:', error);
     return NextResponse.json(
-      { message: 'Failed to fetch question' },
+      { error: 'Échec de la récupération de la question' },
       { status: 500 }
     );
   }
@@ -69,12 +69,12 @@ export async function PUT(
     const questionId = id;
 
     const body = await request.json();
-    const { text, questionType, lessonId, moduleId, difficulty, explanation, options } = body;
+    const { text, questionType, studyYearId, lessonId, moduleId, difficulty, explanation, options } = body;
 
     // Validation
     if (!text || !questionType || !options || options.length < 2) {
       return NextResponse.json(
-        { message: 'Question text, type, and at least 2 options are required' },
+        { error: 'Le texte de la question, le type et au moins 2 options sont requis' },
         { status: 400 }
       );
     }
@@ -83,7 +83,7 @@ export async function PUT(
     const correctOptions = options.filter((opt: any) => opt.isCorrect);
     if (correctOptions.length === 0) {
       return NextResponse.json(
-        { message: 'At least one option must be marked as correct' },
+        { error: 'Au moins une option doit être marquée comme correcte' },
         { status: 400 }
       );
     }
@@ -113,6 +113,7 @@ export async function PUT(
         data: {
           text,
           questionType,
+          studyYearId: studyYearId || null,
           lessonId: lessonId || null,
           moduleId: moduleId || null,
           difficulty: difficulty || null,
@@ -154,9 +155,9 @@ export async function PUT(
 
     return NextResponse.json(updatedQuestion);
   } catch (error) {
-    console.error('Error updating question:', error);
+    console.error('Erreur lors de la mise à jour de la question:', error);
     return NextResponse.json(
-      { message: 'Failed to update question' },
+      { error: 'Échec de la mise à jour de la question' },
       { status: 500 }
     );
   }
@@ -189,11 +190,11 @@ export async function DELETE(
       where: { id: questionId },
     });
 
-    return NextResponse.json({ message: 'Question deleted successfully' });
+    return NextResponse.json({ message: 'Question supprimée avec succès' });
   } catch (error) {
-    console.error('Error deleting question:', error);
+    console.error('Erreur lors de la suppression de la question:', error);
     return NextResponse.json(
-      { message: 'Failed to delete question' },
+      { error: 'Échec de la suppression de la question' },
       { status: 500 }
     );
   }

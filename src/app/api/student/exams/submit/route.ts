@@ -5,7 +5,7 @@ import { QuestionType } from '@prisma/client';
 
 interface StudentAnswer {
   questionId: string;
-  selectedOptions: string[];
+  selectedOptionIds: string[];
   textAnswer?: string;
 }
 
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { message: 'User not found' },
+        { message: 'Utilisateur non trouvé' },
         { status: 401 }
       );
     }
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     if (!attempt) {
       return NextResponse.json(
-        { message: 'Exam attempt not found or already completed' },
+        { message: 'Tentative d\'examen non trouvée ou déjà terminée' },
         { status: 404 }
       );
     }
@@ -60,7 +60,9 @@ export async function POST(request: NextRequest) {
       submission.answers
     );
 
-    const timeSpent = Math.round((new Date().getTime() - attempt.startedAt.getTime()) / 60000); // minutes
+    const timeSpent = Math.round(
+      (new Date().getTime() - attempt.startedAt.getTime()) / 60000
+    ); // minutes
 
     // Update the attempt with results
     const completedAttempt = await db.quizAttempt.update({
@@ -71,35 +73,32 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Save individual answers
-    await Promise.all(
-      submission.answers.flatMap(answer => {
-        const questionResult = questionResults.find(qr => qr.questionId === answer.questionId);
-        // Handle multiple selected options by creating one record per selected option
-        if (answer.selectedOptions.length > 0) {
-          return answer.selectedOptions.map(optionId => 
-            db.quizAttemptAnswer.create({
-              data: {
-                attemptId: attempt.id,
-                questionId: answer.questionId,
-                selectedOptionId: optionId,
-                isCorrect: questionResult?.isCorrect || false
-              }
-            })
-          );
-        } else {
-          // For questions with no selected options (like QROC without implementation)
-          return db.quizAttemptAnswer.create({
-            data: {
-              attemptId: attempt.id,
-              questionId: answer.questionId,
-              selectedOptionId: null,
-              isCorrect: questionResult?.isCorrect || false
-            }
-          });
-        }
-      })
-    );
+    // Prepare answers for bulk insert
+    const answersToInsert = submission.answers.flatMap((answer) => {
+      const questionResult = questionResults.find(qr => qr.questionId === answer.questionId);
+
+      if (answer.selectedOptionIds.length > 0) {
+        return answer.selectedOptionIds.map((optionId) => ({
+          attemptId: attempt.id,
+          questionId: answer.questionId,
+          selectedOptionId: optionId, // always string
+          isCorrect: questionResult?.isCorrect ?? false,
+        }));
+      }
+
+      // No options selected → use placeholder string instead of null
+      return [{
+        attemptId: attempt.id,
+        questionId: answer.questionId,
+        selectedOptionId: "NONE", // 👈 placeholder to satisfy schema
+        isCorrect: questionResult?.isCorrect ?? false,
+      }];
+    });
+
+    // Batch insert for efficiency
+    await db.quizAttemptAnswer.createMany({
+      data: answersToInsert,
+    });
 
     // Calculate percentage
     const percentage = maxScore > 0 ? (score / maxScore) * 100 : 0;
@@ -131,13 +130,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error submitting exam:', error);
     return NextResponse.json(
-      { message: 'Failed to submit exam' },
+      { message: 'Échec de la soumission de l\'examen' },
       { status: 500 }
     );
   }
 }
 
-// Scoring logic (similar to the service but adapted for API)
+// Scoring logic
 function calculateExamScore(questions: any[], answers: StudentAnswer[]) {
   let totalScore = 0;
   let maxScore = 0;
@@ -176,7 +175,6 @@ function getQuestionMaxScore(questionType: QuestionType): number {
     case 'QCMA':
     case 'QCS':
     case 'QROC':
-      return 1;
     case 'QCMP':
       return 1;
     default:
@@ -188,35 +186,31 @@ function calculateQuestionScore(question: any, userAnswer?: StudentAnswer): {
   score: number;
   isCorrect: boolean;
 } {
-  if (!userAnswer) {
-    return { score: 0, isCorrect: false };
-  }
+  if (!userAnswer) return { score: 0, isCorrect: false };
 
   const correctOptions = question.options.filter((opt: any) => opt.isCorrect);
 
   switch (question.questionType) {
-    case 'QCMA': // All-or-nothing
-      const userSelectedQCMA = new Set(userAnswer.selectedOptions);
-      const correctSelectedQCMA = new Set(correctOptions.map((opt: any) => opt.id));
-      
-      const isExactMatch = userSelectedQCMA.size === correctSelectedQCMA.size &&
-        [...userSelectedQCMA].every(id => correctSelectedQCMA.has(id));
-      
-      return {
-        score: isExactMatch ? 1 : 0,
-        isCorrect: isExactMatch
-      };
+    case 'QCMA': {
+      const userSelected = new Set(userAnswer.selectedOptionIds);
+      const correctSelected = new Set(correctOptions.map((opt: any) => opt.id));
 
-    case 'QCMP': // Partial credit
-      const userSelectedQCMP = new Set(userAnswer.selectedOptions);
-      const correctSelectedQCMP = new Set(correctOptions.map((opt: any) => opt.id));
-      const incorrectOptions = question.options.filter((opt: any) => !opt.isCorrect);
+      const isExactMatch =
+        userSelected.size === correctSelected.size &&
+        [...userSelected].every(id => correctSelected.has(id));
+
+      return { score: isExactMatch ? 1 : 0, isCorrect: isExactMatch };
+    }
+
+    case 'QCMP': {
+      const userSelected = new Set(userAnswer.selectedOptionIds);
+      const correctSelected = new Set(correctOptions.map((opt: any) => opt.id));
 
       let correctCount = 0;
       let incorrectCount = 0;
 
-      userSelectedQCMP.forEach(id => {
-        if (correctSelectedQCMP.has(id)) {
+      userSelected.forEach(id => {
+        if (correctSelected.has(id)) {
           correctCount++;
         } else {
           incorrectCount++;
@@ -224,33 +218,24 @@ function calculateQuestionScore(question: any, userAnswer?: StudentAnswer): {
       });
 
       const totalCorrect = correctOptions.length;
-      const score = Math.max(0, (correctCount - incorrectCount) / totalCorrect);
-      
-      return {
-        score: Math.max(0, score),
-        isCorrect: score === 1
-      };
+      const rawScore = Math.max(0, (correctCount - incorrectCount) / totalCorrect);
 
-    case 'QCS': // Single choice
-      const userSelectedQCS = userAnswer.selectedOptions[0];
-      const correctOptionQCS = correctOptions[0];
-      const isCorrectQCS = userSelectedQCS === correctOptionQCS?.id;
-      
-      return {
-        score: isCorrectQCS ? 1 : 0,
-        isCorrect: isCorrectQCS
-      };
+      return { score: rawScore, isCorrect: rawScore === 1 };
+    }
 
-    case 'QROC': // Open response
+    case 'QCS': {
+      const userSelected = userAnswer.selectedOptionIds[0];
+      const correctOption = correctOptions[0];
+      const isCorrect = userSelected === correctOption?.id;
+      return { score: isCorrect ? 1 : 0, isCorrect };
+    }
+
+    case 'QROC': {
       const userText = userAnswer.textAnswer?.toLowerCase().trim() || '';
       const correctText = correctOptions[0]?.text?.toLowerCase().trim() || '';
-      
-      const isCorrectQROC = userText === correctText;
-      
-      return {
-        score: isCorrectQROC ? 1 : 0,
-        isCorrect: isCorrectQROC
-      };
+      const isCorrect = userText === correctText;
+      return { score: isCorrect ? 1 : 0, isCorrect };
+    }
 
     default:
       return { score: 0, isCorrect: false };
@@ -264,7 +249,7 @@ function formatUserAnswer(question: any, userAnswer?: StudentAnswer): string[] {
     return [userAnswer.textAnswer || 'Pas de réponse'];
   }
 
-  return userAnswer.selectedOptions.map(optionId => {
+  return userAnswer.selectedOptionIds.map((optionId: string) => {
     const option = question.options.find((opt: any) => opt.id === optionId);
     return option?.text || 'Option inconnue';
   });
@@ -274,3 +259,4 @@ function formatCorrectAnswer(question: any): string[] {
   const correctOptions = question.options.filter((opt: any) => opt.isCorrect);
   return correctOptions.map((opt: any) => opt.text);
 }
+  

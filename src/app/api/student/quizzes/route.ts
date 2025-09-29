@@ -18,8 +18,6 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const studyYearId = searchParams.get('studyYearId');
 
-    console.log('🔍 Student Quizzes API - Params:', { studyYearId });
-
     // Build where clause for quizzes
     const quizWhere: any = {
       type: 'QUIZ'  // Only get quizzes, not exams
@@ -47,9 +45,7 @@ export async function GET(
       ];
     }
 
-    console.log('📋 Quiz where clause:', JSON.stringify(quizWhere, null, 2));
-
-    // Fetch all quizzes with their related data
+    // Fetch all quizzes with their related data and user's latest attempt
     const quizzes = await db.quiz.findMany({
       where: quizWhere,
       include: {
@@ -82,99 +78,135 @@ export async function GET(
           orderBy: {
             createdAt: 'desc'
           },
-          take: 1 // Only get the latest attempt
-        }
+          take: 1
+        },
+        questions: true
       },
       orderBy: [
         { createdAt: 'desc' }
       ]
     });
 
-    console.log(`📊 Found ${quizzes.length} quizzes`);
-
-    // Group quizzes by study year > semester > module > lesson
-    const moduleMap = new Map();
+    // Group quizzes by module -> lesson
+    const moduleMap = new Map<string, any>();
     
     quizzes.forEach(quiz => {
-      const module = quiz.lesson?.module || quiz.module;
-      
-      if (!module) {
-        console.warn('⚠️ Quiz without module found:', quiz.id);
-        return;
-      }
+      const mod = quiz.lesson?.module || quiz.module;
+      if (!mod) return;
 
-      // Create module entry if it doesn't exist
-      if (!moduleMap.has(module.id)) {
-        moduleMap.set(module.id, {
-          id: module.id,
-          name: module.name,
-          description: module.description,
-          semester: module.semester,
-          lessons: new Map()
+      // Ensure module entry
+      if (!moduleMap.has(mod.id)) {
+        moduleMap.set(mod.id, {
+          id: mod.id,
+          name: mod.name,
+          description: (mod as any).description,
+          semester: (mod as any).semester,
+          lessons: new Map<string, any>()
         });
       }
+      const moduleEntry = moduleMap.get(mod.id);
 
-      const moduleEntry = moduleMap.get(module.id);
-      
       if (quiz.lesson) {
-        // Quiz belongs to a lesson
         const lesson = quiz.lesson;
-        
         if (!moduleEntry.lessons.has(lesson.id)) {
           moduleEntry.lessons.set(lesson.id, {
             id: lesson.id,
             title: lesson.title,
             order: lesson.order,
-            quizzes: []
+            quizzes: [] as any[]
           });
         }
-        
         const lessonEntry = moduleEntry.lessons.get(lesson.id);
+
+        // Decorate with completion info
+        const latestAttempt = quiz.attempts[0] || null;
+        const earnedPoints = latestAttempt?.score ? Number(latestAttempt.score) : 0;
+        const maxScore = quiz.questions.length || 0;
+        const percentage = maxScore > 0 ? (earnedPoints / maxScore) * 100 : 0;
+        const isCompleted = latestAttempt?.finishedAt ? true : false;
+
         lessonEntry.quizzes.push({
           id: quiz.id,
           title: quiz.title,
           description: quiz.description,
           type: quiz.type,
-          questionCount: quiz.questionCount,
+          questionsCount: quiz.questionCount ?? quiz.questions.length,
           timeLimit: quiz.timeLimit,
           order: quiz.order,
           createdAt: quiz.createdAt,
-          latestAttempt: quiz.attempts[0] || null
+          latestAttempt: latestAttempt ? {
+            id: latestAttempt.id,
+            score: earnedPoints,
+            finishedAt: latestAttempt.finishedAt,
+          } : null,
+          isCompleted,
+          score: Math.round(earnedPoints),
+          maxScore,
+          percentage,
+          completedAt: latestAttempt?.finishedAt ?? null,
+          canStart: true // temporary; will compute below per lesson
         });
       } else {
-        // Quiz belongs directly to module (no lesson)
+        // Quizzes directly under module; treat as a special lesson
         if (!moduleEntry.lessons.has('module-direct')) {
           moduleEntry.lessons.set('module-direct', {
             id: 'module-direct',
             title: 'Quizzes du module',
             order: 0,
-            quizzes: []
+            quizzes: [] as any[]
           });
         }
-        
         const directEntry = moduleEntry.lessons.get('module-direct');
+
+        const latestAttempt = quiz.attempts[0] || null;
+        const earnedPoints = latestAttempt?.score ? Number(latestAttempt.score) : 0;
+        const maxScore = quiz.questions.length || 0;
+        const percentage = maxScore > 0 ? (earnedPoints / maxScore) * 100 : 0;
+        const isCompleted = latestAttempt?.finishedAt ? true : false;
+
         directEntry.quizzes.push({
           id: quiz.id,
           title: quiz.title,
           description: quiz.description,
           type: quiz.type,
-          questionCount: quiz.questionCount,
+          questionsCount: quiz.questionCount ?? quiz.questions.length,
           timeLimit: quiz.timeLimit,
-          order: quiz.order,
+          order: quiz.order ?? 0,
           createdAt: quiz.createdAt,
-          latestAttempt: quiz.attempts[0] || null
+          latestAttempt: latestAttempt ? {
+            id: latestAttempt.id,
+            score: earnedPoints,
+            finishedAt: latestAttempt.finishedAt,
+          } : null,
+          isCompleted,
+          score: Math.round(earnedPoints),
+          maxScore,
+          percentage,
+          completedAt: latestAttempt?.finishedAt ?? null,
+          canStart: true
         });
       }
     });
 
-    // Convert maps to arrays and sort properly
+    // Compute gating per lesson: a quiz is unlocked if first in order, or previous quiz completed with >=80%
     const organizedQuizzes = Array.from(moduleMap.values()).map(moduleEntry => {
       const lessons = Array.from(moduleEntry.lessons.values())
-        .sort((a: any, b: any) => a.order - b.order)
-        .map((lesson: any) => ({
-          ...lesson,
-          quizzes: lesson.quizzes.sort((a: any, b: any) => a.order - b.order)
-        }));
+        .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
+        .map((lesson: any) => {
+          // Sort quizzes by order
+          lesson.quizzes.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0));
+          // Apply gating
+          for (let i = 0; i < lesson.quizzes.length; i++) {
+            if (i === 0) {
+              lesson.quizzes[i].canStart = true; // first quiz is always available
+              continue;
+            }
+            const prev = lesson.quizzes[i - 1];
+            const allow = prev.isCompleted && (prev.percentage ?? 0) >= 80;
+            lesson.quizzes[i].canStart = allow;
+          }
+          return lesson;
+        });
 
       return {
         ...moduleEntry,
