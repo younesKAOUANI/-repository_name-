@@ -1,13 +1,14 @@
 'use client'
 
-import React, { useState } from 'react';
-import { Menu, X, Mail, Phone } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, X, Mail, Phone, User, BookOpen, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fadeVariants, slideVariants, bounceVariants, staggerContainer, staggerItem } from '@/lib/animations';
 import NavLink from './NavLink';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useSession } from 'next-auth/react';
 
 interface HeaderProps {
     className?: string;
@@ -15,6 +16,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ className = '' }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { data: session, status } = useSession();
 
     // Navigation links array
     const navLinks = [
@@ -25,6 +27,36 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
         { href: '#', label: 'À propos', isActive: false },
         { href: '#', label: 'Contact', isActive: false }
     ];
+
+    // Get dashboard route and label based on user role
+    const getDashboardInfo = () => {
+        if (!session?.user?.role) return null;
+        
+        switch (session.user.role) {
+            case 'STUDENT':
+                return {
+                    route: '/student/dashboard',
+                    label: 'Tableau de bord Étudiant',
+                    icon: <BookOpen className="h-4 w-4" />
+                };
+            case 'INSTRUCTOR':
+                return {
+                    route: '/teacher/dashboard',
+                    label: 'Tableau de bord Enseignant',
+                    icon: <User className="h-4 w-4" />
+                };
+            case 'ADMIN':
+                return {
+                    route: '/admin/dashboard',
+                    label: 'Tableau de bord Admin',
+                    icon: <Settings className="h-4 w-4" />
+                };
+            default:
+                return null;
+        }
+    };
+
+    const dashboardInfo = getDashboardInfo();
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -129,7 +161,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                     
                     </motion.nav>
 
-                    {/* Se connecter Button */}
+                    {/* Authentication/Dashboard Buttons */}
                     <motion.div 
                         className="hidden md:flex items-center space-x-4"
                         variants={fadeVariants}
@@ -137,34 +169,60 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                         animate="visible"
                         transition={{ delay: 0.4 }}
                     >
-                        <Link href="/auth/sign-in">
-                            <motion.div
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                            >
-                                <Button 
-                                    variant="secondary"
-                                    className="text-white hover:text-pharmapedia-accent border border-white/20 bg-transparent uppercase font-medium"
+                        {status === 'loading' ? (
+                            <div className="flex items-center space-x-2">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                <span className="text-white text-sm">Chargement...</span>
+                            </div>
+                        ) : session && dashboardInfo ? (
+                            // User is authenticated - show dashboard button
+                            <Link href={dashboardInfo.route}>
+                                <motion.div
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
                                 >
-                                    Se connecter
-                                </Button>
-                            </motion.div>
-                        </Link>
-                        <Link href="/auth/sign-up">
-                            <motion.div
-                                variants={bounceVariants}
-                                initial="rest"
-                                whileHover="hover"
-                                whileTap="tap"
-                            >
-                                <Button 
-                                    variant="primary"
-                                    className="bg-white hover:bg-pharmapedia-accent text-black uppercase font-medium"
-                                >
-                                    S'inscrire
-                                </Button>
-                            </motion.div>
-                        </Link>
+                                    <Button 
+                                        variant="primary"
+                                        className="bg-white hover:bg-pharmapedia-accent text-black uppercase font-medium flex items-center gap-2"
+                                    >
+                                        {dashboardInfo.icon}
+                                        {dashboardInfo.label}
+                                    </Button>
+                                </motion.div>
+                            </Link>
+                        ) : (
+                            // User is not authenticated - show login/signup buttons
+                            <>
+                                <Link href="/auth/sign-in">
+                                    <motion.div
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        <Button 
+                                            variant="secondary"
+                                            className="text-white hover:text-pharmapedia-accent border border-white/20 bg-transparent uppercase font-medium"
+                                        >
+                                            Se connecter
+                                        </Button>
+                                    </motion.div>
+                                </Link>
+                                <Link href="/auth/sign-up">
+                                    <motion.div
+                                        variants={bounceVariants}
+                                        initial="rest"
+                                        whileHover="hover"
+                                        whileTap="tap"
+                                    >
+                                        <Button 
+                                            variant="primary"
+                                            className="bg-white hover:bg-pharmapedia-accent text-black uppercase font-medium"
+                                        >
+                                            S'inscrire
+                                        </Button>
+                                    </motion.div>
+                                </Link>
+                            </>
+                        )}
                     </motion.div>
 
                     {/* Mobile menu button */}
@@ -246,36 +304,65 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                             >
                                 Formations
                             </NavLink>
-                            <Link href="/auth/sign-in" className="block mt-4">
-                                <motion.div
-                                    variants={staggerItem}
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                >
-                                    <Button 
-                                        variant="secondary"
-                                        fullWidth
-                                        className="text-gray-700 hover:text-pharmapedia-primary border border-gray-300"
+                            {/* Mobile Authentication/Dashboard Buttons */}
+                            {status === 'loading' ? (
+                                <div className="flex items-center justify-center py-4">
+                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-pharmapedia-primary"></div>
+                                    <span className="ml-2 text-gray-600">Chargement...</span>
+                                </div>
+                            ) : session && dashboardInfo ? (
+                                // User is authenticated - show dashboard button
+                                <Link href={dashboardInfo.route} className="block mt-4">
+                                    <motion.div
+                                        variants={staggerItem}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
                                     >
-                                        Se connecter
-                                    </Button>
-                                </motion.div>
-                            </Link>
-                            <Link href="/auth/sign-up" className="block mt-2">
-                                <motion.div
-                                    variants={staggerItem}
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                >
-                                    <Button 
-                                        variant="primary"
-                                        fullWidth
-                                        className="bg-pharmapedia-primary hover:bg-pharmapedia-accent text-white"
-                                    >
-                                        S'inscrire
-                                    </Button>
-                                </motion.div>
-                            </Link>
+                                        <Button 
+                                            variant="primary"
+                                            fullWidth
+                                            className="bg-pharmapedia-primary hover:bg-pharmapedia-accent text-white flex items-center justify-center gap-2"
+                                        >
+                                            {dashboardInfo.icon}
+                                            {dashboardInfo.label}
+                                        </Button>
+                                    </motion.div>
+                                </Link>
+                            ) : (
+                                // User is not authenticated - show login/signup buttons
+                                <>
+                                    <Link href="/auth/sign-in" className="block mt-4">
+                                        <motion.div
+                                            variants={staggerItem}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                        >
+                                            <Button 
+                                                variant="secondary"
+                                                fullWidth
+                                                className="text-gray-700 hover:text-pharmapedia-primary border border-gray-300"
+                                            >
+                                                Se connecter
+                                            </Button>
+                                        </motion.div>
+                                    </Link>
+                                    <Link href="/auth/sign-up" className="block mt-2">
+                                        <motion.div
+                                            variants={staggerItem}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                        >
+                                            <Button 
+                                                variant="primary"
+                                                fullWidth
+                                                className="bg-pharmapedia-primary hover:bg-pharmapedia-accent text-white"
+                                            >
+                                                S'inscrire
+                                            </Button>
+                                        </motion.div>
+                                    </Link>
+                                </>
+                            )}
                         </motion.div>
                     </motion.div>
                 )}

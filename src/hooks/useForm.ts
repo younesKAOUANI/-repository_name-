@@ -42,13 +42,28 @@ export function useForm<T extends Record<string, any>>({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // French field name mapping
+  const getFrenchFieldName = (fieldName: string): string => {
+    const frenchNames: Record<string, string> = {
+      name: 'Le nom',
+      email: "L'adresse e-mail",
+      password: 'Le mot de passe',
+      confirmPassword: 'La confirmation du mot de passe',
+      year: "L'année d'études",
+      university: "L'université",
+    };
+    return frenchNames[fieldName] || fieldName;
+  };
+
   const validateField = useCallback((name: keyof T, value: string): string => {
     const rules = validationRules[name];
     if (!rules) return '';
 
+    const fieldName = getFrenchFieldName(String(name));
+
     // Required validation
     if (rules.required && !value.trim()) {
-      return `${String(name)} is required`;
+      return `${fieldName} est requis`;
     }
 
     // Skip other validations if field is empty and not required
@@ -56,24 +71,27 @@ export function useForm<T extends Record<string, any>>({
 
     // Min length validation
     if (rules.minLength && value.length < rules.minLength) {
-      return `${String(name)} must be at least ${rules.minLength} characters`;
+      return `${fieldName} doit contenir au moins ${rules.minLength} caractères`;
     }
 
     // Max length validation
     if (rules.maxLength && value.length > rules.maxLength) {
-      return `${String(name)} must be no more than ${rules.maxLength} characters`;
+      return `${fieldName} ne doit pas dépasser ${rules.maxLength} caractères`;
     }
 
     // Pattern validation
     if (rules.pattern && !rules.pattern.test(value)) {
-      return `${String(name)} format is invalid`;
+      if (String(name) === 'email') {
+        return 'Adresse e-mail invalide';
+      }
+      return `${fieldName} n'est pas valide`;
     }
 
     // Match validation (for password confirmation, etc.)
     if (rules.match) {
       const matchField = fields[rules.match as keyof T];
       if (matchField && value !== matchField.value) {
-        return `${String(name)} must match ${String(rules.match)}`;
+        return `${fieldName} doit correspondre à ${getFrenchFieldName(String(rules.match))}`;
       }
     }
 

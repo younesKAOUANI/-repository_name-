@@ -6,155 +6,140 @@ export async function GET(request: NextRequest) {
   try {
     const session = await requireRole(['STUDENT']);
     const { searchParams } = new URL(request.url);
-    
+
     const moduleId = searchParams.get('moduleId');
     const lessonId = searchParams.get('lessonId');
     const studyYearId = searchParams.get('studyYearId');
     const type = (searchParams.get('type') || 'ALL').toUpperCase(); // QUIZ | EXAM | ALL
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { message: 'User ID not found in session' },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: 'User ID not found in session' }, { status: 400 });
     }
 
-    // Build where clause for filtering quiz attempts
-    const where: any = {
-      userId: session.user.id,
-      score: { not: null }, // Only completed attempts
-    };
-
-    // Apply filters to the quiz
+    // Build quiz filters
     const quizWhere: any = {};
+    if (type === 'QUIZ') quizWhere.type = 'QUIZ';
+    else if (type === 'EXAM') quizWhere.type = 'EXAM';
+    else quizWhere.type = { in: ['QUIZ', 'EXAM'] };
 
-    if (type === 'QUIZ') {
-      quizWhere.type = 'QUIZ';
-    } else if (type === 'EXAM') {
-      quizWhere.type = 'EXAM';
-    } else {
-      quizWhere.type = { in: ['QUIZ', 'EXAM'] };
-    }
-
-    if (moduleId) {
-      quizWhere.moduleId = moduleId;
-    }
-
-    if (lessonId) {
-      quizWhere.lessonId = lessonId;
-    }
+    if (moduleId) quizWhere.moduleId = moduleId;
+    if (lessonId) quizWhere.lessonId = lessonId;
 
     if (studyYearId) {
       quizWhere.OR = [
-        { 
-          lesson: {
-            module: {
-              semester: {
-                studyYearId: studyYearId
-              }
-            }
-          }
+        {
+          lesson: { module: { semester: { studyYearId } } }
         },
         {
-          module: {
-            semester: {
-              studyYearId: studyYearId
-            }
-          }
+          module: { semester: { studyYearId } }
         }
       ];
     }
 
-    // Add quiz filter to attempts where clause
-    where.quiz = quizWhere;
-
-    // Get quiz attempts with quiz data
+    // Get all attempts with lightweight quiz info
     const attempts = await db.quizAttempt.findMany({
-      where,
+      where: {
+        userId: session.user.id,
+        score: { not: null },
+        quiz: quizWhere
+      },
       include: {
         quiz: {
-          include: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            timeLimit: true,
+            createdAt: true,
             module: {
-              include: {
+              select: {
+                id: true,
+                name: true,
                 semester: {
-                  include: {
-                    studyYear: true
+                  select: {
+                    studyYear: { select: { id: true, name: true } }
                   }
                 }
               }
             },
             lesson: {
-              include: {
+              select: {
+                id: true,
+                title: true,
                 module: {
-                  include: {
+                  select: {
+                    id: true,
+                    name: true,
                     semester: {
-                      include: {
-                        studyYear: true
+                      select: {
+                        studyYear: { select: { id: true, name: true } }
                       }
                     }
                   }
                 }
               }
             },
-            questions: true
+            _count: { select: { questions: true } }
           }
         }
       },
-      orderBy: { finishedAt: 'desc' }
+      orderBy: [
+        { quizId: 'asc' },
+        { finishedAt: 'desc' }
+      ]
     });
 
-    // Convert all attempts to exam history format
+    // Map attempts into exam history objects
     const examHistory = attempts.map(attempt => {
-      const earnedPoints = Number(attempt.score) || 0; // Points earned (e.g., 2.0)
-      const maxScore = attempt.quiz.questions.length; // Total questions (e.g., 3)
-      const percentage = maxScore > 0 ? (earnedPoints / maxScore) * 100 : 0; // (2.0/3) * 100 = 66.67%
-      const currentScore = Math.round(earnedPoints); // Round to nearest whole number for display
+      const quiz = attempt.quiz;
+      if (!quiz) return null;
 
-      // Determine study year from module or lesson
-      let studyYear = null;
-      if (attempt.quiz.lesson?.module?.semester?.studyYear) {
-        studyYear = attempt.quiz.lesson.module.semester.studyYear;
-      } else if (attempt.quiz.module?.semester?.studyYear) {
-        studyYear = attempt.quiz.module.semester.studyYear;
-      }
+      const earnedPoints = Number(attempt.score) || 0;
+      const maxScore = quiz._count.questions ?? 0;
+      const percentage = maxScore > 0 ? (earnedPoints / maxScore) * 100 : 0;
+
+      // Prefer lesson.module.studyYear, then module.studyYear
+      const studyYear =
+        quiz.lesson?.module?.semester?.studyYear ??
+        quiz.module?.semester?.studyYear ??
+        null;
+
+      const module =
+        quiz.module
+          ? { id: quiz.module.id, name: quiz.module.name }
+          : quiz.lesson?.module
+          ? { id: quiz.lesson.module.id, name: quiz.lesson.module.name }
+          : undefined;
 
       return {
-        id: attempt.quiz.id,
-        attemptId: attempt.id, // Include attempt ID to distinguish between multiple attempts
-        title: attempt.quiz.title,
-        description: attempt.quiz.description,
-        timeLimit: attempt.quiz.timeLimit,
-        questionsCount: attempt.quiz.questions.length,
+        id: quiz.id,
+        attemptId: attempt.id,
+        title: quiz.title,
+        description: quiz.description,
+        timeLimit: quiz.timeLimit,
+        questionsCount: maxScore,
         isCompleted: true,
-        score: currentScore, // Rounded whole number for display
+        score: earnedPoints, // keep fractional if any
+        scoreRounded: Math.round(earnedPoints), // UI-friendly rounded
         maxScore,
         percentage,
         startedAt: attempt.startedAt?.toISOString(),
         completedAt: attempt.finishedAt?.toISOString(),
-        createdAt: attempt.quiz.createdAt.toISOString(),
-        studyYear: studyYear ? {
-          id: studyYear.id,
-          name: studyYear.name
-        } : undefined,
-        module: attempt.quiz.module ? {
-          id: attempt.quiz.module.id,
-          name: attempt.quiz.module.name
-        } : attempt.quiz.lesson?.module ? {
-          id: attempt.quiz.lesson.module.id,
-          name: attempt.quiz.lesson.module.name
-        } : undefined,
-        lesson: attempt.quiz.lesson ? {
-          id: attempt.quiz.lesson.id,
-          title: attempt.quiz.lesson.title
-        } : undefined
+        createdAt: quiz.createdAt.toISOString(),
+        studyYear: studyYear ? { id: studyYear.id, name: studyYear.name } : undefined,
+        module,
+        lesson: quiz.lesson ? { id: quiz.lesson.id, title: quiz.lesson.title } : undefined
       };
-    });
+    }).filter(Boolean);
 
-    return NextResponse.json(examHistory);
+    return NextResponse.json(examHistory, {
+      status: 200,
+      headers: { 'Cache-Control': 'private, max-age=30, stale-while-revalidate=60' }
+    });
   } catch (error) {
     console.error('Error fetching exam history:', error);
     return NextResponse.json(
-      { 
+      {
         message: 'Failed to fetch exam history',
         error: error instanceof Error ? error.message : String(error)
       },
