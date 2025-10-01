@@ -39,6 +39,20 @@ export default function StudentQuizInterface() {
 
   const [selectedStudyYear, setSelectedStudyYear] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState<'available' | 'history'>('available');
+  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+
+  // Helper functions for module expansion
+  const toggleModuleExpansion = (moduleId: string) => {
+    const newExpanded = new Set(expandedModules);
+    if (newExpanded.has(moduleId)) {
+      newExpanded.delete(moduleId);
+    } else {
+      newExpanded.add(moduleId);
+    }
+    setExpandedModules(newExpanded);
+  };
+
+  const isModuleExpanded = (moduleId: string) => expandedModules.has(moduleId);
 
   // Load data on component mount
   useEffect(() => {
@@ -293,6 +307,8 @@ export default function StudentQuizInterface() {
                     <ModuleCard
                       key={module.id}
                       module={module}
+                      isExpanded={isModuleExpanded(module.id)}
+                      onToggle={() => toggleModuleExpansion(module.id)}
                       onStartQuiz={handleStartQuiz}
                       getQuizStatusBadge={getQuizStatusBadge}
                       formatDuration={formatDuration}
@@ -377,6 +393,8 @@ export default function StudentQuizInterface() {
 // Module Card Component
 interface ModuleCardProps {
   module: ModuleWithQuizzes;
+  isExpanded: boolean;
+  onToggle: () => void;
   onStartQuiz: (quizId: string) => void;
   getQuizStatusBadge: (quiz: QuizItem) => React.ReactElement;
   formatDuration: (minutes?: number) => string;
@@ -384,6 +402,8 @@ interface ModuleCardProps {
 
 function ModuleCard({ 
   module, 
+  isExpanded,
+  onToggle,
   onStartQuiz, 
   getQuizStatusBadge, 
   formatDuration 
@@ -394,9 +414,12 @@ function ModuleCard({
   );
 
   return (
-    <div className="bg-gray-50 rounded-xl border border-gray-200">
-      {/* Module Header */}
-      <div className="p-6 border-b border-gray-200 bg-white rounded-t-xl">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+      {/* Module Header - Clickable to expand/collapse */}
+      <div 
+        className="p-6 cursor-pointer hover:bg-gray-50 transition-colors"
+        onClick={onToggle}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="p-2 bg-blue-100 rounded-lg">
@@ -413,7 +436,7 @@ function ModuleCard({
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <div className="text-center">
               <div className="text-sm font-medium text-gray-500">Quiz</div>
               <div className="text-lg font-bold text-gray-900">{totalQuizzes}</div>
@@ -428,22 +451,33 @@ function ModuleCard({
                 {totalQuizzes > 0 ? Math.round((completedQuizzes / totalQuizzes) * 100) : 0}%
               </div>
             </div>
+            <div className="ml-4">
+              {isExpanded ? (
+                <ChevronDown className="h-6 w-6 text-gray-400" />
+              ) : (
+                <ChevronRight className="h-6 w-6 text-gray-400" />
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Module Content */}
-      <div className="p-6 space-y-4">
-        {module.lessons.map((lesson) => (
-          <LessonSection
-            key={lesson.id}
-            lesson={lesson}
-            onStartQuiz={onStartQuiz}
-            getQuizStatusBadge={getQuizStatusBadge}
-            formatDuration={formatDuration}
-          />
-        ))}
-      </div>
+      {/* Expandable Content */}
+      {isExpanded && (
+        <div className="border-t border-gray-200">
+          <div className="p-6 space-y-4">
+            {module.lessons.map((lesson) => (
+              <LessonSection
+                key={lesson.id}
+                lesson={lesson}
+                onStartQuiz={onStartQuiz}
+                getQuizStatusBadge={getQuizStatusBadge}
+                formatDuration={formatDuration}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
