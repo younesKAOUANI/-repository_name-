@@ -23,6 +23,7 @@ export default function SignUpPage() {
   const router = useRouter();
   const [authError, setAuthError] = useState<string>('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string>('');
 
   const {
     values,
@@ -97,10 +98,11 @@ export default function SignUpPage() {
         }
 
         setIsSuccess(true);
+        setSuccessMessage(result.message);
         // Redirect to sign-in after successful registration
         setTimeout(() => {
-          router.push('/auth/sign-in?message=Compte créé avec succès');
-        }, 2000);
+          router.push('/auth/sign-in?message=Vérifiez votre e-mail pour activer votre compte');
+        }, 3000);
       } catch (error) {
         setAuthError('Erreur de réseau. Veuillez réessayer.');
         console.error('Sign up error:', error);
@@ -119,7 +121,15 @@ export default function SignUpPage() {
                 <GraduationCap className="h-8 w-8 text-green-600" />
               </div>
               <h1 className="text-2xl font-bold text-gray-900">Compte créé avec succès !</h1>
-              <p className="text-gray-600 mt-2">
+              <p className="text-gray-600 mt-2 mb-4">
+                {successMessage}
+              </p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <p className="text-blue-700 text-sm">
+                  📧 Vérifiez votre boîte e-mail et cliquez sur le lien de vérification pour activer votre compte.
+                </p>
+              </div>
+              <p className="text-gray-500 text-sm">
                 Vous allez être redirigé vers la page de connexion...
               </p>
             </div>
@@ -294,3 +304,6 @@ export default function SignUpPage() {
     </div>
   );
 }
+
+// Force dynamic rendering to avoid prerendering issues with event handlers
+export const dynamic = 'force-dynamic';

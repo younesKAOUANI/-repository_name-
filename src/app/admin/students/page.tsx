@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering to avoid prerendering issues with event handlers
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import AdminLayout from '@/components/layouts/AdminLayout';

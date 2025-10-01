@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['@prisma/client', 'bcrypt']
-  },
+  serverExternalPackages: ['@prisma/client', 'bcrypt'],
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.externals.push('@prisma/client');

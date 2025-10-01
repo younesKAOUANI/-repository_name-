@@ -133,3 +133,5 @@ export default function AdminDashboard() {
     </AdminLayout>
   );
 }
+
+export const dynamic = 'force-dynamic';

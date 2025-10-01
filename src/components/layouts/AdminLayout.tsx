@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Admin Layout Component
  * Provides consistent layout and navigation for all admin pages

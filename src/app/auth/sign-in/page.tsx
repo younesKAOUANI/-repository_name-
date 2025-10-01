@@ -19,6 +19,9 @@ interface SignInFormData {
 export default function SignInPage() {
   const router = useRouter();
   const [authError, setAuthError] = useState<string>('');
+  const [showResendVerification, setShowResendVerification] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
 
   const {
     values,
@@ -54,6 +57,10 @@ export default function SignInPage() {
 
         if (result?.error) {
           setAuthError(result.error);
+          // Check if error is about email verification
+          if (result.error.includes('vérifier votre e-mail')) {
+            setShowResendVerification(true);
+          }
           return;
         }
 
@@ -83,6 +90,40 @@ export default function SignInPage() {
     },
   });
 
+  const handleResendVerification = async () => {
+    if (!values.email) {
+      setAuthError('Veuillez entrer votre adresse e-mail');
+      return;
+    }
+
+    setResendLoading(true);
+    setResendSuccess(false);
+
+    try {
+      const response = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: values.email }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setResendSuccess(true);
+        setAuthError('');
+        setShowResendVerification(false);
+      } else {
+        setAuthError(data.message || 'Erreur lors de l\'envoi de l\'e-mail');
+      }
+    } catch (error) {
+      setAuthError('Erreur lors de l\'envoi de l\'e-mail de vérification');
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen relative bg-gradient-to-br from-blue-300 to-indigo-100 flex items-center justify-center p-4">
       <BackgroundGradient />
@@ -108,6 +149,34 @@ export default function SignInPage() {
           {authError && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-sm text-red-700">{authError}</p>
+              {showResendVerification && (
+                <div className="mt-3">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleResendVerification}
+                    disabled={resendLoading}
+                    className="text-sm"
+                  >
+                    {resendLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                        Envoi en cours...
+                      </>
+                    ) : (
+                      'Renvoyer l\'e-mail de vérification'
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {resendSuccess && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-700">
+                E-mail de vérification envoyé avec succès ! Vérifiez votre boîte de réception.
+              </p>
             </div>
           )}
           

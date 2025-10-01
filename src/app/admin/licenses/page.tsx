@@ -487,3 +487,6 @@ export default function AdminLicensesPage() {
     </AdminLayout>
   );
 }
+
+// Force dynamic rendering to avoid prerendering issues with event handlers
+export const dynamic = 'force-dynamic';

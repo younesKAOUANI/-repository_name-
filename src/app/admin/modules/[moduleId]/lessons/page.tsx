@@ -422,3 +422,6 @@ export default function ModuleLessonsPage() {
     </AdminLayout>
   );
 }
+
+// Force dynamic rendering to avoid prerendering issues with event handlers
+export const dynamic = 'force-dynamic';

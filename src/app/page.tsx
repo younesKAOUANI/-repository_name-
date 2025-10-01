@@ -1,3 +1,6 @@
+// Force dynamic rendering to avoid prerendering issues with event handlers
+export const dynamic = 'force-dynamic';
+
 import About from "@/components/LandingPage/About";
 import Features from "@/components/LandingPage/Features";
 import Header from "@/components/LandingPage/Header";

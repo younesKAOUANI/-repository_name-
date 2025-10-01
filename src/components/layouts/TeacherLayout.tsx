@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Teacher Layout Component
  * Provides consistent layout and navigation for all teacher pages
