@@ -1,20 +1,9 @@
-'use client';
+import { COMMON_METADATA } from '@/lib/metadata';
+import TeacherModulesClient from '@/components/teacher/TeacherModulesClient';
 
-import TeacherLayout from '@/components/layouts/TeacherLayout';
-import ModulesManager from '@/components/ModulesManager';
+// Export metadata for this page
+export const metadata = COMMON_METADATA.teacher.modules;
 
 export default function TeacherModulesPage() {
-  return (
-    <TeacherLayout
-      title="Modules d'enseignement"
-      subtitle="Consultez et gérez vos modules d'enseignement"
-    >
-      <ModulesManager 
-        allowCreate={false}
-        allowEdit={false}
-        allowDelete={false}
-        showActions={true}
-      />
-    </TeacherLayout>
-  );
+  return <TeacherModulesClient />;
 }

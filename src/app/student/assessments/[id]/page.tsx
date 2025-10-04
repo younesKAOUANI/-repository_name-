@@ -3,13 +3,15 @@
  * Handles both quizzes and exams in a single interface
  */
 
-import { Metadata } from 'next';
-import ExamSessionView from '@/components/ExamSessionView';
+import AssessmentSessionClient from './AssessmentSessionClient';
+import { generateMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
-  title: 'Assessment Session - Pharmapedia',
-  description: 'Session d\'évaluation - Quiz ou Examen',
-};
+// Export metadata for assessment sessions
+export const metadata = generateMetadata({
+  title: 'Session d\'Évaluation',
+  description: 'Passez votre quiz ou examen dans un environnement sécurisé et optimisé.',
+  keywords: ['session', 'évaluation', 'quiz', 'examen', 'test'],
+});
 
 interface AssessmentSessionPageProps {
   params: Promise<{ id: string }>;
@@ -18,5 +20,5 @@ interface AssessmentSessionPageProps {
 export default async function AssessmentSessionPage({ params }: AssessmentSessionPageProps) {
   const { id } = await params;
   
-  return <ExamSessionView examId={id} />;
+  return <AssessmentSessionClient assessmentId={id} />;
 }

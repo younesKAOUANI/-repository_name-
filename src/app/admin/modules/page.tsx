@@ -1,23 +1,9 @@
-'use client';
+import { COMMON_METADATA } from '@/lib/metadata';
+import AdminModulesClient from '@/components/admin/AdminModulesClient';
 
-import AdminLayout from '@/components/layouts/AdminLayout';
-import ModulesManager from '@/components/ModulesManager';
+// Export metadata for this page
+export const metadata = COMMON_METADATA.admin.modules;
 
 export default function AdminModulesPage() {
-  return (
-    <AdminLayout
-      title="Gestion des modules"
-      subtitle="Gérez les modules, semestres et années d'étude"
-    >
-      <ModulesManager 
-        allowCreate={true}
-        allowEdit={true}
-        allowDelete={true}
-        showActions={true}
-      />
-    </AdminLayout>
-  );
+  return <AdminModulesClient />;
 }
-
-// Force dynamic rendering to avoid prerendering issues with event handlers
-export const dynamic = 'force-dynamic';

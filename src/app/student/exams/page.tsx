@@ -3,13 +3,11 @@
  * Main page for students to access exams
  */
 
-import { Metadata } from 'next';
-import StudentExamInterface from '@/components/StudentExamInterface';
+import StudentExamInterface from '@/components/student/StudentExamInterface';
+import { COMMON_METADATA } from '@/lib/metadata';
 
-export const metadata: Metadata = {
-  title: 'Examens - Pharmapedia',
-  description: 'Passez vos examens et consultez vos résultats',
-};
+// Export metadata using our centralized system
+export const metadata = COMMON_METADATA.student.exams;
 
 export default function StudentExamPage() {
   return <StudentExamInterface />

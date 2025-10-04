@@ -111,11 +111,21 @@ class StudentRevisionQuizService {
    */
   async getAvailableQuestionCount(
     lessonIds: string[], 
-    moduleIds: string[]
+    moduleIds: string[],
+    difficulties?: string[],
+    questionTypes?: QuestionType[]
   ): Promise<QuestionCountInfo> {
     const params = new URLSearchParams();
     lessonIds.forEach(id => params.append('lessonIds', id));
     moduleIds.forEach(id => params.append('moduleIds', id));
+    
+    if (difficulties && difficulties.length > 0) {
+      difficulties.forEach(diff => params.append('difficulties', diff));
+    }
+    
+    if (questionTypes && questionTypes.length > 0) {
+      questionTypes.forEach(type => params.append('questionTypes', type));
+    }
 
     const response = await fetch(`${this.questionBankUrl}/count?${params}`);
     

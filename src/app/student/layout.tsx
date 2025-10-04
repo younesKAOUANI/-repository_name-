@@ -1,27 +1,21 @@
-"use client";
+'use client';
 
-/**
- * Student Layout Component
- * Provides consistent layout and navigation for all student pages
- */
-
-import DashboardLayout from "@/components/DashboardLayout";
+import DashboardLayout from "@/components/shared/DashboardLayout";
 import {
   MdHome,
   MdLibraryBooks,
   MdQuiz,
-  MdBarChart,
-  MdCalendarToday,
   MdPerson,
-} from "react-icons/md";
+  MdShuffle,
+  } from "react-icons/md";
 
 const studentMenuItems = [
   { label: "Tableau de bord", href: "/student/dashboard", icon: MdHome },
   { label: "Mes cours", href: "/student/courses", icon: MdLibraryBooks },
   { label: "Quiz disponibles", href: "/student/quizzes", icon: MdQuiz },
-  { label: "Examens", href: "/student/exams", icon: MdQuiz },
-  { label: "Mes résultats", href: "/student/results", icon: MdBarChart },
-  { label: "Planning", href: "/student/schedule", icon: MdCalendarToday },
+  { label: "Quiz de révision", href: "/student/revision-quiz", icon: MdShuffle },
+   { label: "Examens", href: "/student/exams", icon: MdQuiz },
+  // { label: "Planning", href: "/student/schedule", icon: MdCalendarToday },
   { label: "Profil", href: "/student/profile", icon: MdPerson },
 ];
 

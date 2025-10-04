@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
-import AuthProvider from "@/components/AuthProvider";
+import AuthProvider from "@/components/auth/AuthProvider";
+import { generateMetadata } from "@/lib/metadata";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -19,10 +20,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Pharmapedia - Plateforme d'apprentissage pharmaceutique",
-  description: "La plateforme incontournable pour réussir vos examens en médecine, pharmacie et sciences de la santé. Quiz, cours et formations professionnelles.",
-};
+// Generate comprehensive metadata using our custom function
+export const metadata: Metadata = generateMetadata();
 
 export default function RootLayout({
   children,

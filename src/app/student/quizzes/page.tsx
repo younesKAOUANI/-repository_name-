@@ -3,13 +3,11 @@
  * Main page for students to access course quizzes
  */
 
-import { Metadata } from 'next';
-import StudentQuizInterface from '@/components/StudentQuizInterface';
+import StudentQuizInterface from '@/components/student/StudentQuizInterface';
+import { COMMON_METADATA } from '@/lib/metadata';
 
-export const metadata: Metadata = {
-  title: 'Quiz - Pharmapedia',
-  description: 'Testez vos connaissances avec nos quiz de cours',
-};
+// Export metadata using our centralized system
+export const metadata = COMMON_METADATA.student.quizzes;
 
 export default function StudentQuizPage() {
   return <StudentQuizInterface />;

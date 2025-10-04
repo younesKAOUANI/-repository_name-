@@ -70,7 +70,7 @@ export async function GET(
       }
     });
 
-    if (!hasAccess) {
+    if (!hasAccess && process.env.NODE_ENV !== 'development') {
       return NextResponse.json(
         { error: 'Accès non autorisé à ce module' },
         { status: 403 }

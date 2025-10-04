@@ -10,6 +10,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const lessonIds = searchParams.getAll('lessonIds');
     const moduleIds = searchParams.getAll('moduleIds');
+    const difficulties = searchParams.getAll('difficulties');
+    const questionTypes = searchParams.getAll('questionTypes') as QuestionType[];
 
     if (lessonIds.length === 0 && moduleIds.length === 0) {
       return NextResponse.json(
@@ -23,6 +25,20 @@ export async function GET(request: NextRequest) {
       isActive: true,
       OR: []
     };
+
+    // Add difficulty filters if specified
+    if (difficulties.length > 0) {
+      where.difficulty = {
+        in: difficulties
+      };
+    }
+
+    // Add question type filters if specified
+    if (questionTypes.length > 0) {
+      where.questionType = {
+        in: questionTypes
+      };
+    }
 
     if (lessonIds.length > 0) {
       where.OR.push({

@@ -1,15 +1,9 @@
-'use client';
+import { COMMON_METADATA } from '@/lib/metadata';
+import TeacherQuizzesClient from '@/components/teacher/TeacherQuizzesClient';
 
-import TeacherLayout from '@/components/layouts/TeacherLayout';
-import QuizManager from '@/components/QuizManager';
+// Export metadata for this page
+export const metadata = COMMON_METADATA.teacher.quizzes;
 
 export default function TeacherQuizzesPage() {
-  return (
-    <TeacherLayout
-      title="Mes Quiz"
-      subtitle="Créez et gérez vos quiz: leçons, examens et quiz de révision"
-    >
-      <QuizManager userRole="INSTRUCTOR" />
-    </TeacherLayout>
-  );
+  return <TeacherQuizzesClient />;
 }

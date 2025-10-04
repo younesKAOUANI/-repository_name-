@@ -77,7 +77,72 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(user);
+    // Get user stats
+    const quizStats = await db.quizAttempt.aggregate({
+      where: {
+        userId: session.user.id,
+        finishedAt: { not: null }
+      },
+      _count: { id: true },
+      _avg: { score: true },
+      _max: { score: true }
+    });
+
+    // Get recent quiz attempts
+    const recentQuizAttempts = await db.quizAttempt.findMany({
+      where: {
+        userId: session.user.id,
+        finishedAt: { not: null }
+      },
+      include: {
+        quiz: {
+          select: {
+            title: true,
+            module: {
+              select: {
+                name: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: {
+        finishedAt: 'desc'
+      },
+      take: 10
+    });
+
+    // Calculate stats
+    const stats = {
+      totalQuizzes: quizStats._count.id || 0,
+      averageScore: Number(quizStats._avg.score) || 0,
+      bestScore: Number(quizStats._max.score) || 0,
+      totalStudyTime: 0, // This would require tracking study sessions
+      currentStreak: 0, // This would require more complex calculation
+      totalModulesAccessed: 0 // This would require tracking module access
+    };
+
+    // Transform recent attempts for client
+    const transformedAttempts = recentQuizAttempts.map(attempt => ({
+      id: attempt.id,
+      score: Number(attempt.score) || 0,
+      maxScore: 100, // Assuming scores are percentages
+      percentage: Number(attempt.score) || 0,
+      completedAt: attempt.finishedAt?.toISOString(),
+      quiz: {
+        title: attempt.quiz.title,
+        module: {
+          name: attempt.quiz.module?.name || 'Module inconnu'
+        }
+      }
+    }));
+
+    return NextResponse.json({
+      user,
+      licenses: user.licenses,
+      recentQuizAttempts: transformedAttempts,
+      stats
+    });
   } catch (error) {
     console.error('Erreur lors de la récupération du profil:', error);
     return NextResponse.json(

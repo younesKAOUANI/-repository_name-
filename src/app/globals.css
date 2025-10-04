@@ -43,10 +43,81 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   
+  /* Pharmapedia Tailwind Color Classes */
+  --color-pharmapedia-primary-50: var(--color-pharmapedia-primary-50);
+  --color-pharmapedia-primary-100: var(--color-pharmapedia-primary-100);
+  --color-pharmapedia-primary-200: var(--color-pharmapedia-primary-200);
+  --color-pharmapedia-primary-300: var(--color-pharmapedia-primary-300);
+  --color-pharmapedia-primary-400: var(--color-pharmapedia-primary-400);
+  --color-pharmapedia-primary-500: var(--color-pharmapedia-primary-500);
+  --color-pharmapedia-primary-600: var(--color-pharmapedia-primary-600);
+  --color-pharmapedia-primary-700: var(--color-pharmapedia-primary-700);
+  --color-pharmapedia-primary-800: var(--color-pharmapedia-primary-800);
+  --color-pharmapedia-primary-900: var(--color-pharmapedia-primary-900);
+  --color-pharmapedia-secondary-50: var(--color-pharmapedia-secondary-50);
+  --color-pharmapedia-secondary-100: var(--color-pharmapedia-secondary-100);
+  --color-pharmapedia-secondary-200: var(--color-pharmapedia-secondary-200);
+  --color-pharmapedia-secondary-300: var(--color-pharmapedia-secondary-300);
+  --color-pharmapedia-secondary-400: var(--color-pharmapedia-secondary-400);
+  --color-pharmapedia-secondary-500: var(--color-pharmapedia-secondary-500);
+  --color-pharmapedia-secondary-600: var(--color-pharmapedia-secondary-600);
+  --color-pharmapedia-secondary-700: var(--color-pharmapedia-secondary-700);
+  --color-pharmapedia-secondary-800: var(--color-pharmapedia-secondary-800);
+  --color-pharmapedia-secondary-900: var(--color-pharmapedia-secondary-900);
+  --color-pharmapedia-accent-50: var(--color-pharmapedia-accent-50);
+  --color-pharmapedia-accent-100: var(--color-pharmapedia-accent-100);
+  --color-pharmapedia-accent-200: var(--color-pharmapedia-accent-200);
+  --color-pharmapedia-accent-300: var(--color-pharmapedia-accent-300);
+  --color-pharmapedia-accent-400: var(--color-pharmapedia-accent-400);
+  --color-pharmapedia-accent-500: var(--color-pharmapedia-accent-500);
+  --color-pharmapedia-accent-600: var(--color-pharmapedia-accent-600);
+  --color-pharmapedia-accent-700: var(--color-pharmapedia-accent-700);
+  --color-pharmapedia-accent-800: var(--color-pharmapedia-accent-800);
+  --color-pharmapedia-accent-900: var(--color-pharmapedia-accent-900);
+  
   /* Pharmapedia Custom Colors */
-  --color-pharmapedia-primary: oklch(0.41 0.19 268); /* #3a0acd */
-  --color-pharmapedia-accent: oklch(0.78 0.12 200); /* #1dcbe9 */
-  --color-pharmapedia-secondary: oklch(0.43 0.11 238); /* #1b5498 */
+  /* Updated Pharmapedia Colors - Consistent with new design system */
+  
+  /* Primary Colors - Blue Palette */
+  --color-pharmapedia-primary-50: #eff6ff;
+  --color-pharmapedia-primary-100: #dbeafe;
+  --color-pharmapedia-primary-200: #bfdbfe;
+  --color-pharmapedia-primary-300: #93c5fd;
+  --color-pharmapedia-primary-400: #60a5fa;
+  --color-pharmapedia-primary-500: #3b82f6; /* Main Primary */
+  --color-pharmapedia-primary-600: #2563eb;
+  --color-pharmapedia-primary-700: #1d4ed8;
+  --color-pharmapedia-primary-800: #1e40af;
+  --color-pharmapedia-primary-900: #1e3a8a;
+  
+  /* Secondary Colors - Sky Palette */
+  --color-pharmapedia-secondary-50: #f0f9ff;
+  --color-pharmapedia-secondary-100: #e0f2fe;
+  --color-pharmapedia-secondary-200: #bae6fd;
+  --color-pharmapedia-secondary-300: #7dd3fc;
+  --color-pharmapedia-secondary-400: #38bdf8;
+  --color-pharmapedia-secondary-500: #0ea5e9; /* Main Secondary */
+  --color-pharmapedia-secondary-600: #0284c7;
+  --color-pharmapedia-secondary-700: #0369a1;
+  --color-pharmapedia-secondary-800: #075985;
+  --color-pharmapedia-secondary-900: #0c4a6e;
+  
+  /* Accent Colors - Amber Palette */
+  --color-pharmapedia-accent-50: #fef3c7;
+  --color-pharmapedia-accent-100: #fde68a;
+  --color-pharmapedia-accent-200: #fcd34d;
+  --color-pharmapedia-accent-300: #fbbf24;
+  --color-pharmapedia-accent-400: #f59e0b;
+  --color-pharmapedia-accent-500: #d97706; /* Main Accent */
+  --color-pharmapedia-accent-600: #b45309;
+  --color-pharmapedia-accent-700: #92400e;
+  --color-pharmapedia-accent-800: #78350f;
+  --color-pharmapedia-accent-900: #451a03;
+  
+  /* Legacy variables for backward compatibility */
+  --color-pharmapedia-primary: var(--color-pharmapedia-primary-500);
+  --color-pharmapedia-secondary: var(--color-pharmapedia-secondary-500);
+  --color-pharmapedia-accent: var(--color-pharmapedia-accent-500);
   
   /* Animation durations for consistent timing */
   --animate-duration-fast: 0.2s;

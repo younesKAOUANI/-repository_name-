@@ -16,14 +16,14 @@ model User {
   role                    Role           @default(STUDENT)
   createdAt               DateTime       @default(now())
   updatedAt               DateTime       @updatedAt
+  emailVerificationToken  String?
   password                String?
+  pendingEmail            String?
   resetToken              String?
   resetTokenExpiry        DateTime?
-  pendingEmail            String?
-  emailVerificationToken  String?
-  emailVerificationExpiry DateTime?
-  year                    Int?
   university              String?
+  year                    Int?
+  emailVerificationExpiry DateTime?
   accounts                Account[]
   licenses                License[]
   quizAttempts            QuizAttempt[]
@@ -97,10 +97,10 @@ model Semester {
 model Module {
   id                String          @id @default(cuid())
   name              String
-  description       String?
   semesterId        String
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
+  description       String?
   lessons           Lesson[]
   licenseLinks      LicenseModule[]
   semester          Semester        @relation(fields: [semesterId], references: [id], onDelete: Cascade)
@@ -113,12 +113,12 @@ model Module {
 model Lesson {
   id                String              @id @default(cuid())
   title             String
-  description       String?
   content           String?
-  order             Int                 @default(0)
   moduleId          String
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
+  description       String?
+  order             Int                 @default(0)
   module            Module              @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   pdfs              LessonPDF[]
   videos            LessonVideo[]
@@ -151,15 +151,15 @@ model LessonVideo {
 model Quiz {
   id                 String                  @id @default(cuid())
   title              String
-  description        String?
   lessonId           String?
   moduleId           String?
   type               QuizType
   order              Int?
-  questionCount      Int?
-  timeLimit          Int?
   createdAt          DateTime                @default(now())
   updatedAt          DateTime                @updatedAt
+  description        String?
+  questionCount      Int?
+  timeLimit          Int?
   generatedQuestions GeneratedQuizQuestion[]
   questions          Question[]
   lesson             Lesson?                 @relation(fields: [lessonId], references: [id])
@@ -192,7 +192,6 @@ model QuestionBank {
   id            String                  @id @default(cuid())
   text          String
   questionType  QuestionType
-  studyYearId   String?
   lessonId      String?
   moduleId      String?
   difficulty    String?
@@ -200,6 +199,7 @@ model QuestionBank {
   isActive      Boolean                 @default(true)
   createdAt     DateTime                @default(now())
   updatedAt     DateTime                @updatedAt
+  studyYearId   String?
   usedInQuizzes GeneratedQuizQuestion[]
   lesson        Lesson?                 @relation(fields: [lessonId], references: [id])
   module        Module?                 @relation(fields: [moduleId], references: [id])
@@ -307,6 +307,31 @@ model SessionQuizLesson {
   @@unique([quizId, lessonId])
   @@index([quizId])
   @@index([lessonId])
+}
+
+model University {
+  id         String      @id @default(cuid())
+  name       String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  driveLinks DriveLink[]
+
+  @@index([name])
+}
+
+model DriveLink {
+  id           String     @id @default(cuid())
+  studyYear    String
+  year         String
+  link         String
+  universityId String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  university   University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  @@index([universityId])
+  @@index([studyYear])
+  @@index([year])
 }
 
 model PlanType {

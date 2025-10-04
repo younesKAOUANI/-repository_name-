@@ -54,22 +54,12 @@ async function main() {
   const studentData = [
     // 3rd Year Students (Main Focus)
     { email: 'student1@pharmapedia.com', name: 'Amina Khelifi', year: 3, university: 'Université d\'Alger - Faculté de Pharmacie' },
-    { email: 'student2@pharmapedia.com', name: 'Karim Belhadj', year: 3, university: 'Université d\'Alger - Faculté de Pharmacie' },
-    { email: 'student3@pharmapedia.com', name: 'Nadia Chergui', year: 3, university: 'Université de Constantine - Faculté de Pharmacie' },
-    { email: 'student4@pharmapedia.com', name: 'Sofiane Meziani', year: 3, university: 'Université d\'Oran - Faculté de Pharmacie' },
-    { email: 'student5@pharmapedia.com', name: 'Yasmine Boudali', year: 3, university: 'Université de Tlemcen - Faculté de Pharmacie' },
-    { email: 'student6@pharmapedia.com', name: 'Omar Benali', year: 3, university: 'Université de Sétif - Faculté de Pharmacie' },
-    { email: 'student7@pharmapedia.com', name: 'Samira Kaddour', year: 3, university: 'Université de Batna - Faculté de Pharmacie' },
-    { email: 'student8@pharmapedia.com', name: 'Reda Hamdi', year: 3, university: 'Université de Blida - Faculté de Pharmacie' },
-    { email: 'student9@pharmapedia.com', name: 'Leila Boukerch', year: 3, university: 'Université d\'Annaba - Faculté de Pharmacie' },
-    { email: 'student10@pharmapedia.com', name: 'Abderrahim Slimani', year: 3, university: 'Université d\'Alger - Faculté de Pharmacie' },
-    
+
     // Other years for diversity
     { email: 'student11@pharmapedia.com', name: 'Youcef Meziane', year: 4, university: 'Université de Constantine - Faculté de Pharmacie' },
     { email: 'student12@pharmapedia.com', name: 'Fatima Boudiaf', year: 5, university: 'Université d\'Oran - Faculté de Pharmacie' },
     { email: 'student13@pharmapedia.com', name: 'Lina Berkane', year: 4, university: 'Université de Tlemcen - Faculté de Pharmacie' },
     { email: 'student14@pharmapedia.com', name: 'Ahmed Brahimi', year: 2, university: 'Université d\'Alger - Faculté de Pharmacie' },
-    { email: 'student15@pharmapedia.com', name: 'Meriem Bouazza', year: 2, university: 'Université de Constantine - Faculté de Pharmacie' },
   ];
 
   for (const data of studentData) {
@@ -1497,8 +1487,69 @@ async function main() {
     }
   }
 
+  // Create Universities and Drive Links
+  console.log('\n🏛️ Creating universities and drive links...');
+  
+  const universityData = [
+    { name: 'Université d\'Alger - Faculté de Pharmacie' },
+    { name: 'Université de Constantine - Faculté de Pharmacie' },
+    { name: 'Université d\'Oran - Faculté de Pharmacie' },
+    { name: 'Université de Tlemcen - Faculté de Pharmacie' },
+    { name: 'Université de Sétif - Faculté de Pharmacie' },
+    { name: 'Université de Batna - Faculté de Pharmacie' },
+    { name: 'Université de Blida - Faculté de Pharmacie' },
+    { name: 'Université d\'Annaba - Faculté de Pharmacie' },
+    { name: 'Université de Béjaïa - Faculté de Pharmacie' },
+    { name: 'Université de Mostaganem - Faculté de Pharmacie' },
+  ];
+
+  const universities = [];
+  for (const data of universityData) {
+    const university = await prisma.university.create({
+      data: {
+        id: createId(),
+        name: data.name,
+      },
+    });
+    universities.push(university);
+    console.log(`✅ University: ${university.name}`);
+  }
+
+  // Create Drive Links for each university
+  console.log('\n🔗 Creating drive links...');
+  
+  const academicYears = ['2022/2023', '2023/2024', '2024/2025', '2025/2026'];
+  const studyYearNames = ['1ère année', '2ème année', '3ème année', '4ème année', '5ème année', '6ème année'];
+  const driveLinks = [];
+
+  for (const university of universities) {
+    // Create drive links for different study years and academic years
+    const yearsToCreate = academicYears.slice(Math.floor(Math.random() * 2), Math.floor(Math.random() * 2) + 3);
+    const studyYearsToCreate = studyYearNames.slice(0, Math.floor(Math.random() * 4) + 3); // 3-6 study years per university
+    
+    for (const studyYear of studyYearsToCreate) {
+      for (const academicYear of yearsToCreate) {
+        // Not all study years have resources for all academic years
+        if (Math.random() > 0.3) { // 70% chance of having resources
+          const driveLink = await prisma.driveLink.create({
+            data: {
+              id: createId(),
+              studyYear: studyYear,
+              year: academicYear,
+              link: `https://drive.google.com/drive/folders/${createId()}?usp=sharing`,
+              universityId: university.id,
+            },
+          });
+          driveLinks.push(driveLink);
+          console.log(`✅ Drive Link: ${university.name} - ${studyYear} - ${academicYear}`);
+        }
+      }
+    }
+  }
+
   // Summary
   console.log('\n🎉 COMPREHENSIVE DATABASE SEEDING COMPLETED!');
+
   console.log('\n📊 DETAILED DATABASE SUMMARY:');
   console.log('==============================================');
   console.log(`👥 Users: ${studentData.length + 2} (${studentData.filter(s => s.year === 3).length} 3rd year students + others, 1 teacher, 1 admin)`);
@@ -1513,6 +1564,8 @@ async function main() {
   console.log(`   🔄 Session Quizzes: ${sessionQuizData.length} (revision & integration)`);
   console.log(`   🎯 Specialized Exams: 2 (integrative assessments)`);
   console.log(`🎫 Student Licenses: ${students.length} (Annual - Year-specific access)`);
+  console.log(`🏛️ Universities: ${universities.length} (Algerian pharmacy faculties)`);
+  console.log(`🔗 Drive Links: ${driveLinks.length} (Academic year resources)`);
   
   console.log('\n🎯 3RD YEAR FOCUS HIGHLIGHTS:');
   console.log('==============================================');
