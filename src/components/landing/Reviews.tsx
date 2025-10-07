@@ -1,6 +1,7 @@
 'use client';
 
 import { Star, Quote } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface Review {
   id: number;
@@ -71,43 +72,98 @@ const reviews: Review[] = [
 
 export default function Reviews() {
   return (
-    <section className="py-20 bg-gray-50">
+    <motion.section 
+      className="py-20"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: true }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          viewport={{ once: true }}
+        >
+          <motion.h2 
+            className="text-4xl font-bold text-gray-900 mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
             Ce que disent nos étudiants
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-gray-600 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            viewport={{ once: true }}
+          >
             Découvrez les témoignages de milliers d&apos;étudiants qui ont transformé 
             leur apprentissage avec Pharmapedia
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
-          <div className="text-center">
-            <div className="text-4xl font-bold text-pharmapedia-primary-600 mb-2">4.9/5</div>
-            <div className="text-gray-600">Note moyenne</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-pharmapedia-primary-600 mb-2">10k+</div>
-            <div className="text-gray-600">Étudiants actifs</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-pharmapedia-primary-600 mb-2">95%</div>
-            <div className="text-gray-600">Taux de réussite</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-pharmapedia-primary-600 mb-2">50k+</div>
-            <div className="text-gray-600">Questions disponibles</div>
-          </div>
-        </div>
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+          viewport={{ once: true }}
+        >
+          {[
+            { value: "4.9/5", label: "Note moyenne" },
+            { value: "10k+", label: "Étudiants actifs" },
+            { value: "95%", label: "Taux de réussite" },
+            { value: "50k+", label: "Questions disponibles" }
+          ].map((stat, index) => (
+            <motion.div 
+              key={stat.label}
+              className="text-center"
+              initial={{ opacity: 0, y: 20, scale: 0.8 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.6, delay: 1.0 + index * 0.1 }}
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <motion.div 
+                className="text-4xl font-bold text-pharmapedia-primary-600 mb-2"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 1.2 + index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                {stat.value}
+              </motion.div>
+              <div className="text-gray-600">{stat.label}</div>
+            </motion.div>
+          ))}
+        </motion.div>
 
         {/* Reviews Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {reviews.map((review) => (
-            <div key={review.id} className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 1.6 }}
+          viewport={{ once: true }}
+        >
+          {reviews.map((review, index) => (
+            <motion.div 
+              key={review.id} 
+              className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.8 + index * 0.1 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -5, scale: 1.02 }}
+            >
               {/* Quote Icon */}
               <div className="flex items-center justify-between mb-4">
                 <Quote className="w-8 h-8 text-pharmapedia-primary-600 opacity-50" />
@@ -136,20 +192,40 @@ export default function Reviews() {
                   <div className="text-xs text-pharmapedia-primary-600">{review.university}</div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* CTA */}
-        <div className="text-center mt-12">
-          <p className="text-gray-600 mb-6">
+        <motion.div 
+          className="text-center mt-12"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 2.4 }}
+          viewport={{ once: true }}
+        >
+          <motion.p 
+            className="text-gray-600 mb-6"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 2.6 }}
+            viewport={{ once: true }}
+          >
             Rejoignez des milliers d&apos;étudiants qui font confiance à Pharmapedia
-          </p>
-          <button className="bg-pharmapedia-primary-600 hover:bg-pharmapedia-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-300">
+          </motion.p>
+          <motion.button 
+            className="bg-pharmapedia-primary-600 hover:bg-pharmapedia-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-300"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 2.8 }}
+            viewport={{ once: true }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             Commencer gratuitement
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }

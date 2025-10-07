@@ -8,11 +8,10 @@ import Hero from "@/components/landing/Hero";
 import Reviews from "@/components/landing/Reviews";
 import CTA from "@/components/landing/CTA";
 import Subscription from "@/components/landing/Subscription";
-import ContactForm from "@/components/landing/ContactForm";
 import Footer from "@/components/landing/Footer";
-import Pricing from "@/components/landing/Pricing";
-import BackgroundGradient from "@/components/ui/BackgroundGradient";
 import { generateMetadata } from "@/lib/metadata";
+import AnimatedBackground from "@/components/ui/AnimatedBackground";
+import Pricing from "@/components/landing/Pricing";
 
 // Export metadata for the landing page
 export const metadata = generateMetadata({
@@ -31,17 +30,25 @@ export const metadata = generateMetadata({
 
 export default function Home() {
   return (
-    <div>
-      <Header />
-      <Hero />
-      <About />
-      <Features />
-      <Reviews />
-      {/* <Pricing /> */}
-      <CTA />
-      <Subscription />
-      <ContactForm />
-      <Footer />
+    <div className="relative">
+      {/* Animated background with many particles */}
+      <AnimatedBackground
+        particleCount={200}
+        colors={['bg-blue-400', 'bg-purple-400', 'bg-pink-400', 'bg-indigo-400', 'bg-violet-400', 'bg-cyan-400', 'bg-emerald-400', 'bg-yellow-400']}
+      />
+      
+      {/* Page content */}
+      <div className="relative z-10">
+        <Header />
+        <Hero />
+        <About />
+        <Features />
+        <Reviews />
+        <Pricing />
+        <CTA />
+        <Subscription />
+        <Footer />
+      </div>
     </div>
   );
 }

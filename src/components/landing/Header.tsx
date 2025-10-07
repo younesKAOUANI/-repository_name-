@@ -20,12 +20,9 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 
     // Navigation links array
     const navLinks = [
-        { href: '#', label: 'Accueil', isActive: true },
-        { href: '#', label: 'Présentation', isActive: false },
-        { href: '#', label: 'Cours', isActive: false },
-        { href: '#', label: 'Quiz', isActive: false },
-        { href: '#', label: 'À propos', isActive: false },
-        { href: '#', label: 'Contact', isActive: false }
+        { href: '/', label: 'Accueil', isActive: true },
+        { href: '/about', label: 'À propos', isActive: false },
+        { href: '/contact', label: 'Contact', isActive: false }
     ];
 
     // Get dashboard route and label based on user role
@@ -71,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 
     return (
         <motion.header 
-            className={`max-w-7xl mx-auto  ${className}`}
+            className={`container mx-auto  ${className}`}
             variants={slideVariants.fromTop}
             initial="hidden"
             animate="visible"
@@ -84,7 +81,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                 animate="visible"
                 transition={{ delay: 0.1 }}
             >
-                <div className=" mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center my-4 text-sm">
                         {/* Logo */}
                         <motion.div 

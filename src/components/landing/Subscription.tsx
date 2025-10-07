@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Mail, Gift, Bell, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function Subscription() {
   const [email, setEmail] = useState('');
@@ -31,25 +32,56 @@ export default function Subscription() {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-pharmapedia-primary-50 via-white to-pharmapedia-secondary-50">
+    <motion.section 
+      className="py-20 bg-gradient-to-br from-pharmapedia-primary-50 via-white to-pharmapedia-secondary-50"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: true }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-pharmapedia-primary-600 to-pharmapedia-secondary-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            <motion.div 
+              className="inline-flex items-center space-x-2 bg-gradient-to-r from-pharmapedia-primary-600 to-pharmapedia-secondary-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-4"
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.05 }}
+            >
               <Gift className="w-4 h-4" />
               <span>Newsletter Exclusive</span>
-            </div>
+            </motion.div>
             
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <motion.h2 
+              className="text-4xl font-bold text-gray-900 mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              viewport={{ once: true }}
+            >
               Restez informé de nos dernières nouveautés
-            </h2>
+            </motion.h2>
             
-            <p className="text-xl text-gray-600 leading-relaxed">
+            <motion.p 
+              className="text-xl text-gray-600 leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              viewport={{ once: true }}
+            >
               Rejoignez notre newsletter et recevez chaque semaine des conseils d&apos;étude, 
               des nouvelles questions et des ressources exclusives pour réussir vos examens
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -172,6 +204,6 @@ export default function Subscription() {
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

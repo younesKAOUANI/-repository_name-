@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { 
   Send, 
   MapPin, 
@@ -119,22 +120,53 @@ export default function ContactForm() {
   }
 
   return (
-    <section id="contact" className="py-20 bg-gray-50">
+    <motion.section 
+      id="contact" 
+      className="py-20 bg-gray-50"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: true }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center space-x-2 bg-pharmapedia-primary-100 text-pharmapedia-primary-600 px-4 py-2 rounded-full text-sm font-medium mb-4">
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          viewport={{ once: true }}
+        >
+          <motion.div 
+            className="inline-flex items-center space-x-2 bg-pharmapedia-primary-100 text-pharmapedia-primary-600 px-4 py-2 rounded-full text-sm font-medium mb-4"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
             <MessageCircle className="w-4 h-4" />
             <span>Contact</span>
-          </div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          </motion.div>
+          <motion.h2 
+            className="text-4xl font-bold text-gray-900 mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            viewport={{ once: true }}
+          >
             Une question ? Contactez-nous
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-gray-600 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            viewport={{ once: true }}
+          >
             Notre équipe est là pour vous aider. N&apos;hésitez pas à nous contacter 
             pour toute question concernant Pharmapedia
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Contact Info */}
@@ -313,6 +345,6 @@ export default function ContactForm() {
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
