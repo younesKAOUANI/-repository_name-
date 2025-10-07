@@ -13,17 +13,11 @@ export async function GET(request: NextRequest) {
 
     const userId = session.user.id;
 
-    // Get comprehensive statistics in parallel
+    // Get basic statistics first to avoid timeout
     const [
       totalQuizAttempts,
       completedQuizzes,
-      averageScore,
-      recentAttempts,
-      quizProgress,
-      topPerformingQuizzes,
-      strugglingQuizzes,
-      activityStats,
-      universityStats
+      averageScore
     ] = await Promise.all([
       // Total quiz attempts
       db.quizAttempt.count({
@@ -48,40 +42,48 @@ export async function GET(request: NextRequest) {
         _avg: {
           score: true
         }
-      }),
+      })
+    ]);
 
-      // Recent attempts (last 5)
-      db.quizAttempt.findMany({
-        where: { userId },
-        include: {
-          quiz: {
-            include: {
-              module: {
-                include: {
-                  semester: {
-                    include: {
-                      studyYear: true
-                    }
-                  }
-                }
+    // Get recent attempts with simplified includes
+    const recentAttempts = await db.quizAttempt.findMany({
+      where: { userId },
+      include: {
+        quiz: {
+          select: {
+            id: true,
+            title: true,
+            module: {
+              select: {
+                id: true,
+                name: true
               }
             }
           }
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 5
-      }),
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 5
+    });
 
-      // Quiz progress stats
-      db.quizProgress.groupBy({
+    // Get quiz progress stats if the table exists
+    let quizProgress: any = [];
+    try {
+      quizProgress = await db.quizProgress.groupBy({
         by: ['status'],
         where: { userId },
         _count: {
           status: true
         }
-      }),
+      });
+    } catch (error) {
+      // QuizProgress table might not exist, continue without it
+      console.log('QuizProgress table not found, skipping...');
+    }
 
-      // Top performing quizzes (highest scores)
+    // Get performance stats with simplified queries
+    const [topPerformingQuizzes, strugglingQuizzes] = await Promise.all([
+      // Top performing quizzes (simplified)
       db.quizAttempt.findMany({
         where: { 
           userId,
@@ -89,16 +91,9 @@ export async function GET(request: NextRequest) {
         },
         include: {
           quiz: {
-            include: {
-              module: {
-                include: {
-                  semester: {
-                    include: {
-                      studyYear: true
-                    }
-                  }
-                }
-              }
+            select: {
+              id: true,
+              title: true
             }
           }
         },
@@ -106,7 +101,7 @@ export async function GET(request: NextRequest) {
         take: 3
       }),
 
-      // Struggling areas (lowest scores)
+      // Struggling areas (simplified)
       db.quizAttempt.findMany({
         where: { 
           userId,
@@ -114,58 +109,48 @@ export async function GET(request: NextRequest) {
         },
         include: {
           quiz: {
-            include: {
-              module: {
-                include: {
-                  semester: {
-                    include: {
-                      studyYear: true
-                    }
-                  }
-                }
-              }
+            select: {
+              id: true,
+              title: true
             }
           }
         },
         orderBy: { score: 'asc' },
         take: 3
-      }),
-
-      // Activity stats (attempts by day for last 30 days)
-      db.quizAttempt.groupBy({
-        by: ['startedAt'],
-        where: {
-          userId,
-          startedAt: {
-            gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Last 30 days
-          }
-        },
-        _count: {
-          id: true
-        }
-      }),
-
-      // Total quizzes available in the system
-      db.quiz.count()
+      })
     ]);
 
-    // Process activity data for chart
-    const activityByDate = activityStats.reduce((acc, stat) => {
-      const date = stat.startedAt.toISOString().split('T')[0];
-      acc[date] = (acc[date] || 0) + stat._count.id;
-      return acc;
-    }, {} as Record<string, number>);
-
-    // Use the universityStats we already fetched
-    const totalQuizzesAvailable = universityStats;
+    // Get total quizzes count separately to avoid timeout
+    const totalQuizzesAvailable = await db.quiz.count();
 
     const completionRate = totalQuizzesAvailable > 0 
       ? (completedQuizzes / totalQuizzesAvailable * 100).toFixed(1)
       : '0';
 
     // Process progress status
-    const progressStats = quizProgress.reduce((acc, progress) => {
+    const progressStats = quizProgress.reduce((acc: any, progress: any) => {
       acc[progress.status] = progress._count.status;
+      return acc;
+    }, {} as Record<string, number>);
+
+    // Get simple activity data for last 7 days instead of 30 to reduce complexity
+    const last7Days = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const activityStats = await db.quizAttempt.groupBy({
+      by: ['startedAt'],
+      where: {
+        userId,
+        startedAt: {
+          gte: last7Days
+        }
+      },
+      _count: {
+        id: true
+      }
+    });
+
+    const activityByDate = activityStats.reduce((acc, stat) => {
+      const date = stat.startedAt.toISOString().split('T')[0];
+      acc[date] = (acc[date] || 0) + stat._count.id;
       return acc;
     }, {} as Record<string, number>);
 
@@ -187,20 +172,15 @@ export async function GET(request: NextRequest) {
         quizTitle: attempt.quiz.title,
         score: attempt.score ? Number(attempt.score) : null,
         completedAt: attempt.finishedAt,
-        module: attempt.quiz.module?.name,
-        studyYear: attempt.quiz.module?.semester?.studyYear?.name
+        module: attempt.quiz.module?.name || 'Unknown Module'
       })),
       topPerformance: topPerformingQuizzes.map(attempt => ({
         quizTitle: attempt.quiz.title,
-        score: Number(attempt.score),
-        module: attempt.quiz.module?.name,
-        studyYear: attempt.quiz.module?.semester?.studyYear?.name
+        score: Number(attempt.score)
       })),
       strugglingAreas: strugglingQuizzes.map(attempt => ({
         quizTitle: attempt.quiz.title,
-        score: Number(attempt.score),
-        module: attempt.quiz.module?.name,
-        studyYear: attempt.quiz.module?.semester?.studyYear?.name
+        score: Number(attempt.score)
       })),
       activityChart: activityByDate
     });

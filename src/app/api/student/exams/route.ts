@@ -75,9 +75,9 @@ export async function GET(request: NextRequest) {
       filteredModuleIds = [moduleId];
     }
 
-    // Build where clause for quizzes: type is QUIZ or EXAM, and either moduleId in filtered set OR lesson.moduleId in filtered set
+    // Build where clause for quizzes: type is EXAM only, and either moduleId in filtered set OR lesson.moduleId in filtered set
     const where: any = {
-      type: { in: ["QUIZ", "EXAM"] },
+      type: "EXAM",
       OR: [
         { moduleId: { in: filteredModuleIds } },
         { lesson: { moduleId: { in: filteredModuleIds } } },

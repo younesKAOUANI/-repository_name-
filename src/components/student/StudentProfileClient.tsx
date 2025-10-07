@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { AlertCircle, User, Key, CreditCard, TrendingUp, Calendar, Trophy, Target, BookOpen } from 'lucide-react';
+import { AlertCircle, User, Key, CreditCard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
@@ -10,6 +10,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+
+interface University {
+  id: string;
+  name: string;
+}
 
 interface License {
   id: string;
@@ -62,6 +67,7 @@ interface ProfileData {
   licenses: License[];
   recentQuizAttempts?: QuizAttempt[];
   stats?: StudentStats;
+  universities: University[];
 }
 
 export default function StudentProfileClient() {
@@ -76,7 +82,7 @@ export default function StudentProfileClient() {
   const [profileForm, setProfileForm] = useState({
     name: '',
     year: '',
-    university: '',
+    universityId: '',
   });
 
   // Password form state
@@ -105,10 +111,15 @@ export default function StudentProfileClient() {
       setProfileData(data);
       
       // Initialize form data
+      // Find the university ID that matches the university name
+      const matchingUniversity = data.universities?.find(
+        (uni: University) => uni.name === data.user.university
+      );
+      
       setProfileForm({
         name: data.user.name || '',
         year: data.user.year?.toString() || '',
-        university: data.user.university || '',
+        universityId: matchingUniversity?.id || '',
       });
       
     } catch (err) {
@@ -133,7 +144,7 @@ export default function StudentProfileClient() {
         body: JSON.stringify({
           name: profileForm.name,
           year: profileForm.year ? parseInt(profileForm.year) : null,
-          university: profileForm.university || null,
+          universityId: profileForm.universityId || null,
         }),
       });
 
@@ -168,7 +179,7 @@ export default function StudentProfileClient() {
       setSaving(true);
       setError('');
       
-      const response = await fetch('/api/student/change-password', {
+      const response = await fetch('/api/auth/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -215,7 +226,7 @@ export default function StudentProfileClient() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement du profil...</p>
@@ -226,7 +237,7 @@ export default function StudentProfileClient() {
 
   if (status === 'unauthenticated') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Accès non autorisé</h1>
@@ -238,7 +249,7 @@ export default function StudentProfileClient() {
 
   if (error && !profileData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen  flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Erreur</h1>
@@ -256,8 +267,8 @@ export default function StudentProfileClient() {
   const activeLicense = profileData.licenses.find(l => l.isActive);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="min-h-screen">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Mon Profil</h1>
@@ -272,84 +283,67 @@ export default function StudentProfileClient() {
           </Alert>
         )}
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-3">
-                <Trophy className="h-8 w-8 text-yellow-500" />
-                <div>
-                  <p className="text-sm text-gray-600">Meilleur score</p>
-                  <p className="text-2xl font-bold text-gray-900">{profileData.stats?.bestScore ?? 0}%</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-3">
-                <Target className="h-8 w-8 text-blue-500" />
-                <div>
-                  <p className="text-sm text-gray-600">Moyenne</p>
-                  <p className="text-2xl font-bold text-gray-900">{(profileData.stats?.averageScore ?? 0).toFixed(1)}%</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-3">
-                <BookOpen className="h-8 w-8 text-green-500" />
-                <div>
-                  <p className="text-sm text-gray-600">Quiz réalisés</p>
-                  <p className="text-2xl font-bold text-gray-900">{profileData.stats?.totalQuizzes ?? 0}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-3">
-                <Calendar className="h-8 w-8 text-purple-500" />
-                <div>
-                  <p className="text-sm text-gray-600">Série actuelle</p>
-                  <p className="text-2xl font-bold text-gray-900">{profileData.stats?.currentStreak ?? 0} jours</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Main Content */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="profile" className="flex items-center space-x-2">
-              <User className="h-4 w-4" />
-              <span>Profil</span>
-            </TabsTrigger>
-            <TabsTrigger value="security" className="flex items-center space-x-2">
-              <Key className="h-4 w-4" />
-              <span>Sécurité</span>
-            </TabsTrigger>
-            <TabsTrigger value="subscription" className="flex items-center space-x-2">
-              <CreditCard className="h-4 w-4" />
-              <span>Abonnement</span>
-            </TabsTrigger>
-          </TabsList>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="border-b border-gray-200 bg-gray-50/50">
+              <TabsList className="w-full justify-start p-0 bg-transparent h-auto flex ">
+                <TabsTrigger 
+                  value="profile" 
+                  className="flex items-center gap-3 px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-white data-[state=active]:text-blue-600 hover:bg-white/50 transition-all duration-200"
+                >
+                  <User className="h-5 w-5" />
+                  <span className="font-medium">Informations personnelles</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="security" 
+                  className="flex items-center gap-3 px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-white data-[state=active]:text-blue-600 hover:bg-white/50 transition-all duration-200"
+                >
+                  <Key className="h-5 w-5" />
+                  <span className="font-medium">Sécurité</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="subscription" 
+                  className="flex items-center gap-3 px-6 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-white data-[state=active]:text-blue-600 hover:bg-white/50 transition-all duration-200"
+                >
+                  <CreditCard className="h-5 w-5" />
+                  <span className="font-medium">Abonnement</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-          {/* Profile Tab */}
-          <TabsContent value="profile" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Informations personnelles</CardTitle>
-                <CardDescription>
-                  Mettez à jour vos informations de profil
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+            {/* Profile Tab */}
+            <TabsContent value="profile" className="p-6">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Informations personnelles</h3>
+                  <p className="text-gray-600 text-sm">Mettez à jour vos informations de profil</p>
+                </div>
+                
+                {/* Current Information Display */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-gray-900 mb-3">Informations actuelles</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Nom :</span>
+                      <p className="font-medium text-gray-900">{profileData?.user.name || 'Non spécifié'}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Année d'étude :</span>
+                      <p className="font-medium text-gray-900">
+                        {profileData?.user.year ? `${profileData.user.year}ème année` : 'Non spécifiée'}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Université :</span>
+                      <p className="font-medium text-gray-900">
+                        {profileData?.user.university || 'Non spécifiée'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
                 <form onSubmit={handleProfileUpdate} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -389,67 +383,38 @@ export default function StudentProfileClient() {
 
                     <div className="space-y-2">
                       <Label htmlFor="university">Université</Label>
-                      <Input
+                      <select
                         id="university"
-                        value={profileForm.university}
-                        onChange={(e) => setProfileForm(prev => ({ ...prev, university: e.target.value }))}
-                        placeholder="Nom de votre université"
-                      />
+                        value={profileForm.universityId}
+                        onChange={(e) => setProfileForm(prev => ({ ...prev, universityId: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Sélectionner une université</option>
+                        {profileData?.universities?.map(university => (
+                          <option key={university.id} value={university.id}>
+                            {university.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
 
-                  <div className="flex justify-end">
-                    <Button type="submit" disabled={saving}>
-                      {saving ? 'Sauvegarde...' : 'Sauvegarder'}
+                  <div className="flex justify-end pt-4">
+                    <Button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+                      {saving ? 'Sauvegarde...' : 'Sauvegarder les modifications'}
                     </Button>
                   </div>
                 </form>
-              </CardContent>
-            </Card>
+              </div>
+            </TabsContent>
 
-            {/* Recent Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Activité récente</CardTitle>
-                <CardDescription>
-                  Vos derniers quiz réalisés
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {(profileData.recentQuizAttempts?.length ?? 0) > 0 ? (
-                    profileData.recentQuizAttempts?.map((attempt) => (
-                      <div key={attempt.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{attempt.quiz.title || 'Quiz sans titre'}</p>
-                          <p className="text-sm text-gray-600">{attempt.quiz.module.name || 'Module inconnu'}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium text-gray-900">{(attempt.percentage ?? 0).toFixed(0)}%</p>
-                          <p className="text-sm text-gray-600">{attempt.completedAt ? formatDate(attempt.completedAt) : 'Date inconnue'}</p>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-center py-4">
-                      Aucun quiz réalisé récemment
-                    </p>
-                  )}
+            {/* Security Tab */}
+            <TabsContent value="security" className="p-6">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Changer le mot de passe</h3>
+                  <p className="text-gray-600 text-sm">Mettez à jour votre mot de passe pour sécuriser votre compte</p>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Security Tab */}
-          <TabsContent value="security">
-            <Card>
-              <CardHeader>
-                <CardTitle>Changer le mot de passe</CardTitle>
-                <CardDescription>
-                  Mettez à jour votre mot de passe pour sécuriser votre compte
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
                 <form onSubmit={handlePasswordUpdate} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="currentPassword">Mot de passe actuel</Label>
@@ -484,26 +449,22 @@ export default function StudentProfileClient() {
                     />
                   </div>
 
-                  <div className="flex justify-end">
-                    <Button type="submit" disabled={saving}>
+                  <div className="flex justify-end pt-4">
+                    <Button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700">
                       {saving ? 'Mise à jour...' : 'Changer le mot de passe'}
                     </Button>
                   </div>
                 </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </TabsContent>
 
-          {/* Subscription Tab */}
-          <TabsContent value="subscription">
-            <Card>
-              <CardHeader>
-                <CardTitle>Abonnement actuel</CardTitle>
-                <CardDescription>
-                  Gérez votre abonnement et consultez l'historique
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+            {/* Subscription Tab */}
+            <TabsContent value="subscription" className="p-6">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Abonnement actuel</h3>
+                  <p className="text-gray-600 text-sm">Gérez votre abonnement et consultez l'historique</p>
+                </div>
                 {activeLicense ? (
                   <div className="space-y-4">
                     <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -548,10 +509,10 @@ export default function StudentProfileClient() {
                     </div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   );

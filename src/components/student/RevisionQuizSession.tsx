@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/button';
 import { 
   Clock, 
   CheckCircle, 
-  Circle,
-  AlertTriangle,
-  Send,
+  XCircle,
   ChevronLeft,
   ChevronRight,
+  AlertTriangle,
+  Send,
   BookOpen,
   Play,
   RotateCcw
@@ -21,9 +21,12 @@ interface RevisionQuestion {
   text: string;
   questionType: string;
   order: number;
+  explanation?: string;
+  explanationImg?: string;
   options: {
     id: string;
     text: string;
+    isCorrect?: boolean;
   }[];
 }
 
@@ -74,6 +77,7 @@ export default function RevisionQuizSession({ quizId }: Props) {
   
   const [quizSession, setQuizSession] = useState<RevisionQuizSession | null>(null);
   const [currentAnswers, setCurrentAnswers] = useState<Record<string, string[]>>({});
+  const [viewedResponses, setViewedResponses] = useState<Record<string, boolean>>({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [timeStarted, setTimeStarted] = useState<Date | null>(null);
@@ -204,9 +208,19 @@ export default function RevisionQuizSession({ quizId }: Props) {
     }
   };
 
-  // Navigation functions
+  // View response functionality
+  const handleViewResponse = (questionId: string) => {
+    setViewedResponses(prev => ({
+      ...prev,
+      [questionId]: true
+    }));
+  };
+
+  // Navigation functions - controlled navigation
   const goToNextQuestion = () => {
-    if (quizSession && currentQuestionIndex < quizSession.quiz.questions.length - 1) {
+    if (!quizSession) return;
+    const currentAnswered = currentAnswers[currentQuestion.id]?.length > 0;
+    if (currentAnswered && currentQuestionIndex < quizSession.quiz.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
@@ -218,13 +232,35 @@ export default function RevisionQuizSession({ quizId }: Props) {
   };
 
   const goToQuestion = (index: number) => {
-    setCurrentQuestionIndex(index);
+    // Can only go to previous questions or current question
+    if (index <= currentQuestionIndex) {
+      setCurrentQuestionIndex(index);
+    }
   };
 
-  // Get question status for navigation
+  // Get question status for navigation display
   const getQuestionStatus = (questionId: string) => {
     const answers = currentAnswers[questionId];
-    return answers && answers.length > 0 ? 'answered' : 'unanswered';
+    if (!answers || answers.length === 0) {
+      return 'unanswered';
+    }
+
+    // Find the question
+    const question = quizSession?.quiz.questions.find(q => q.id === questionId);
+    if (!question) return 'unanswered';
+
+    // Get correct option IDs
+    const correctOptionIds = question.options
+      .filter(opt => opt.isCorrect)
+      .map(opt => opt.id);
+
+    // Check if user's answers are correct
+    const userAnswerIds = answers;
+    const isCorrect = correctOptionIds.length === userAnswerIds.length &&
+                     correctOptionIds.every(id => userAnswerIds.includes(id)) &&
+                     userAnswerIds.every(id => correctOptionIds.includes(id));
+
+    return isCorrect ? 'correct' : 'incorrect';
   };
 
   // Load quiz on mount
@@ -297,9 +333,9 @@ export default function RevisionQuizSession({ quizId }: Props) {
                           {option.isCorrect ? (
                             <CheckCircle className="w-4 h-4 text-green-600" />
                           ) : option.selected ? (
-                            <Circle className="w-4 h-4 text-red-600" />
+                            <XCircle className="w-4 h-4 text-red-600" />
                           ) : (
-                            <Circle className="w-4 h-4 text-gray-400" />
+                            <div className="w-4 h-4 border border-gray-400 rounded-full" />
                           )}
                           <span className={`${
                             option.isCorrect ? 'text-green-900' : 
@@ -336,7 +372,7 @@ export default function RevisionQuizSession({ quizId }: Props) {
                   Nouveau Quiz
                 </Button>
                 <Button 
-                  onClick={() => router.push('/student/quizzes')}
+                  onClick={() => router.push('/student/revision-quiz')}
                 >
                   Retour aux Quiz
                 </Button>
@@ -452,8 +488,13 @@ export default function RevisionQuizSession({ quizId }: Props) {
     );
   }
 
-  const currentQuestion = quizSession.quiz.questions[currentQuestionIndex];
+  const answeredQuestions = Object.keys(currentAnswers).filter(
+    qId => currentAnswers[qId] && currentAnswers[qId].length > 0
+  ).length;
   
+  const progress = ((currentQuestionIndex + 1) / quizSession.quiz.questions.length) * 100;
+  const currentQuestion = quizSession.quiz.questions[currentQuestionIndex];
+
   // Guard against undefined currentQuestion
   if (!currentQuestion) {
     return (
@@ -475,11 +516,6 @@ export default function RevisionQuizSession({ quizId }: Props) {
       </div>
     );
   }
-  
-  const progress = ((currentQuestionIndex + 1) / quizSession.quiz.questions.length) * 100;
-  const answeredQuestions = Object.keys(currentAnswers).filter(
-    qId => currentAnswers[qId] && currentAnswers[qId].length > 0
-  ).length;
 
   return (
     <div className="min-h-screen">
@@ -538,32 +574,55 @@ export default function RevisionQuizSession({ quizId }: Props) {
             <div className="bg-white rounded-lg shadow-sm p-4 sticky top-24">
               <h3 className="font-medium text-gray-900 mb-4">Navigation</h3>
               <div className="grid grid-cols-5 lg:grid-cols-4 gap-2">
-                {quizSession.quiz.questions.map((question, index) => (
-                  <button
-                    key={question.id}
-                    onClick={() => goToQuestion(index)}
-                    className={`w-8 h-8 rounded text-sm font-medium transition-all ${
-                      index === currentQuestionIndex
-                        ? 'bg-blue-600 text-white'
-                        : getQuestionStatus(question.id) === 'answered'
-                        ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    {index + 1}
-                  </button>
-                ))}
+                {quizSession.quiz.questions.map((question, index) => {
+                  const questionStatus = getQuestionStatus(question.id);
+                  const isAnswered = questionStatus !== 'unanswered';
+                  const canNavigate = index <= currentQuestionIndex || isAnswered;
+                  
+                  return (
+                    <button
+                      key={question.id}
+                      onClick={() => goToQuestion(index)}
+                      disabled={!canNavigate}
+                      className={`w-8 h-8 rounded text-sm font-medium transition-all ${
+                        !canNavigate
+                          ? 'cursor-not-allowed opacity-50'
+                          : 'cursor-pointer hover:bg-opacity-80'
+                      } ${
+                        index === currentQuestionIndex
+                          ? 'bg-blue-600 text-white'
+                          : questionStatus === 'correct'
+                          ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                          : questionStatus === 'incorrect'
+                          ? 'bg-red-100 text-red-800 hover:bg-red-200'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {index + 1}
+                    </button>
+                  );
+                })}
               </div>
               
               <div className="mt-4 space-y-2 text-sm">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-green-100 rounded"></div>
-                  <span className="text-gray-600">Répondu ({answeredQuestions})</span>
+                  <span className="text-gray-600">Correct ({quizSession.quiz.questions.filter(q => getQuestionStatus(q.id) === 'correct').length})</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-red-100 rounded"></div>
+                  <span className="text-gray-600">Incorrect ({quizSession.quiz.questions.filter(q => getQuestionStatus(q.id) === 'incorrect').length})</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-gray-100 rounded"></div>
                   <span className="text-gray-600">Non répondu ({quizSession.quiz.questions.length - answeredQuestions})</span>
                 </div>
+              </div>
+              
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <p className="text-blue-800 text-sm">
+                  <strong>Navigation:</strong> Vous pouvez revenir aux questions précédentes, mais vous devez répondre avant de continuer.
+                </p>
               </div>
             </div>
           </div>
@@ -581,15 +640,33 @@ export default function RevisionQuizSession({ quizId }: Props) {
                 <div className="space-y-3">
                   {currentQuestion.options?.map(option => {
                     const isSelected = currentAnswers[currentQuestion.id]?.includes(option.id) || false;
+                    const isCorrect = option.isCorrect;
+                    const hasViewedResponse = viewedResponses[currentQuestion.id];
+                    
+                    let optionClass = "block p-4 border rounded-lg transition-all ";
+                    
+                    if (hasViewedResponse) {
+                      // Show correct/incorrect after viewing response
+                      if (isCorrect) {
+                        optionClass += "border-green-500 bg-green-50 text-green-900";
+                      } else if (isSelected && !isCorrect) {
+                        optionClass += "border-red-500 bg-red-50 text-red-900";
+                      } else {
+                        optionClass += "border-gray-200 bg-gray-50 text-gray-600";
+                      }
+                    } else {
+                      // Normal selection state
+                      if (isSelected) {
+                        optionClass += "border-blue-300 bg-blue-50 cursor-pointer hover:bg-blue-100";
+                      } else {
+                        optionClass += "border-gray-200 cursor-pointer hover:bg-gray-50";
+                      }
+                    }
                     
                     return (
                       <label
                         key={option.id}
-                        className={`block p-4 border rounded-lg cursor-pointer transition-all hover:bg-gray-50 ${
-                          isSelected
-                            ? 'border-blue-300 bg-blue-50'
-                            : 'border-gray-200'
-                        }`}
+                        className={optionClass}
                       >
                         <div className="flex items-center space-x-3">
                           <input
@@ -597,16 +674,68 @@ export default function RevisionQuizSession({ quizId }: Props) {
                             name={`question-${currentQuestion.id}`}
                             value={option.id}
                             checked={isSelected}
-                            onChange={() => handleAnswerSelect(currentQuestion.id, option.id)}
+                            onChange={() => !hasViewedResponse && handleAnswerSelect(currentQuestion.id, option.id)}
+                            disabled={hasViewedResponse}
                             className="w-4 h-4 text-blue-600"
                           />
-                          <span className="text-gray-900">{option.text}</span>
+                          <span className="flex-1">{option.text}</span>
+                          {hasViewedResponse && isCorrect && (
+                            <CheckCircle className="w-5 h-5 text-green-600" />
+                          )}
+                          {hasViewedResponse && isSelected && !isCorrect && (
+                            <XCircle className="w-5 h-5 text-red-600" />
+                          )}
                         </div>
                       </label>
                     );
                   })}
                 </div>
               </div>
+
+              {/* View Response Button and Explanation */}
+              {currentAnswers[currentQuestion.id]?.length > 0 && (
+                <div className="mb-6">
+                  {!viewedResponses[currentQuestion.id] ? (
+                    <Button
+                      onClick={() => handleViewResponse(currentQuestion.id)}
+                      className="w-full"
+                    >
+                      Voir la Réponse
+                    </Button>
+                  ) : (
+                    <div className="space-y-4">
+                      {/* Explanation */}
+                      {(currentQuestion.explanation || currentQuestion.explanationImg) ? (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <h4 className="font-medium text-blue-900 mb-2">Explication:</h4>
+                          
+                          {currentQuestion.explanation && (
+                            <p className="text-blue-800 mb-3">
+                              {currentQuestion.explanation}
+                            </p>
+                          )}
+                          
+                          {currentQuestion.explanationImg && (
+                            <div className="mt-3">
+                              <img
+                                src={currentQuestion.explanationImg}
+                                alt="Schema explicatif"
+                                className="max-w-full h-auto rounded border"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                          <p className="text-gray-600 text-center">
+                            Aucune explication disponible pour cette question.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Navigation buttons */}
               <div className="flex justify-between">
@@ -621,7 +750,10 @@ export default function RevisionQuizSession({ quizId }: Props) {
                 
                 <Button
                   onClick={goToNextQuestion}
-                  disabled={currentQuestionIndex === quizSession.quiz.questions.length - 1}
+                  disabled={
+                    currentQuestionIndex === quizSession.quiz.questions.length - 1 || 
+                    !currentAnswers[currentQuestion.id]?.length
+                  }
                 >
                   Suivant
                   <ChevronRight className="w-4 h-4 ml-1" />

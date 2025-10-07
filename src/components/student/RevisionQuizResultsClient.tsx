@@ -34,6 +34,7 @@ interface QuestionResult {
   correctAnswer: string;
   isCorrect: boolean;
   explanation?: string;
+  explanationImg?: string;
 }
 
 export default function RevisionQuizResultsClient() {
@@ -93,7 +94,7 @@ export default function RevisionQuizResultsClient() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement des résultats...</p>
@@ -104,7 +105,7 @@ export default function RevisionQuizResultsClient() {
 
   if (error || !results) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Erreur</h1>
@@ -125,8 +126,8 @@ export default function RevisionQuizResultsClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="min-h-screen">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <Button
@@ -145,16 +146,16 @@ export default function RevisionQuizResultsClient() {
         </div>
 
         {/* Score Summary */}
-        <div className={`bg-white rounded-lg border-2 p-6 mb-6 ${getScoreBgColor(results.percentage)}`}>
+        <div className={`bg-white rounded-lg border-2 p-6 mb-6 ${getScoreBgColor(results.percentage || 0)}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Trophy className={`h-12 w-12 ${getScoreColor(results.percentage)}`} />
+              <Trophy className={`h-12 w-12 ${getScoreColor(results.percentage || 0)}`} />
               <div>
                 <h2 className="text-3xl font-bold text-gray-900">
                   {results.score} / {results.maxScore}
                 </h2>
-                <p className={`text-xl font-semibold ${getScoreColor(results.percentage)}`}>
-                  {results.percentage.toFixed(1)}%
+                <p className={`text-xl font-semibold ${getScoreColor(results.percentage || 0)}`}>
+                  {(results.percentage || 0).toFixed(1)}%
                 </p>
               </div>
             </div>
@@ -246,12 +247,25 @@ export default function RevisionQuizResultsClient() {
                         </div>
                       </div>
 
-                      {question.explanation && (
+                      {((question.explanation && question.explanation.trim()) || question.explanationImg) && (
                         <div className="border-t border-gray-200 pt-3">
                           <p className="text-sm font-medium text-gray-700 mb-1">Explication:</p>
-                          <p className="text-sm text-gray-600 bg-blue-50 p-3 rounded border border-blue-200">
-                            {question.explanation}
-                          </p>
+                          <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded border border-blue-200">
+                            {question.explanation && question.explanation.trim() && (
+                              <div className="mb-3">
+                                {question.explanation}
+                              </div>
+                            )}
+                            {question.explanationImg && (
+                              <div className="text-center">
+                                <img
+                                  src={question.explanationImg}
+                                  alt="Explication visuelle"
+                                  className="max-w-full h-auto rounded border shadow-sm mx-auto"
+                                />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>

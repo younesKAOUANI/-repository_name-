@@ -98,9 +98,12 @@ export async function GET(
           text: gq.questionBank.text,
           questionType: gq.questionBank.questionType,
           order: gq.order,
+          explanation: gq.questionBank.explanation,
+          explanationImg: gq.questionBank.explanationImg,
           options: gq.questionBank.options.map(opt => ({
             id: opt.id,
-            text: opt.text
+            text: opt.text,
+            isCorrect: opt.isCorrect
           }))
         }))
       },

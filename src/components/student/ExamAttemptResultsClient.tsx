@@ -18,36 +18,30 @@ import {
 } from "lucide-react";
 
 interface QuestionResult {
-  questionId: number;
+  questionId: string;
   questionText: string;
-  questionType: "SINGLE_CHOICE" | "MULTIPLE_CHOICE" | "TRUE_FALSE";
-  options?: string[];
-  userAnswers: string[];
-  correctAnswers: string[];
+  questionType: string;
+  userAnswer: string[];
+  correctAnswer: string[];
   isCorrect: boolean;
   explanation?: string;
-  points: number;
-  maxPoints: number;
+  explanationImg?: string;
+  score: number;
+  maxScore: number;
 }
 
 interface ExamAttemptResult {
   id: string;
-  examId: number;
+  examId: string;
+  title: string;
+  description?: string;
   score: number;
   maxScore: number;
   percentage: number;
   timeSpent: number;
-  timeLimit?: number;
   startedAt: string;
   completedAt: string;
-  status: "COMPLETED" | "ABANDONED" | "TIME_EXPIRED";
-  questions: QuestionResult[];
-  exam: {
-    id: number;
-    title: string;
-    description?: string;
-    passingScore: number;
-  };
+  questionResults: QuestionResult[];
 }
 
 export default function ExamAttemptResultsClient() {
@@ -60,7 +54,7 @@ export default function ExamAttemptResultsClient() {
   const [error, setError] = useState("");
   const [showAllDetails, setShowAllDetails] = useState(false);
   const [showQuestionDetails, setShowQuestionDetails] = useState<
-    Record<number, boolean>
+    Record<string, boolean>
   >({});
 
   useEffect(() => {
@@ -72,7 +66,7 @@ export default function ExamAttemptResultsClient() {
   const loadAttemptResult = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/student/exam-attempts/${attemptId}/results`);
+      const response = await fetch(`/api/student/exams/attempts/${attemptId}/results`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -113,44 +107,27 @@ export default function ExamAttemptResultsClient() {
     return "bg-red-50 border-red-200";
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "COMPLETED":
-        return <CheckCircle className="h-6 w-6 text-green-500" />;
-      case "TIME_EXPIRED":
-        return <Clock className="h-6 w-6 text-orange-500" />;
-      case "ABANDONED":
-        return <XCircle className="h-6 w-6 text-red-500" />;
-      default:
-        return <AlertCircle className="h-6 w-6 text-gray-500" />;
-    }
+  const getStatusIcon = () => {
+    if (!result) return <AlertCircle className="h-6 w-6 text-gray-500" />;
+    return result.percentage >= 50 ? (
+      <CheckCircle className="h-6 w-6 text-green-500" />
+    ) : (
+      <XCircle className="h-6 w-6 text-red-500" />
+    );
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "COMPLETED":
-        return "Examen terminé";
-      case "TIME_EXPIRED":
-        return "Temps expiré";
-      case "ABANDONED":
-        return "Examen abandonné";
-      default:
-        return "Statut inconnu";
-    }
-  };
+  const isPassed = result ? result.percentage >= 50 : false;
 
-  const toggleQuestionDetails = (questionId: number) => {
+  const toggleQuestionDetails = (questionId: string) => {
     setShowQuestionDetails(prev => ({
       ...prev,
       [questionId]: !prev[questionId]
     }));
   };
 
-  const isPassed = result && result.percentage >= result.exam.passingScore;
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement des résultats...</p>
@@ -161,8 +138,8 @@ export default function ExamAttemptResultsClient() {
 
   if (error || !result) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center container mx-auto">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             Erreur de chargement
@@ -186,8 +163,8 @@ export default function ExamAttemptResultsClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="min-h-screen ">
+      <div className="mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <Button
@@ -204,9 +181,9 @@ export default function ExamAttemptResultsClient() {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 Résultats de tentative
               </h1>
-              <p className="text-xl text-gray-600">{result.exam.title}</p>
+              <p className="text-xl text-gray-600">{result.title}</p>
             </div>
-            {getStatusIcon(result.status)}
+            {getStatusIcon()}
           </div>
         </div>
 
@@ -228,7 +205,7 @@ export default function ExamAttemptResultsClient() {
             <div className="text-right">
               <div className="flex items-center text-gray-600 mb-2">
                 <Clock className="h-4 w-4 mr-2" />
-                <span>Temps: {formatDuration(result.timeSpent)}</span>
+                <span>Temps: {result.timeSpent} minutes</span>
               </div>
               <div className="flex items-center text-gray-600 mb-2">
                 <Calendar className="h-4 w-4 mr-2" />
@@ -237,7 +214,7 @@ export default function ExamAttemptResultsClient() {
                 </span>
               </div>
               <div className="text-sm text-gray-500">
-                {getStatusText(result.status)}
+                Terminé
               </div>
             </div>
           </div>
@@ -256,8 +233,8 @@ export default function ExamAttemptResultsClient() {
               )}
               <span className="font-medium">
                 {isPassed 
-                  ? `Félicitations ! Vous avez réussi l'examen (${result.exam.passingScore}% requis)`
-                  : `Échec - ${result.exam.passingScore}% requis pour réussir`
+                  ? `Félicitations ! Vous avez réussi l'examen (50% requis)`
+                  : `Échec - 50% requis pour réussir`
                 }
               </span>
             </div>
@@ -269,7 +246,7 @@ export default function ExamAttemptResultsClient() {
           <div className="bg-white rounded-lg p-6 text-center">
             <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <p className="text-2xl font-bold text-gray-900">
-              {result.questions.filter(q => q.isCorrect).length}
+              {result.questionResults.filter(q => q.isCorrect).length}
             </p>
             <p className="text-sm text-gray-600">Bonnes réponses</p>
           </div>
@@ -277,7 +254,7 @@ export default function ExamAttemptResultsClient() {
           <div className="bg-white rounded-lg p-6 text-center">
             <XCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
             <p className="text-2xl font-bold text-gray-900">
-              {result.questions.filter(q => !q.isCorrect).length}
+              {result.questionResults.filter(q => !q.isCorrect).length}
             </p>
             <p className="text-sm text-gray-600">Réponses incorrectes</p>
           </div>
@@ -285,7 +262,7 @@ export default function ExamAttemptResultsClient() {
           <div className="bg-white rounded-lg p-6 text-center">
             <BookOpen className="h-8 w-8 text-blue-500 mx-auto mb-2" />
             <p className="text-2xl font-bold text-gray-900">
-              {result.questions.length}
+              {result.questionResults.length}
             </p>
             <p className="text-sm text-gray-600">Total questions</p>
           </div>
@@ -316,7 +293,7 @@ export default function ExamAttemptResultsClient() {
           </div>
 
           <div className="space-y-4">
-            {result.questions.map((question, index) => {
+            {result.questionResults.map((question, index) => {
               const showDetails = showAllDetails || showQuestionDetails[question.questionId];
               
               return (
@@ -362,7 +339,7 @@ export default function ExamAttemptResultsClient() {
                           : 'bg-red-200 text-red-800'
                       }`}
                     >
-                      {question.points} / {question.maxPoints} pts
+                      {question.score} / {question.maxScore} pts
                     </span>
                   </div>
 
@@ -374,8 +351,8 @@ export default function ExamAttemptResultsClient() {
                             Votre réponse:
                           </p>
                           <p className="text-sm text-gray-600 bg-white p-2 rounded border">
-                            {question.userAnswers.length > 0
-                              ? question.userAnswers.join(', ')
+                            {question.userAnswer.length > 0
+                              ? question.userAnswer.join(', ')
                               : 'Aucune réponse'}
                           </p>
                         </div>
@@ -384,18 +361,31 @@ export default function ExamAttemptResultsClient() {
                             Réponse correcte:
                           </p>
                           <p className="text-sm text-green-600 bg-white p-2 rounded border">
-                            {question.correctAnswers.join(', ')}
+                            {question.correctAnswer.join(', ')}
                           </p>
                         </div>
                       </div>
 
-                      {question.explanation && (
+                      {((question.explanation && question.explanation.trim()) || question.explanationImg) && (
                         <div className="border-t border-gray-200 pt-3">
                           <p className="text-sm font-medium text-gray-700 mb-1">
                             Explication:
                           </p>
                           <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded border border-blue-200">
-                            {question.explanation}
+                            {question.explanation && question.explanation.trim() && (
+                              <div className="mb-3">
+                                {question.explanation}
+                              </div>
+                            )}
+                            {question.explanationImg && (
+                              <div className="text-center">
+                                <img
+                                  src={question.explanationImg}
+                                  alt="Explication visuelle"
+                                  className="max-w-full h-auto rounded border shadow-sm mx-auto"
+                                />
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
@@ -418,7 +408,7 @@ export default function ExamAttemptResultsClient() {
           
           <Button
             variant="secondary"
-            onClick={() => router.push(`/student/exams/${result.examId}`)}
+            onClick={() => router.push(`/student/assessments/${result.examId}`)}
           >
             Refaire l'examen
           </Button>

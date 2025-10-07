@@ -21,6 +21,8 @@ export async function GET(request: NextRequest) {
         name: true,
         email: true,
         image: true,
+        university: true,
+        year: true,
         createdAt: true,
         updatedAt: true,
         licenses: {
@@ -137,11 +139,23 @@ export async function GET(request: NextRequest) {
       }
     }));
 
+    // Get all universities for dropdown
+    const universities = await db.university.findMany({
+      select: {
+        id: true,
+        name: true
+      },
+      orderBy: {
+        name: 'asc'
+      }
+    });
+
     return NextResponse.json({
       user,
       licenses: user.licenses,
       recentQuizAttempts: transformedAttempts,
-      stats
+      stats,
+      universities
     });
   } catch (error) {
     console.error('Erreur lors de la récupération du profil:', error);
@@ -164,10 +178,10 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email, currentPassword, newPassword } = body;
+    const { name, email, currentPassword, newPassword, year, universityId } = body;
 
     // Validate required fields
-    if (!name && !email && !newPassword) {
+    if (!name && !email && !newPassword && year === undefined && !universityId) {
       return NextResponse.json(
         { error: 'Au moins un champ doit être fourni pour la mise à jour' },
         { status: 400 }
@@ -255,6 +269,37 @@ export async function PUT(request: NextRequest) {
       // Hash new password
       const hashedPassword = await bcrypt.hash(newPassword, 12);
       updateData.password = hashedPassword;
+    }
+
+    // Update year if provided
+    if (year !== undefined) {
+      if (year !== null && (year < 1 || year > 6)) {
+        return NextResponse.json(
+          { error: 'L\'année d\'étude doit être entre 1 et 6' },
+          { status: 400 }
+        );
+      }
+      updateData.year = year;
+    }
+
+    // Update university if provided
+    if (universityId !== undefined) {
+      if (universityId) {
+        // Validate that the university exists
+        const university = await db.university.findUnique({
+          where: { id: universityId }
+        });
+        
+        if (!university) {
+          return NextResponse.json(
+            { error: 'Université non trouvée' },
+            { status: 400 }
+          );
+        }
+        updateData.university = university.name;
+      } else {
+        updateData.university = null;
+      }
     }
 
     // Update user

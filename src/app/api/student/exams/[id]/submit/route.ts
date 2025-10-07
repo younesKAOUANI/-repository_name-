@@ -159,7 +159,7 @@ export async function POST(
 }
 
 // Scoring logic
-function calculateExamScore(questions: any[], answers: ExamAnswer[]) {
+function  calculateExamScore(questions: any[], answers: ExamAnswer[]) {
   let totalScore = 0;
   let maxScore = 0;
   const questionResults: any[] = [];

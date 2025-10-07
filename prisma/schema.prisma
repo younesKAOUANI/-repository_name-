@@ -179,6 +179,8 @@ model Question {
   quizId         String
   questionType   QuestionType
   order          Int?
+  explanation    String?             // Text explanation for the correct answer
+  explanationImg String?             // Image URL for schema/diagram explanation
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @updatedAt
   options        AnswerOption[]
@@ -195,7 +197,8 @@ model QuestionBank {
   lessonId      String?
   moduleId      String?
   difficulty    String?
-  explanation   String?
+  explanation   String?                 // Text explanation for the correct answer
+  explanationImg String?                // Image URL for schema/diagram explanation
   isActive      Boolean                 @default(true)
   createdAt     DateTime                @default(now())
   updatedAt     DateTime                @updatedAt

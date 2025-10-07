@@ -276,7 +276,8 @@ async function main() {
       moduleId: modules[12].id,
       lessonId: lessons[1].id,
       difficulty: 'MEDIUM',
-      explanation: 'Les bêta-bloquants bloquent les récepteurs bêta-adrénergiques, empêchant l\'action de l\'adrénaline et de la noradrénaline.',
+      explanation: 'Les bêta-bloquants bloquent les récepteurs bêta-adrénergiques, empêchant l\'action de l\'adrénaline et de la noradrénaline sur le système cardiovasculaire.',
+      explanationImg: 'https://via.placeholder.com/600x400/3B82F6/FFFFFF?text=Mécanisme+Bêta-Bloquants',
       options: [
         { text: 'Blocage des récepteurs bêta-adrénergiques', isCorrect: true },
         { text: 'Activation des récepteurs alpha-adrénergiques', isCorrect: false },
@@ -289,7 +290,7 @@ async function main() {
       moduleId: modules[12].id,
       lessonId: lessons[3].id,
       difficulty: 'EASY',
-      explanation: 'La distribution est la phase où le médicament se répartit dans l\'organisme après absorption.',
+      explanation: 'La distribution est la phase où le médicament se répartit dans l\'organisme après absorption, via la circulation sanguine vers les tissus cibles.',
       options: [
         { text: 'Phase où le médicament se répartit dans les tissus', isCorrect: true },
         { text: 'Phase d\'absorption du médicament', isCorrect: false },
@@ -302,7 +303,7 @@ async function main() {
       moduleId: modules[12].id,
       lessonId: lessons[7].id,
       difficulty: 'MEDIUM',
-      explanation: 'La morphine agit principalement sur les récepteurs opioïdes μ (mu).',
+      explanationImg: 'https://via.placeholder.com/600x400/10B981/FFFFFF?text=Récepteurs+Opioïdes+Mu',
       options: [
         { text: 'Récepteurs opioïdes μ (mu)', isCorrect: true },
         { text: 'Récepteurs GABA-A', isCorrect: false },
@@ -315,7 +316,8 @@ async function main() {
       moduleId: modules[12].id,
       lessonId: lessons[7].id,
       difficulty: 'MEDIUM',
-      explanation: 'L\'aspirine inhibe la cyclooxygénase (COX), enzyme clé dans la synthèse des prostaglandines.',
+      explanation: 'L\'aspirine inhibe irréversiblement la cyclooxygénase (COX), enzyme clé dans la synthèse des prostaglandines et thromboxanes.',
+      explanationImg: 'https://via.placeholder.com/600x400/EF4444/FFFFFF?text=Inhibition+COX+Aspirine',
       options: [
         { text: 'Cyclooxygénase (COX)', isCorrect: true },
         { text: 'Phosphodiestérase', isCorrect: false },
@@ -328,7 +330,7 @@ async function main() {
       moduleId: modules[12].id,
       lessonId: lessons[5].id,
       difficulty: 'MEDIUM',
-      explanation: 'La maladie de Parkinson est caractérisée par une dégénérescence des neurones dopaminergiques.',
+      explanation: 'La maladie de Parkinson est caractérisée par une dégénérescence des neurones dopaminergiques de la substance noire.',
       options: [
         { text: 'Dopamine', isCorrect: true },
         { text: 'Sérotonine', isCorrect: false },
@@ -341,7 +343,7 @@ async function main() {
       moduleId: modules[12].id,
       lessonId: lessons[3].id,
       difficulty: 'EASY',
-      explanation: 'La voie sublinguale évite le premier passage hépatique car l\'absorption se fait directement dans la circulation systémique.',
+      explanationImg: 'https://via.placeholder.com/600x400/8B5CF6/FFFFFF?text=Voies+Administration+Schéma',
       options: [
         { text: 'Sublinguale', isCorrect: true },
         { text: 'Orale', isCorrect: false },
@@ -356,7 +358,7 @@ async function main() {
       moduleId: modules[13].id,
       lessonId: lessons[10].id,
       difficulty: 'EASY',
-      explanation: 'L\'aspirine est un anti-inflammatoire non stéroïdien (AINS) de la famille des salicylés.',
+      explanation: 'L\'aspirine est un anti-inflammatoire non stéroïdien (AINS) de la famille des salicylés, avec des propriétés antalgiques, antipyrétiques et antiagrégantes.',
       options: [
         { text: 'AINS (Anti-inflammatoires non stéroïdiens)', isCorrect: true },
         { text: 'Corticoïdes', isCorrect: false },
@@ -369,7 +371,8 @@ async function main() {
       moduleId: modules[13].id,
       lessonId: lessons[11].id,
       difficulty: 'MEDIUM',
-      explanation: 'Les pénicillines inhibent la synthèse du peptidoglycane de la paroi bactérienne.',
+      explanation: 'Les pénicillines inhibent la transpeptidase impliquée dans la synthèse du peptidoglycane, fragilisant la paroi bactérienne.',
+      explanationImg: 'https://via.placeholder.com/600x400/F59E0B/FFFFFF?text=Mécanisme+Pénicillines+Paroi',
       options: [
         { text: 'Inhibition de la synthèse du peptidoglycane', isCorrect: true },
         { text: 'Inhibition de la synthèse protéique', isCorrect: false },
@@ -382,7 +385,7 @@ async function main() {
       moduleId: modules[13].id,
       lessonId: lessons[11].id,
       difficulty: 'HARD',
-      explanation: 'Le cycle bêta-lactame est la structure pharmacophore essentielle des antibiotiques bêta-lactamines.',
+      explanationImg: 'https://via.placeholder.com/600x400/06B6D4/FFFFFF?text=Structure+Beta-Lactame',
       options: [
         { text: 'Le cycle bêta-lactame', isCorrect: true },
         { text: 'Le groupement carboxyle', isCorrect: false },
@@ -395,7 +398,8 @@ async function main() {
       moduleId: modules[13].id,
       lessonId: lessons[14].id,
       difficulty: 'MEDIUM',
-      explanation: 'Les inhibiteurs de l\'ECA (enzyme de conversion de l\'angiotensine) comme l\'énalapril sont des antihypertenseurs.',
+      explanation: 'Les IEC bloquent la conversion de l\'angiotensine I en angiotensine II, réduisant la vasoconstriction et la rétention sodée.',
+      explanationImg: 'https://via.placeholder.com/600x400/DC2626/FFFFFF?text=Système+Rénine-Angiotensine',
       options: [
         { text: 'Énalapril', isCorrect: true },
         { text: 'Propranolol', isCorrect: false },
@@ -410,7 +414,8 @@ async function main() {
       moduleId: modules[14].id,
       lessonId: lessons[17].id,
       difficulty: 'EASY',
-      explanation: 'La morphine est le principal alcaloïde extrait de l\'opium (Papaver somniferum).',
+      explanation: 'La morphine, premier alcaloïde isolé de l\'histoire (1806), représente 10-15% de l\'opium brut extrait du Papaver somniferum.',
+      explanationImg: 'https://via.placeholder.com/600x400/7C3AED/FFFFFF?text=Pavot+Opium+Morphine',
       options: [
         { text: 'Morphine', isCorrect: true },
         { text: 'Caféine', isCorrect: false },
@@ -423,7 +428,7 @@ async function main() {
       moduleId: modules[14].id,
       lessonId: lessons[19].id,
       difficulty: 'MEDIUM',
-      explanation: 'Les tanins sont des polyphénols qui se lient aux protéines, créant un effet astringent.',
+      explanation: 'Les tanins sont des polyphénols complexes qui précipitent les protéines par liaisons hydrogène et interactions hydrophobes.',
       options: [
         { text: 'Polyphénols', isCorrect: true },
         { text: 'Alcaloïdes', isCorrect: false },
@@ -436,7 +441,7 @@ async function main() {
       moduleId: modules[14].id,
       lessonId: lessons[20].id,
       difficulty: 'MEDIUM',
-      explanation: 'La digitaline (digitoxine et digoxine) est extraite de la digitale pourpre (Digitalis purpurea).',
+      explanationImg: 'https://via.placeholder.com/600x400/EC4899/FFFFFF?text=Digitale+Pourpre+Cardiaque',
       options: [
         { text: 'Digitale pourpre (Digitalis purpurea)', isCorrect: true },
         { text: 'Belladone (Atropa belladonna)', isCorrect: false },
@@ -449,7 +454,8 @@ async function main() {
       moduleId: modules[14].id,
       lessonId: lessons[22].id,
       difficulty: 'MEDIUM',
-      explanation: 'Les ginsénosides sont les saponosides triterpéniques responsables de l\'activité du ginseng.',
+      explanation: 'Les ginsénosides (Rb1, Rg1, Re, etc.) sont des saponosides triterpéniques aux propriétés adaptogènes et immunostimulantes.',
+      explanationImg: 'https://via.placeholder.com/600x400/10B981/FFFFFF?text=Structure+Ginsénosides',
       options: [
         { text: 'Ginsénosides', isCorrect: true },
         { text: 'Flavonoïdes', isCorrect: false },
@@ -464,7 +470,8 @@ async function main() {
       moduleId: modules[15].id,
       lessonId: lessons[23].id,
       difficulty: 'EASY',
-      explanation: 'La loi de Beer-Lambert (A = ε × l × c) régit l\'absorption lumineuse.',
+      explanation: 'La loi de Beer-Lambert (A = ε × l × c) établit la relation linéaire entre absorbance et concentration.',
+      explanationImg: 'https://via.placeholder.com/600x400/F59E0B/FFFFFF?text=Loi+Beer-Lambert+Formule',
       options: [
         { text: 'Loi de Beer-Lambert', isCorrect: true },
         { text: 'Loi de Raoult', isCorrect: false },
@@ -477,7 +484,7 @@ async function main() {
       moduleId: modules[15].id,
       lessonId: lessons[24].id,
       difficulty: 'MEDIUM',
-      explanation: 'Le détecteur UV-Vis est idéal pour les molécules possédant des chromophores.',
+      explanation: 'Le détecteur UV-Vis détecte sélectivement les molécules avec chromophores (cycles aromatiques, liaisons conjuguées).',
       options: [
         { text: 'Détecteur UV-Vis', isCorrect: true },
         { text: 'Détecteur à indice de réfraction', isCorrect: false },
@@ -490,7 +497,7 @@ async function main() {
       moduleId: modules[15].id,
       lessonId: lessons[26].id,
       difficulty: 'MEDIUM',
-      explanation: 'Les protons aromatiques résonnent dans la zone 7-8 ppm en RMN 1H.',
+      explanationImg: 'https://via.placeholder.com/600x400/6366F1/FFFFFF?text=Spectre+RMN+Protons+Aromatiques',
       options: [
         { text: '7-8 ppm', isCorrect: true },
         { text: '1-2 ppm', isCorrect: false },
@@ -505,7 +512,8 @@ async function main() {
       moduleId: modules[17].id,
       lessonId: lessons[30].id,
       difficulty: 'EASY',
-      explanation: 'La DL50 est la dose qui provoque la mort de 50% des animaux testés.',
+      explanation: 'La DL50 quantifie la toxicité aiguë d\'une substance en déterminant la dose causant 50% de mortalité.',
+      explanationImg: 'https://via.placeholder.com/600x400/DC2626/FFFFFF?text=Courbe+Dose-Réponse+DL50',
       options: [
         { text: 'DL50', isCorrect: true },
         { text: 'DE50', isCorrect: false },
@@ -518,7 +526,7 @@ async function main() {
       moduleId: modules[17].id,
       lessonId: lessons[31].id,
       difficulty: 'MEDIUM',
-      explanation: 'La N-acétylcystéine (NAC) est l\'antidote spécifique du paracétamol.',
+      explanation: 'La N-acétylcystéine reconstitue les réserves de glutathion hépatique, neutralisant le métabolite toxique NAPQI.',
       options: [
         { text: 'N-acétylcystéine', isCorrect: true },
         { text: 'Naloxone', isCorrect: false },
@@ -531,7 +539,7 @@ async function main() {
       moduleId: modules[17].id,
       lessonId: lessons[33].id,
       difficulty: 'EASY',
-      explanation: 'Le foie est l\'organe principal de détoxification et de métabolisation des substances étrangères.',
+      explanationImg: 'https://via.placeholder.com/600x400/059669/FFFFFF?text=Métabolisme+Hépatique+Phases',
       options: [
         { text: 'Foie', isCorrect: true },
         { text: 'Rein', isCorrect: false },
@@ -544,7 +552,8 @@ async function main() {
       moduleId: modules[17].id,
       lessonId: lessons[33].id,
       difficulty: 'MEDIUM',
-      explanation: 'La phase II de biotransformation implique des réactions de conjugaison (glucuronidation, sulfatation, etc.).',
+      explanation: 'La phase II conjugue les métabolites avec des cofacteurs endogènes (acide glucuronique, sulfate, glycine) pour faciliter l\'excrétion.',
+      explanationImg: 'https://via.placeholder.com/600x400/7C2D12/FFFFFF?text=Phases+Biotransformation+I+II',
       options: [
         { text: 'Phase II', isCorrect: true },
         { text: 'Phase I', isCorrect: false },
@@ -559,7 +568,8 @@ async function main() {
       moduleId: modules[18].id,
       lessonId: lessons[36].id,
       difficulty: 'MEDIUM',
-      explanation: 'La troponine cardiaque est le marqueur le plus spécifique de l\'infarctus du myocarde.',
+      explanation: 'Les troponines I et T cardiaques se libèrent lors de nécrose myocardique, avec une cinétique caractéristique sur 7-14 jours.',
+      explanationImg: 'https://via.placeholder.com/600x400/EF4444/FFFFFF?text=Cinétique+Troponines+IDM',
       options: [
         { text: 'Troponine cardiaque', isCorrect: true },
         { text: 'Phosphatase alcaline', isCorrect: false },
@@ -572,7 +582,7 @@ async function main() {
       moduleId: modules[18].id,
       lessonId: lessons[37].id,
       difficulty: 'EASY',
-      explanation: 'L\'hémoglobine glyquée (HbA1c) reflète la glycémie moyenne des 2-3 derniers mois.',
+      explanation: 'L\'HbA1c résulte de la glycation non-enzymatique de l\'hémoglobine, proportionnelle à la glycémie moyenne.',
       options: [
         { text: 'Hémoglobine glyquée (HbA1c)', isCorrect: true },
         { text: 'Glycémie à jeun', isCorrect: false },
@@ -585,7 +595,7 @@ async function main() {
       moduleId: modules[18].id,
       lessonId: lessons[39].id,
       difficulty: 'MEDIUM',
-      explanation: 'La créatinine sérique normale est de 60-120 μmol/L chez l\'adulte.',
+      explanationImg: 'https://via.placeholder.com/600x400/0891B2/FFFFFF?text=Fonction+Rénale+Créatinine',
       options: [
         { text: '60-120 μmol/L', isCorrect: true },
         { text: '200-400 μmol/L', isCorrect: false },
@@ -600,7 +610,8 @@ async function main() {
       moduleId: modules[19].id,
       lessonId: lessons[42].id,
       difficulty: 'EASY',
-      explanation: 'La coloration de Gram différencie les bactéries selon la structure de leur paroi.',
+      explanation: 'La coloration de Gram révèle l\'épaisseur du peptidoglycane : épais chez les Gram+ (violet), mince chez les Gram- (rose).',
+      explanationImg: 'https://via.placeholder.com/600x400/8B5CF6/FFFFFF?text=Coloration+Gram+Parois+Bactériennes',
       options: [
         { text: 'Coloration de Gram', isCorrect: true },
         { text: 'Coloration de Ziehl-Neelsen', isCorrect: false },
@@ -613,7 +624,7 @@ async function main() {
       moduleId: modules[19].id,
       lessonId: lessons[45].id,
       difficulty: 'MEDIUM',
-      explanation: 'L\'autoclavage à 121°C pendant 15-20 minutes assure une stérilisation efficace.',
+      explanation: 'L\'autoclavage combine température, pression et temps : 121°C à 1 bar de surpression pendant 15-20 minutes.',
       options: [
         { text: '121°C', isCorrect: true },
         { text: '100°C', isCorrect: false },
@@ -626,7 +637,8 @@ async function main() {
       moduleId: modules[19].id,
       lessonId: lessons[47].id,
       difficulty: 'MEDIUM',
-      explanation: 'La production de bêta-lactamases qui hydrolysent le cycle bêta-lactame est le mécanisme principal.',
+      explanation: 'Les bêta-lactamases hydrolysent le cycle bêta-lactame, inactivant l\'antibiotique avant qu\'il n\'atteigne sa cible.',
+      explanationImg: 'https://via.placeholder.com/600x400/F97316/FFFFFF?text=Résistance+Beta-Lactamases',
       options: [
         { text: 'Production de bêta-lactamases', isCorrect: true },
         { text: 'Modification de la cible', isCorrect: false },
@@ -642,7 +654,8 @@ async function main() {
       moduleId: modules[16].id,
       lessonId: lessons[27].id,
       difficulty: 'MEDIUM',
-      explanation: 'La povidone (PVP) est un liant couramment utilisé en compression directe.',
+      explanation: 'La povidone forme des films flexibles et résistants, assurant la cohésion du comprimé lors de la compression.',
+      explanationImg: 'https://via.placeholder.com/600x400/14B8A6/FFFFFF?text=Formulation+Comprimés+Excipients',
       options: [
         { text: 'Povidone (PVP)', isCorrect: true },
         { text: 'Stéarate de magnésium', isCorrect: false },
@@ -655,7 +668,7 @@ async function main() {
       moduleId: modules[16].id,
       lessonId: lessons[28].id,
       difficulty: 'HARD',
-      explanation: 'Les particules dans les préparations injectables ne doivent pas dépasser 25 μm.',
+      explanation: 'Au-delà de 25 μm, les particules risquent d\'obstruer les capillaires et de provoquer des embolies.',
       options: [
         { text: '25 μm', isCorrect: true },
         { text: '50 μm', isCorrect: false },
@@ -670,7 +683,8 @@ async function main() {
       moduleId: modules[18].id,
       lessonId: lessons[41].id,
       difficulty: 'EASY',
-      explanation: 'Le pH sanguin artériel normal est de 7,35-7,45.',
+      explanation: 'L\'équilibre acido-basique est maintenu par les systèmes tampons (bicarbonates, phosphates, protéines).',
+      explanationImg: 'https://via.placeholder.com/600x400/DC2626/FFFFFF?text=Équilibre+Acido-Basique+pH',
       options: [
         { text: '7,35-7,45', isCorrect: true },
         { text: '6,8-7,0', isCorrect: false },
@@ -683,7 +697,7 @@ async function main() {
       moduleId: modules[17].id,
       lessonId: lessons[33].id,
       difficulty: 'MEDIUM',
-      explanation: 'L\'alcool déshydrogénase hépatique convertit l\'éthanol en acétaldéhyde.',
+      explanation: 'L\'alcool déshydrogénase (ADH) cytosolique oxyde l\'éthanol en acétaldéhyde, puis en acétate par l\'ALDH mitochondriale.',
       options: [
         { text: 'Alcool déshydrogénase', isCorrect: true },
         { text: 'Cytochrome P450 2E1', isCorrect: false },
@@ -696,7 +710,8 @@ async function main() {
       moduleId: modules[22].id,
       lessonId: lessons[49].id,
       difficulty: 'HARD',
-      explanation: 'Une synergie amplifie l\'effet thérapeutique au-delà de la simple addition',
+      explanation: 'La synergie résulte de mécanismes complémentaires ou d\'une potentialisation mutuelle des effets pharmacologiques.',
+      explanationImg: 'https://via.placeholder.com/600x400/7C3AED/FFFFFF?text=Interactions+Synergiques+Schéma',
       options: [
         { text: 'L\'effet combiné est supérieur à la somme des effets individuels', isCorrect: true },
         { text: 'Un médicament annule l\'effet de l\'autre', isCorrect: false },
@@ -722,6 +737,7 @@ async function main() {
         lessonId: bankQ.lessonId,
         difficulty: bankQ.difficulty,
         explanation: bankQ.explanation,
+        explanationImg: bankQ.explanationImg,
         isActive: true,
       },
     });

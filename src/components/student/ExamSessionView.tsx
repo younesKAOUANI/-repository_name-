@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { useStudentExam } from '@/hooks/useStudentExam';
 import { ExamQuestion, ExamAnswer } from '@/services/student-exam.service';
-import ExamResultView from '@/components/ExamResultView';
+import ExamResultView from '@/components/student/ExamResultView';
 
 interface Props {
   examId?: string;
@@ -76,9 +76,10 @@ export default function ExamSessionView({ examId }: Props) {
     router.push('/student/exams');
   };
 
-  // If there's a result to show, show the result view
+  // If there's a result to show, redirect to exams page
   if (currentResult) {
-    return <ExamResultView onBack={handleSubmitComplete} />;
+    handleSubmitComplete();
+    return null;
   }
 
   // Show loading screen while exam is being loaded
@@ -218,6 +219,22 @@ export default function ExamSessionView({ examId }: Props) {
     }
   };
 
+  // Smart navigation: check if user can navigate to a specific question
+  const canNavigateToQuestion = (index: number) => {
+    if (index < 0 || index >= totalQuestions) return false;
+    
+    const targetQuestion = currentSession.questions[index];
+    const isAnswered = currentAnswers.some(a => a.questionId === targetQuestion.id);
+    
+    // Can navigate to any answered question, or if going forward, can only go to the next question if current is answered
+    if (isAnswered) return true; // Can always go to answered questions
+    if (index <= currentQuestionIndex) return true; // Can go backward within answered range
+    
+    // For forward navigation, can only go to the immediately next question if current is answered
+    const currentQuestionAnswered = currentAnswers.some(a => a.questionId === currentQuestion?.id);
+    return index === currentQuestionIndex + 1 && currentQuestionAnswered;
+  };
+
   const handleSubmit = () => {
     setShowSubmitConfirmation(true);
   };
@@ -301,17 +318,21 @@ export default function ExamSessionView({ examId }: Props) {
                 {currentSession.questions.map((_, index) => {
                   const isAnswered = currentAnswers.some(a => a.questionId === currentSession.questions[index].id);
                   const isCurrent = index === currentQuestionIndex;
+                  const canNavigate = canNavigateToQuestion(index);
                   
                   return (
                     <button
                       key={index}
-                      onClick={() => goToQuestion(index)}
+                      onClick={() => canNavigate && goToQuestion(index)}
+                      disabled={!canNavigate}
                       className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
                         isCurrent
                           ? 'bg-blue-600 text-white'
                           : isAnswered
                           ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          : canNavigate
+                          ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          : 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-50'
                       }`}
                     >
                       {index + 1}
@@ -361,7 +382,7 @@ export default function ExamSessionView({ examId }: Props) {
                 <Button
                   variant="secondary"
                   onClick={() => goToQuestion(currentQuestionIndex - 1)}
-                  disabled={currentQuestionIndex === 0}
+                  disabled={!canNavigateToQuestion(currentQuestionIndex - 1)}
                   className="flex items-center gap-2"
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -374,7 +395,7 @@ export default function ExamSessionView({ examId }: Props) {
 
                 <Button
                   onClick={() => goToQuestion(currentQuestionIndex + 1)}
-                  disabled={currentQuestionIndex === totalQuestions - 1}
+                  disabled={!canNavigateToQuestion(currentQuestionIndex + 1)}
                   className="flex items-center gap-2"
                 >
                   Suivant

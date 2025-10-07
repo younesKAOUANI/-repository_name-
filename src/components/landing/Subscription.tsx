@@ -122,7 +122,7 @@ export default function Subscription() {
                           <span>Inscription en cours...</span>
                         </div>
                       ) : (
-                        'S&apos;inscrire à la newsletter'
+                        'S\'inscrire à la newsletter'
                       )}
                     </button>
 

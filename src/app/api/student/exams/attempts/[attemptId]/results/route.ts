@@ -163,6 +163,7 @@ function calculateAttemptScore(questions: any[], attemptAnswers: any[]) {
       score: result.score,
       maxScore: questionMaxScore,
       explanation: question.explanation,
+      explanationImg: question.explanationImg,
     });
   });
 
