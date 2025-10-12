@@ -23,6 +23,8 @@ export async function GET(request: NextRequest) {
         image: true,
         university: true,
         year: true,
+        sex: true,
+        phoneNumber: true,
         createdAt: true,
         updatedAt: true,
         licenses: {
@@ -178,10 +180,10 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email, currentPassword, newPassword, year, universityId } = body;
+    const { name, email, currentPassword, newPassword, year, universityId, sex, phoneNumber } = body;
 
     // Validate required fields
-    if (!name && !email && !newPassword && year === undefined && !universityId) {
+    if (!name && !email && !newPassword && year === undefined && !universityId && sex === undefined && phoneNumber === undefined) {
       return NextResponse.json(
         { error: 'Au moins un champ doit être fourni pour la mise à jour' },
         { status: 400 }
@@ -299,6 +301,34 @@ export async function PUT(request: NextRequest) {
         updateData.university = university.name;
       } else {
         updateData.university = null;
+      }
+    }
+
+    // Update sex if provided
+    if (sex !== undefined) {
+      if (sex && !['MALE', 'FEMALE'].includes(sex)) {
+        return NextResponse.json(
+          { error: 'Sexe invalide' },
+          { status: 400 }
+        );
+      }
+      updateData.sex = sex || null;
+    }
+
+    // Update phone number if provided
+    if (phoneNumber !== undefined) {
+      if (phoneNumber && phoneNumber.trim().length > 0) {
+        // Basic phone number validation
+        const phoneRegex = /^[\+]?[0-9\s\-\(\)]+$/;
+        if (!phoneRegex.test(phoneNumber.trim())) {
+          return NextResponse.json(
+            { error: 'Format de numéro de téléphone invalide' },
+            { status: 400 }
+          );
+        }
+        updateData.phoneNumber = phoneNumber.trim();
+      } else {
+        updateData.phoneNumber = null;
       }
     }
 

@@ -27,9 +27,16 @@ interface User {
   role: string;
   year: number | null;
   university: string | null;
+  universityId: string | null;
+  sex: string | null;
+  phoneNumber: string | null;
   createdAt: string;
   emailVerified: string | null;
   image: string | null;
+  universityRelation?: {
+    id: string;
+    name: string;
+  } | null;
 }
 
 interface UserFormData {
@@ -38,7 +45,14 @@ interface UserFormData {
   password: string;
   role: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN';
   year?: number;
-  university?: string;
+  universityId?: string;
+  sex?: 'MALE' | 'FEMALE';
+  phoneNumber?: string;
+}
+
+interface University {
+  id: string;
+  name: string;
 }
 
 interface UserPagination {
@@ -77,10 +91,14 @@ export default function AdminUsersClient() {
     password: '',
     role: 'STUDENT',
     year: undefined,
-    university: '',
+    universityId: '',
+    sex: undefined,
+    phoneNumber: '',
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [universities, setUniversities] = useState<University[]>([]);
+  const [loadingUniversities, setLoadingUniversities] = useState(false);
 
   const loadUsers = async () => {
     try {
@@ -119,11 +137,28 @@ export default function AdminUsersClient() {
 
   useEffect(() => {
     loadUsers();
+    loadUniversities();
   }, [pagination.currentPage, pagination.pageSize]);
 
   const handleSearch = () => {
     setPagination(prev => ({ ...prev, currentPage: 1 }));
     loadUsers();
+  };
+
+  const loadUniversities = async () => {
+    try {
+      setLoadingUniversities(true);
+      const response = await fetch('/api/universities');
+      if (response.ok) {
+        const data = await response.json();
+        setUniversities(data.universities || []);
+      }
+    } catch (error) {
+      console.error('Error loading universities:', error);
+      setUniversities([]);
+    } finally {
+      setLoadingUniversities(false);
+    }
   };
 
   const resetForm = () => {
@@ -133,7 +168,9 @@ export default function AdminUsersClient() {
       password: '',
       role: 'STUDENT',
       year: undefined,
-      university: '',
+      universityId: '',
+      sex: undefined,
+      phoneNumber: '',
     });
     setFormErrors({});
   };
@@ -158,9 +195,13 @@ export default function AdminUsersClient() {
     }
 
     if (formData.role === 'STUDENT') {
-      if (!formData.university?.trim()) {
-        errors.university = 'L\'université est requise pour les étudiants';
+      if (!formData.universityId?.trim()) {
+        errors.universityId = 'L\'université est requise pour les étudiants';
       }
+    }
+
+    if (formData.phoneNumber && !/^\+\d{1,3}\d{8,14}$/.test(formData.phoneNumber)) {
+      errors.phoneNumber = 'Format de téléphone invalide (ex: +213xxxxxxxxx)';
     }
 
     setFormErrors(errors);
@@ -271,7 +312,9 @@ export default function AdminUsersClient() {
       password: '', // Keep empty for edit
       role: user.role as 'STUDENT' | 'INSTRUCTOR' | 'ADMIN',
       year: user.year || undefined,
-      university: user.university || '',
+      universityId: user.universityId || '',
+      sex: user.sex as 'MALE' | 'FEMALE' | undefined,
+      phoneNumber: user.phoneNumber || '',
     });
     setFormErrors({});
     setShowEditModal(true);
@@ -337,12 +380,16 @@ export default function AdminUsersClient() {
     {
       key: 'university',
       label: 'Université',
-      render: (value, user) => user.university || '-',
+      render: (value, user) => user.universityRelation?.name || user.university || '-',
     },
     {
       key: 'year',
       label: 'Année',
-      render: (value, user) => user.year ? `${user.year}ème année` : '-',
+      render: (value, user) => {
+        if (!user.year) return '-';
+        if (user.year === 7) return 'Résidanat';
+        return `${user.year}ème année`;
+      },
     },
     {
       key: 'emailVerified',
@@ -516,31 +563,84 @@ export default function AdminUsersClient() {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Sexe
+                    </label>
+                    <select
+                      value={formData.sex || ''}
+                      onChange={(e) => setFormData({ ...formData, sex: e.target.value as 'MALE' | 'FEMALE' | undefined })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">Sélectionnez</option>
+                      <option value="MALE">Homme</option>
+                      <option value="FEMALE">Femme</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Numéro de téléphone
+                    </label>
+                    <Input
+                      type="tel"
+                      value={formData.phoneNumber || ''}
+                      onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                      error={formErrors.phoneNumber}
+                      placeholder="+33 1 23 45 67 89"
+                    />
+                  </div>
+                </div>
+
                 {formData.role === 'STUDENT' && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Université *
                       </label>
-                      <Input
-                        type="text"
-                        value={formData.university || ''}
-                        onChange={(e) => setFormData({ ...formData, university: e.target.value })}
-                        error={formErrors.university}
-                      />
+                      {loadingUniversities ? (
+                        <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500">
+                          Chargement...
+                        </div>
+                      ) : (
+                        <select
+                          value={formData.universityId || ''}
+                          onChange={(e) => setFormData({ ...formData, universityId: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="">Sélectionnez une université</option>
+                          {universities.map((university) => (
+                            <option key={university.id} value={university.id}>
+                              {university.name}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {formErrors.universityId && (
+                        <p className="text-red-500 text-xs mt-1">{formErrors.universityId}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Année d'études
                       </label>
-                      <Input
-                        type="number"
-                        min="1"
-                        max="7"
+                      <select
                         value={formData.year || ''}
                         onChange={(e) => setFormData({ ...formData, year: e.target.value ? parseInt(e.target.value) : undefined })}
-                        error={formErrors.year}
-                      />
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="">Sélectionnez l'année</option>
+                        <option value="1">1ère année</option>
+                        <option value="2">2ème année</option>
+                        <option value="3">3ème année</option>
+                        <option value="4">4ème année</option>
+                        <option value="5">5ème année</option>
+                        <option value="6">6ème année</option>
+                        <option value="7">Résidanat</option>
+                      </select>
+                      {formErrors.year && (
+                        <p className="text-red-500 text-xs mt-1">{formErrors.year}</p>
+                      )}
                     </div>
                   </div>
                 )}
@@ -625,31 +725,84 @@ export default function AdminUsersClient() {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Sexe
+                    </label>
+                    <select
+                      value={formData.sex || ''}
+                      onChange={(e) => setFormData({ ...formData, sex: e.target.value as 'MALE' | 'FEMALE' | undefined })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">Sélectionnez</option>
+                      <option value="MALE">Homme</option>
+                      <option value="FEMALE">Femme</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Numéro de téléphone
+                    </label>
+                    <Input
+                      type="tel"
+                      value={formData.phoneNumber || ''}
+                      onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                      error={formErrors.phoneNumber}
+                      placeholder="+33 1 23 45 67 89"
+                    />
+                  </div>
+                </div>
+
                 {formData.role === 'STUDENT' && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Université *
                       </label>
-                      <Input
-                        type="text"
-                        value={formData.university || ''}
-                        onChange={(e) => setFormData({ ...formData, university: e.target.value })}
-                        error={formErrors.university}
-                      />
+                      {loadingUniversities ? (
+                        <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500">
+                          Chargement...
+                        </div>
+                      ) : (
+                        <select
+                          value={formData.universityId || ''}
+                          onChange={(e) => setFormData({ ...formData, universityId: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="">Sélectionnez une université</option>
+                          {universities.map((university) => (
+                            <option key={university.id} value={university.id}>
+                              {university.name}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {formErrors.universityId && (
+                        <p className="text-red-500 text-xs mt-1">{formErrors.universityId}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Année d'études
                       </label>
-                      <Input
-                        type="number"
-                        min="1"
-                        max="7"
+                      <select
                         value={formData.year || ''}
                         onChange={(e) => setFormData({ ...formData, year: e.target.value ? parseInt(e.target.value) : undefined })}
-                        error={formErrors.year}
-                      />
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="">Sélectionnez l'année</option>
+                        <option value="1">1ère année</option>
+                        <option value="2">2ème année</option>
+                        <option value="3">3ème année</option>
+                        <option value="4">4ème année</option>
+                        <option value="5">5ème année</option>
+                        <option value="6">6ème année</option>
+                        <option value="7">Résidanat</option>
+                      </select>
+                      {formErrors.year && (
+                        <p className="text-red-500 text-xs mt-1">{formErrors.year}</p>
+                      )}
                     </div>
                   </div>
                 )}
@@ -700,11 +853,11 @@ export default function AdminUsersClient() {
                 <div className="grid grid-cols-2 gap-4 pt-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Université</label>
-                    <p className="mt-1">{selectedUser.university || '-'}</p>
+                    <p className="mt-1">{selectedUser.universityRelation?.name || selectedUser.university || '-'}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Année d'études</label>
-                    <p className="mt-1">{selectedUser.year ? `${selectedUser.year}ème année` : '-'}</p>
+                    <p className="mt-1">{selectedUser.year ? (selectedUser.year === 7 ? 'Résidanat' : `${selectedUser.year}ème année`) : '-'}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Email vérifié</label>

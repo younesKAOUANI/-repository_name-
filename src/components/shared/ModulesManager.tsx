@@ -23,8 +23,8 @@ import {
 } from 'lucide-react';
 
 interface ExpandedState {
-  studyYears: Set<number>;
-  semesters: Set<number>;
+  studyYears: Set<string>;
+  semesters: Set<string>;
 }
 
 interface ModulesManagerProps {
@@ -50,7 +50,7 @@ export default function ModulesManager({
 
   // Modal states
   const [showCreateModule, setShowCreateModule] = useState(false);
-  const [selectedSemesterId, setSelectedSemesterId] = useState<number | null>(null);
+  const [selectedSemesterId, setSelectedSemesterId] = useState<string | null>(null);
   const [editingModule, setEditingModule] = useState<Module | null>(null);
 
   // Form states
@@ -74,7 +74,7 @@ export default function ModulesManager({
     }
   };
 
-  const toggleStudyYear = (studyYearId: number) => {
+  const toggleStudyYear = (studyYearId: string) => {
     setExpanded(prev => ({
       ...prev,
       studyYears: prev.studyYears.has(studyYearId) 
@@ -83,7 +83,7 @@ export default function ModulesManager({
     }));
   };
 
-  const toggleSemester = (semesterId: number) => {
+  const toggleSemester = (semesterId: string) => {
     setExpanded(prev => ({
       ...prev,
       semesters: prev.semesters.has(semesterId)
@@ -92,7 +92,7 @@ export default function ModulesManager({
     }));
   };
 
-  const handleCreateModule = (semesterId: number) => {
+  const handleCreateModule = (semesterId: string) => {
     if (!allowCreate) return;
     setSelectedSemesterId(semesterId);
     setModuleName('');

@@ -56,8 +56,8 @@ export default function EditQuizModal({
     sessionLessons: [],
   });
 
-  const [selectedStudyYear, setSelectedStudyYear] = useState<number | null>(null);
-  const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
+  const [selectedStudyYear, setSelectedStudyYear] = useState<string | null>(null);
+  const [selectedSemester, setSelectedSemester] = useState<string | null>(null);
   const [availableModules, setAvailableModules] = useState<any[]>([]);
   const [availableLessons, setAvailableLessons] = useState<any[]>([]);
 

@@ -4,7 +4,7 @@
  */
 
 export interface StudyYear {
-  id: number;
+  id: string;
   name: string;
   createdAt: string;
   updatedAt: string;
@@ -16,9 +16,9 @@ export interface StudyYear {
 }
 
 export interface Semester {
-  id: number;
+  id: string;
   name: string;
-  studyYearId: number;
+  studyYearId: string;
   createdAt: string;
   updatedAt: string;
   studyYear?: StudyYear;
@@ -29,9 +29,9 @@ export interface Semester {
 }
 
 export interface Module {
-  id: number;
+  id: string;
   name: string;
-  semesterId: number;
+  semesterId: string;
   createdAt: string;
   updatedAt: string;
   semester: Semester;
@@ -44,10 +44,10 @@ export interface Module {
 }
 
 export interface Lesson {
-  id: number;
+  id: string;
   title: string;
   content: string | null;
-  moduleId: number;
+  moduleId: string;
   createdAt: string;
   updatedAt: string;
   _count: {
@@ -72,12 +72,12 @@ export interface Quiz {
 
 export interface CreateModuleData {
   name: string;
-  semesterId: number;
+  semesterId: string;
 }
 
 export interface UpdateModuleData {
   name?: string;
-  semesterId?: number;
+  semesterId?: string;
 }
 
 class ModuleService {
@@ -116,7 +116,7 @@ class ModuleService {
   /**
    * Get all modules with optional filtering
    */
-  async getModules(filters?: { studyYearId?: number; semesterId?: number }): Promise<Module[]> {
+  async getModules(filters?: { studyYearId?: string; semesterId?: string }): Promise<Module[]> {
     try {
       const params = new URLSearchParams();
       if (filters?.studyYearId) {
@@ -149,7 +149,7 @@ class ModuleService {
   /**
    * Get a specific module by ID
    */
-  async getModule(id: number): Promise<Module> {
+  async getModule(id: string): Promise<Module> {
     try {
       const response = await fetch(`${this.baseUrl}/modules/${id}`, {
         method: 'GET',
@@ -200,7 +200,7 @@ class ModuleService {
   /**
    * Update a module
    */
-  async updateModule(id: number, moduleData: UpdateModuleData): Promise<Module> {
+  async updateModule(id: string, moduleData: UpdateModuleData): Promise<Module> {
     try {
       const response = await fetch(`${this.baseUrl}/modules/${id}`, {
         method: 'PUT',
@@ -226,7 +226,7 @@ class ModuleService {
   /**
    * Delete a module
    */
-  async deleteModule(id: number): Promise<void> {
+  async deleteModule(id: string): Promise<void> {
     try {
       const response = await fetch(`${this.baseUrl}/modules/${id}`, {
         method: 'DELETE',

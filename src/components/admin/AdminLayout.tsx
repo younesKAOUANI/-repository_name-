@@ -14,16 +14,18 @@ import {
   MdQuiz,
   MdCardMembership,
   MdBarChart,
-  MdSettings
-} from "react-icons/md";const adminMenuItems = [
+  MdSettings,
+  MdContactSupport
+} from "react-icons/md";
+
+const adminMenuItems = [
   { label: 'Tableau de bord', href: '/admin/dashboard', icon: MdSpaceDashboard },
   { label: 'Utilisateurs', href: '/admin/users', icon: MdPeople },
-  { label: 'Universités', href: '/admin/universities', icon: MdSchool },
+  { label: 'Universités / Cours', href: '/admin/universities', icon: MdSchool },
   { label: 'Modules', href: '/admin/modules', icon: MdMenuBook },
-  { label: 'Quiz', href: '/admin/quizzes', icon: MdQuiz },
+  { label: 'Examens', href: '/admin/quizzes', icon: MdQuiz },
   { label: 'Licences', href: '/admin/licenses', icon: MdCardMembership },
-  { label: 'Statistiques', href: '/admin/stats', icon: MdBarChart },
-  { label: 'Contact', href: '/admin/contact', icon: MdSettings },
+  { label: 'Contact', href: '/admin/contact', icon: MdContactSupport },
   { label: 'Paramètres', href: '/admin/settings', icon: MdSettings },
 ];
 

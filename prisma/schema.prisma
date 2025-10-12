@@ -14,6 +14,8 @@ model User {
   emailVerified           DateTime?
   image                   String?
   role                    Role           @default(STUDENT)
+  sex                     Sex?
+  phoneNumber             String?
   createdAt               DateTime       @default(now())
   updatedAt               DateTime       @updatedAt
   emailVerificationToken  String?
@@ -22,6 +24,7 @@ model User {
   resetToken              String?
   resetTokenExpiry        DateTime?
   university              String?
+  universityId            String?
   year                    Int?
   emailVerificationExpiry DateTime?
   accounts                Account[]
@@ -29,6 +32,7 @@ model User {
   quizAttempts            QuizAttempt[]
   quizProgresses          QuizProgress[]
   sessions                Session[]
+  universityRelation      University? @relation(fields: [universityId], references: [id])
 }
 
 model Account {
@@ -318,6 +322,7 @@ model University {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   driveLinks DriveLink[]
+  users      User[]
 
   @@index([name])
 }
@@ -433,4 +438,9 @@ enum PlanTypeName {
   ANNUAL
   SEMESTRIAL
   MODULE
+}
+
+enum Sex {
+  MALE
+  FEMALE
 }

@@ -1,6 +1,6 @@
 /**
  * Create Quiz Modal Component
- * Handles creation of all three quiz types: QUIZ, EXAM, SESSION
+ * Handles creation of examens de module
  */
 
 'use client';
@@ -22,9 +22,7 @@ interface CreateQuizModalProps {
 }
 
 const QuizTypeOptions = [
-  { value: 'QUIZ', label: 'Quiz de leçon', icon: BookOpen, description: 'Quiz attaché à une leçon spécifique' },
   { value: 'EXAM', label: 'Examen de module', icon: GraduationCap, description: 'Examen couvrant un module entier' },
-  { value: 'SESSION', label: 'Quiz de révision', icon: Shuffle, description: 'Quiz généré à partir de plusieurs leçons' },
 ];
 
 const QuestionTypeOptions = [
@@ -45,7 +43,7 @@ export default function CreateQuizModal({
   const [quizData, setQuizData] = useState<QuizCreate>({
     title: '',
     description: '',
-    type: 'QUIZ',
+    type: 'EXAM',
     lessonId: undefined,
     moduleId: undefined,
     questionCount: 20,
@@ -54,8 +52,8 @@ export default function CreateQuizModal({
     sessionLessons: [],
   });
 
-  const [selectedStudyYear, setSelectedStudyYear] = useState<number | null>(null);
-  const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
+  const [selectedStudyYear, setSelectedStudyYear] = useState<string | null>(null);
+  const [selectedSemester, setSelectedSemester] = useState<string | null>(null);
   const [availableModules, setAvailableModules] = useState<any[]>([]);
   const [availableLessons, setAvailableLessons] = useState<any[]>([]);
 
@@ -202,36 +200,15 @@ export default function CreateQuizModal({
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Type de quiz *</label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {QuizTypeOptions.map((option) => {
-                    const Icon = option.icon;
-                    return (
-                      <div
-                        key={option.value}
-                        className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                          quizData.type === option.value
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        onClick={() => setQuizData(prev => ({ 
-                          ...prev, 
-                          type: option.value as QuizType,
-                          lessonId: undefined,
-                          moduleId: undefined,
-                          sessionLessons: [],
-                        }))}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Icon className="h-5 w-5 text-gray-600" />
-                          <div>
-                            <div className="font-medium">{option.label}</div>
-                            <div className="text-sm text-gray-500">{option.description}</div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <label className="block text-sm font-medium mb-2">Type d'évaluation</label>
+                <div className="border rounded-lg p-4 bg-blue-50 border-blue-200">
+                  <div className="flex items-center gap-3">
+                    <GraduationCap className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <div className="font-medium text-blue-800">Examen de module</div>
+                      <div className="text-sm text-blue-600">Examen couvrant un module entier</div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -262,7 +239,7 @@ export default function CreateQuizModal({
                     <select
                       value={selectedStudyYear || ''}
                       onChange={(e) => {
-                        const value = e.target.value ? parseInt(e.target.value) : null;
+                        const value = e.target.value || null;
                         setSelectedStudyYear(value);
                         setSelectedSemester(null);
                         setQuizData(prev => ({ ...prev, moduleId: undefined, lessonId: undefined }));
@@ -284,7 +261,7 @@ export default function CreateQuizModal({
                     <select
                       value={selectedSemester || ''}
                       onChange={(e) => {
-                        const value = e.target.value ? parseInt(e.target.value) : null;
+                        const value = e.target.value || null;
                         setSelectedSemester(value);
                         setQuizData(prev => ({ ...prev, moduleId: undefined, lessonId: undefined }));
                       }}
@@ -311,7 +288,7 @@ export default function CreateQuizModal({
                   <select
                     value={quizData.moduleId || ''}
                     onChange={(e) => {
-                      const value = e.target.value ? parseInt(e.target.value) : undefined;
+                      const value = e.target.value || undefined;
                       setQuizData(prev => ({ ...prev, moduleId: value, lessonId: undefined }));
                     }}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
@@ -333,7 +310,7 @@ export default function CreateQuizModal({
                     <select
                       value={quizData.lessonId || ''}
                       onChange={(e) => {
-                        const value = e.target.value ? parseInt(e.target.value) : undefined;
+                        const value = e.target.value || undefined;
                         setQuizData(prev => ({ ...prev, lessonId: value }));
                       }}
                       className="w-full border border-gray-300 rounded-lg px-3 py-2"

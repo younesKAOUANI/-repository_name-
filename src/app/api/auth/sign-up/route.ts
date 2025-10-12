@@ -8,19 +8,23 @@ interface SignUpRequest {
   name: string;
   email: string;
   password: string;
-  year: string;
-  university: string;
+  confirmPassword?: string;
+  year: string | number;
+  universityId: string;
+  sex: string;
+  phoneNumber: string;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: SignUpRequest = await request.json();
-    const { name, email, password, year, university } = body;
+        // Destructure the request body
+    const { name, email, password, confirmPassword, year, universityId, sex, phoneNumber } = body;
 
     // Validation
-    if (!name || !email || !password || !year || !university) {
+    if (!name || !email || !password) {
       return NextResponse.json(
-        { message: "Tous les champs sont requis" },
+        { message: "Le nom, email et mot de passe sont requis" },
         { status: 400 }
       );
     }
@@ -56,8 +60,43 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Parse year from string (extract the first number)
-    const yearNumber = parseInt(year.match(/\d+/)?.[0] || '1', 10);
+    // Parse year from string or number (extract the first number)
+    let yearNumber = null;
+    if (year) {
+      if (typeof year === 'string') {
+        yearNumber = parseInt(year.match(/\d+/)?.[0] || '1', 10);
+      } else if (typeof year === 'number') {
+        yearNumber = year;
+      } else {
+        yearNumber = parseInt(String(year), 10) || null;
+      }
+    }
+
+    // Validate sex if provided
+    if (sex && !['MALE', 'FEMALE'].includes(sex)) {
+      return NextResponse.json(
+        { message: "Sexe invalide" },
+        { status: 400 }
+      );
+    }
+
+    // Validate and get university if provided
+    let universityName = null;
+    if (universityId) {
+      const university = await db.university.findUnique({
+        where: { id: universityId },
+        select: { name: true }
+      });
+      
+      if (!university) {
+        return NextResponse.json(
+          { message: "Université invalide" },
+          { status: 400 }
+        );
+      }
+      
+      universityName = university.name;
+    }
 
     // Generate verification token
     const verificationToken = generateVerificationToken();
@@ -71,7 +110,9 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         role: Role.STUDENT, // Default role for sign-up
         year: yearNumber,
-        university: university.trim(),
+        university: universityName,
+        sex: sex || null,
+        phoneNumber: phoneNumber?.trim() || null,
         emailVerificationToken: verificationToken,
         emailVerificationExpiry: verificationExpiry,
         emailVerified: null, // Not verified yet
@@ -83,6 +124,8 @@ export async function POST(request: NextRequest) {
         role: true,
         year: true,
         university: true,
+        sex: true,
+        phoneNumber: true,
         createdAt: true,
       },
     });

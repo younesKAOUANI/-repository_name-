@@ -57,114 +57,250 @@ export const getVerificationEmailHtml = (userName: string, verificationUrl: stri
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Vérification de votre adresse e-mail</title>
         <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
             body {
-                font-family: Arial, sans-serif;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                 line-height: 1.6;
-                color: #333;
+                color: #374151;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+            .email-wrapper {
                 max-width: 600px;
                 margin: 0 auto;
-                padding: 20px;
-                background-color: #f4f4f4;
-            }
-            .container {
                 background-color: #ffffff;
-                padding: 40px;
-                border-radius: 8px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             }
             .header {
+                background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+                padding: 40px 20px;
                 text-align: center;
-                margin-bottom: 30px;
+                color: white;
             }
-            .logo {
-                font-size: 28px;
-                font-weight: bold;
-                color: #2563eb;
-                margin-bottom: 10px;
-            }
-            .title {
-                color: #1f2937;
-                font-size: 24px;
+            .logo-container {
                 margin-bottom: 20px;
             }
+            .logo {
+                max-width: 200px;
+                height: auto;
+                display: inline-block;
+            }
+            .title {
+                font-size: 28px;
+                font-weight: 700;
+                margin-bottom: 8px;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .subtitle {
+                font-size: 16px;
+                opacity: 0.9;
+                font-weight: 300;
+            }
             .content {
-                margin-bottom: 30px;
+                padding: 40px;
+            }
+            .greeting {
+                font-size: 18px;
+                font-weight: 600;
+                color: #1f2937;
+                margin-bottom: 20px;
+            }
+            .message {
+                font-size: 16px;
+                color: #4b5563;
+                margin-bottom: 20px;
+                line-height: 1.8;
+            }
+            .cta-container {
+                text-align: center;
+                margin: 40px 0;
+                color: white;
             }
             .verification-button {
                 display: inline-block;
-                background-color: #2563eb;
+                background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
                 color: white;
-                padding: 15px 30px;
+                padding: 16px 32px;
                 text-decoration: none;
-                border-radius: 6px;
-                font-weight: bold;
-                text-align: center;
-                margin: 20px 0;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 16px;
+                box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
+                transition: all 0.3s ease;
+                letter-spacing: 0.5px;
             }
             .verification-button:hover {
-                background-color: #1d4ed8;
-            }
-            .alternative-link {
-                background-color: #f8f9fa;
-                padding: 15px;
-                border-radius: 6px;
-                margin: 20px 0;
-                font-size: 14px;
-                word-break: break-all;
-            }
-            .footer {
-                margin-top: 30px;
-                padding-top: 20px;
-                border-top: 1px solid #e5e7eb;
-                font-size: 14px;
-                color: #6b7280;
-                text-align: center;
+                transform: translateY(-2px);
+                box-shadow: 0 15px 20px -3px rgba(79, 70, 229, 0.5);
             }
             .warning {
-                background-color: #fef3c7;
-                padding: 15px;
-                border-radius: 6px;
-                margin: 20px 0;
-                border-left: 4px solid #f59e0b;
+                background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+                border: 1px solid #f59e0b;
+                padding: 20px;
+                border-radius: 12px;
+                margin: 30px 0;
+                position: relative;
+                overflow: hidden;
+            }
+            .warning::before {
+                content: '⚠️';
+                font-size: 20px;
+                margin-right: 10px;
+            }
+            .warning-text {
+                font-weight: 600;
+                color: #92400e;
+            }
+            .alternative-link {
+                background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+                border: 1px solid #d1d5db;
+                padding: 20px;
+                border-radius: 12px;
+                margin: 30px 0;
+                font-size: 14px;
+                font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+                word-break: break-all;
+                color: #374151;
+                position: relative;
+            }
+            .alternative-link::before {
+                content: '🔗';
+                margin-right: 8px;
+            }
+            .footer {
+                background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+                padding: 30px 40px;
+                border-top: 1px solid #e5e7eb;
+                text-align: center;
+            }
+            .footer-text {
+                font-size: 14px;
+                color: #6b7280;
+                margin-bottom: 8px;
+            }
+            .footer-brand {
+                font-weight: 600;
+                color: #4f46e5;
+            }
+            .features {
+                display: flex;
+                justify-content: space-evenly;
+                margin: 30px 0;
+                padding: 20px;
+                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                border-radius: 12px;
+                border: 1px solid #e2e8f0;
+            }
+            .feature {
+                text-align: center;
+                flex: 1;
+                padding: 0 10px;
+            }
+            .feature-icon {
+                font-size: 24px;
+                margin-bottom: 8px;
+            }
+            .feature-text {
+                font-size: 12px;
+                color: #64748b;
+                font-weight: 500;
+            }
+            @media (max-width: 600px) {
+                .email-wrapper {
+                    margin: 10px;
+                }
+                .header, .content {
+                    padding: 30px 20px;
+                }
+                .features {
+                    flex-direction: column;
+                    gap: 15px;
+                }
+                .title {
+                    font-size: 24px;
+                }
+                .verification-button {
+                    padding: 14px 28px;
+                    font-size: 15px;
+                }
             }
         </style>
     </head>
     <body>
-        <div class="container">
+        <div class="email-wrapper">
             <div class="header">
-                <div class="logo">Pharmapedia</div>
+                <div class="logo-container">
+                    <img src="${process.env.NEXTAUTH_URL}/pharmapedia-logo.png" alt="Pharmapedia Logo" class="logo" />
+                </div>
                 <h1 class="title">Vérifiez votre adresse e-mail</h1>
+                <p class="subtitle">Bienvenue dans la communauté Pharmapedia ! 🎓</p>
             </div>
             
             <div class="content">
-                <p>Bonjour ${userName},</p>
+                <div class="greeting">Bonjour ${userName} ! 👋</div>
                 
-                <p>Merci de vous être inscrit sur Pharmapedia ! Pour finaliser votre inscription et commencer à utiliser notre plateforme éducative, nous devons vérifier votre adresse e-mail.</p>
+                <p class="message">
+                    Nous sommes ravis de vous accueillir sur <strong>Pharmapedia</strong>, votre plateforme éducative dédiée à la pharmacie ! 
+                    Pour finaliser votre inscription et débloquer l'accès à tous nos cours et ressources pédagogiques, 
+                    nous devons d'abord vérifier votre adresse e-mail.
+                </p>
                 
-                <p>Cliquez sur le bouton ci-dessous pour vérifier votre compte :</p>
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon">📚</div>
+                        <div class="feature-text">Cours et ressources pédagogiques</div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-text">Quiz personnalisés</div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🏆</div>
+                        <div class="feature-text">Suivi des progrès</div>
+                    </div>
+                </div>
                 
-                <div style="text-align: center;">
+                <p class="message">
+                    Cliquez sur le bouton ci-dessous pour vérifier votre compte et commencer votre parcours d'apprentissage :
+                </p>
+                
+                <div class="cta-container">
                     <a href="${verificationUrl}" class="verification-button">
-                        Vérifier mon adresse e-mail
+                        ✅ Vérifier mon adresse e-mail
                     </a>
                 </div>
                 
                 <div class="warning">
-                    <strong>Important :</strong> Ce lien de vérification expirera dans 24 heures pour des raisons de sécurité.
+                    <span class="warning-text">Important :</span> Ce lien de vérification expirera dans 24 heures pour des raisons de sécurité.
                 </div>
                 
-                <p>Si le bouton ne fonctionne pas, vous pouvez copier et coller le lien suivant dans votre navigateur :</p>
+                <p class="message">
+                    Si le bouton ne fonctionne pas, vous pouvez copier et coller le lien suivant dans votre navigateur :
+                </p>
                 
                 <div class="alternative-link">
                     ${verificationUrl}
                 </div>
                 
-                <p>Si vous n'avez pas créé de compte sur Pharmapedia, vous pouvez ignorer cet e-mail en toute sécurité.</p>
+                <p class="message">
+                    Si vous n'avez pas créé de compte sur Pharmapedia, vous pouvez ignorer cet e-mail en toute sécurité.
+                </p>
             </div>
             
             <div class="footer">
-                <p>Cet e-mail a été envoyé par Pharmapedia</p>
-                <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>
+                <p class="footer-text">
+                    Cet e-mail a été envoyé par <span class="footer-brand">Pharmapedia</span>
+                </p>
+                <p class="footer-text">
+                    Des questions ? N'hésitez pas à nous contacter ! 💬
+                </p>
             </div>
         </div>
     </body>
@@ -175,20 +311,29 @@ export const getVerificationEmailHtml = (userName: string, verificationUrl: stri
 // Plain text version of the verification email
 export const getVerificationEmailText = (userName: string, verificationUrl: string): string => {
   return `
-Bonjour ${userName},
+🎓 Bienvenue sur Pharmapedia, ${userName} !
 
-Merci de vous être inscrit sur Pharmapedia !
+Nous sommes ravis de vous accueillir dans notre communauté d'apprentissage dédiée à la pharmacie !
 
-Pour finaliser votre inscription, veuillez vérifier votre adresse e-mail en visitant le lien suivant :
+Pour finaliser votre inscription et débloquer l'accès à tous nos contenus pédagogiques (cours interactifs, quiz personnalisés, suivi des progrès), veuillez vérifier votre adresse e-mail en visitant le lien suivant :
 
+🔗 Lien de vérification :
 ${verificationUrl}
 
-Ce lien expirera dans 24 heures.
+⚠️  IMPORTANT : Ce lien expirera dans 24 heures pour des raisons de sécurité.
 
-Si vous n'avez pas créé de compte sur Pharmapedia, vous pouvez ignorer cet e-mail.
+Ce que vous attend sur Pharmapedia :
+📚 Cours et ressources pédagogiques
+🎯 Quiz et examens personnalisés  
+🏆 Suivi détaillé de vos progrès
+👥 Communauté d'étudiants et enseignants
+
+Si vous n'avez pas créé de compte sur Pharmapedia, vous pouvez ignorer cet e-mail en toute sécurité.
+
+Des questions ? N'hésitez pas à nous contacter !
 
 Cordialement,
-L'équipe Pharmapedia
+L'équipe Pharmapedia 💊
   `;
 };
 

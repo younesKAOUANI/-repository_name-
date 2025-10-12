@@ -9,12 +9,12 @@ export interface QuizCreate {
   title: string;
   description?: string;
   type: QuizType;
-  lessonId?: number;
-  moduleId?: number;
+  lessonId?: string;
+  moduleId?: string;
   questionCount?: number; // for SESSION quizzes
   timeLimit?: number; // in minutes
   questions?: QuestionCreate[];
-  sessionLessons?: number[]; // for SESSION quizzes - lesson IDs to pull questions from
+  sessionLessons?: string[]; // for SESSION quizzes - lesson IDs to pull questions from
 }
 
 export interface QuestionCreate {
@@ -30,33 +30,33 @@ export interface AnswerOptionCreate {
 }
 
 export interface Quiz {
-  id: number;
+  id: string;
   title: string;
   description?: string;
   type: QuizType;
-  lessonId?: number;
-  moduleId?: number;
+  lessonId?: string;
+  moduleId?: string;
   questionCount?: number;
   timeLimit?: number;
   order?: number;
   createdAt: string;
   updatedAt: string;
   lesson?: {
-    id: number;
+    id: string;
     title: string;
     module: {
-      id: number;
+      id: string;
       name: string;
     };
   };
   module?: {
-    id: number;
+    id: string;
     name: string;
     semester: {
-      id: number;
+      id: string;
       name: string;
       studyYear: {
-        id: number;
+        id: string;
         name: string;
       };
     };
@@ -64,7 +64,7 @@ export interface Quiz {
   questions?: Question[];
   sessionLessons?: {
     lesson: {
-      id: number;
+      id: string;
       title: string;
     };
   }[];
@@ -75,7 +75,7 @@ export interface Quiz {
 }
 
 export interface Question {
-  id: number;
+  id: string;
   text: string;
   questionType: QuestionType;
   order?: number;
@@ -83,7 +83,7 @@ export interface Question {
 }
 
 export interface AnswerOption {
-  id: number;
+  id: string;
   text: string;
   isCorrect: boolean;
 }
@@ -91,8 +91,8 @@ export interface AnswerOption {
 export interface QuizFilters {
   search: string;
   type?: QuizType;
-  moduleId?: number;
-  lessonId?: number;
+  moduleId?: string;
+  lessonId?: string;
 }
 
 export interface QuizPagination {
@@ -120,9 +120,9 @@ export interface QuizStats {
 
 export interface SessionQuizOptions {
   questionCount: number; // 15-50
-  selectedLessons: number[];
-  selectedModules: number[];
-  selectedSemesters: number[];
+  selectedLessons: string[];
+  selectedModules: string[];
+  selectedSemesters: string[];
   timeLimit?: number;
 }
 
@@ -156,7 +156,7 @@ class QuizAdminService {
   /**
    * Get quiz by ID
    */
-  async getQuizById(id: number): Promise<Quiz> {
+  async getQuizById(id: string): Promise<Quiz> {
     const response = await fetch(`${this.baseUrl}/${id}`);
     if (!response.ok) {
       throw new Error('Échec de la récupération du quiz');
@@ -186,7 +186,7 @@ class QuizAdminService {
   /**
    * Update a quiz
    */
-  async updateQuiz(id: number, quizData: Partial<QuizCreate>): Promise<Quiz> {
+  async updateQuiz(id: string, quizData: Partial<QuizCreate>): Promise<Quiz> {
     const response = await fetch(`${this.baseUrl}/${id}`, {
       method: 'PUT',
       headers: {
@@ -205,7 +205,7 @@ class QuizAdminService {
   /**
    * Delete a quiz
    */
-  async deleteQuiz(id: number): Promise<void> {
+  async deleteQuiz(id: string): Promise<void> {
     const response = await fetch(`${this.baseUrl}/${id}`, {
       method: 'DELETE',
     });
@@ -251,16 +251,16 @@ class QuizAdminService {
    */
   async getQuizResources(): Promise<{
     studyYears: Array<{
-      id: number;
+      id: string;
       name: string;
       semesters: Array<{
-        id: number;
+        id: string;
         name: string;
         modules: Array<{
-          id: number;
+          id: string;
           name: string;
           lessons: Array<{
-            id: number;
+            id: string;
             title: string;
           }>;
         }>;
@@ -277,7 +277,7 @@ class QuizAdminService {
   /**
    * Duplicate a quiz
    */
-  async duplicateQuiz(id: number, newTitle?: string): Promise<Quiz> {
+  async duplicateQuiz(id: string, newTitle?: string): Promise<Quiz> {
     const response = await fetch(`${this.baseUrl}/${id}/duplicate`, {
       method: 'POST',
       headers: {

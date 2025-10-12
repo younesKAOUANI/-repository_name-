@@ -1,6 +1,6 @@
 /**
  * Quiz Manager Component
- * Manages all three types of quizzes: QUIZ (lesson), EXAM (module), SESSION (custom)
+ * Manages examens de module
  */
 
 'use client';
@@ -35,9 +35,7 @@ import EditQuizModal from '@/components/shared/modals/EditQuizModal';
 import ViewQuizModal from '@/components/shared/modals/ViewQuizModal';
 
 const QuizTypeIcons = {
-  QUIZ: BookOpen,
   EXAM: GraduationCap,
-  SESSION: Shuffle,
 } as const;
 
 const isValidQuizType = (type: any): type is keyof typeof QuizTypeIcons => {
@@ -47,15 +45,11 @@ const isValidQuizType = (type: any): type is keyof typeof QuizTypeIcons => {
 
 
 const QuizTypeLabels = {
-  QUIZ: 'Quiz de leçon',
   EXAM: 'Examen de module',
-  SESSION: 'Quiz de révision',
 } as const;
 
 const QuizTypeBadgeColors = {
-  QUIZ: 'bg-blue-100 text-blue-800',
   EXAM: 'bg-red-100 text-red-800',
-  SESSION: 'bg-green-100 text-green-800',
 } as const;
 
 interface QuizManagerProps {
@@ -109,8 +103,8 @@ export default function QuizManager({ userRole }: QuizManagerProps) {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState<QuizType | ''>('');
-  const [selectedModule, setSelectedModule] = useState<number | ''>('');
-  const [selectedLesson, setSelectedLesson] = useState<number | ''>('');
+  const [selectedModule, setSelectedModule] = useState<string | ''>('');
+  const [selectedLesson, setSelectedLesson] = useState<string | ''>('');
 
   useEffect(() => {
     loadStats();
@@ -128,7 +122,7 @@ export default function QuizManager({ userRole }: QuizManagerProps) {
     setFilters({ type: type || undefined });
   };
 
-  const handleModuleFilter = (moduleId: number | '') => {
+  const handleModuleFilter = (moduleId: string | '') => {
     setSelectedModule(moduleId);
     // Clear lesson filter when module changes
     setSelectedLesson('');
@@ -138,7 +132,7 @@ export default function QuizManager({ userRole }: QuizManagerProps) {
     });
   };
 
-  const handleLessonFilter = (lessonId: number | '') => {
+  const handleLessonFilter = (lessonId: string | '') => {
     setSelectedLesson(lessonId);
     setFilters({ lessonId: lessonId || undefined });
   };
@@ -418,7 +412,7 @@ export default function QuizManager({ userRole }: QuizManagerProps) {
 
             <select
               value={selectedModule}
-              onChange={(e) => handleModuleFilter(e.target.value === '' ? '' : parseInt(e.target.value))}
+              onChange={(e) => handleModuleFilter(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm min-w-[140px]"
             >
               <option value="">Tous les modules</option>
@@ -431,7 +425,7 @@ export default function QuizManager({ userRole }: QuizManagerProps) {
 
             <select
               value={selectedLesson}
-              onChange={(e) => handleLessonFilter(e.target.value === '' ? '' : parseInt(e.target.value))}
+              onChange={(e) => handleLessonFilter(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm min-w-[140px]"
               disabled={!selectedModule}
             >

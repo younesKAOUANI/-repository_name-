@@ -30,6 +30,8 @@ async function main() {
       emailVerified: new Date(),
       university: 'Université d\'Alger - Faculté de Pharmacie',
       year: null,
+      sex: 'FEMALE',
+      phoneNumber: '+213 555 123 456',
     },
   });
   console.log(`✅ Admin: ${admin.name}`);
@@ -46,6 +48,8 @@ async function main() {
       emailVerified: new Date(),
       university: 'Université d\'Oran - Faculté de Pharmacie',
       year: null,
+      sex: 'MALE',
+      phoneNumber: '+213 555 789 012',
     },
   });
   console.log(`✅ Teacher: ${teacher.name}`);
@@ -53,13 +57,13 @@ async function main() {
   const students = [];
   const studentData = [
     // 3rd Year Students (Main Focus)
-    { email: 'student1@pharmapedia.com', name: 'Amina Khelifi', year: 3, university: 'Université d\'Alger - Faculté de Pharmacie' },
+    { email: 'student1@pharmapedia.com', name: 'Amina Khelifi', year: 3, university: 'Université d\'Alger - Faculté de Pharmacie', sex: 'FEMALE', phoneNumber: '+213 555 111 222' },
 
     // Other years for diversity
-    { email: 'student11@pharmapedia.com', name: 'Youcef Meziane', year: 4, university: 'Université de Constantine - Faculté de Pharmacie' },
-    { email: 'student12@pharmapedia.com', name: 'Fatima Boudiaf', year: 5, university: 'Université d\'Oran - Faculté de Pharmacie' },
-    { email: 'student13@pharmapedia.com', name: 'Lina Berkane', year: 4, university: 'Université de Tlemcen - Faculté de Pharmacie' },
-    { email: 'student14@pharmapedia.com', name: 'Ahmed Brahimi', year: 2, university: 'Université d\'Alger - Faculté de Pharmacie' },
+    { email: 'student11@pharmapedia.com', name: 'Youcef Meziane', year: 4, university: 'Université de Constantine - Faculté de Pharmacie', sex: 'MALE', phoneNumber: '+213 555 333 444' },
+    { email: 'student12@pharmapedia.com', name: 'Fatima Boudiaf', year: 5, university: 'Université d\'Oran - Faculté de Pharmacie', sex: 'FEMALE', phoneNumber: '+213 555 555 666' },
+    { email: 'student13@pharmapedia.com', name: 'Lina Berkane', year: 4, university: 'Université de Tlemcen - Faculté de Pharmacie', sex: 'FEMALE', phoneNumber: '+213 555 777 888' },
+    { email: 'student14@pharmapedia.com', name: 'Ahmed Brahimi', year: 2, university: 'Université d\'Alger - Faculté de Pharmacie', sex: 'MALE', phoneNumber: '+213 555 999 000' },
   ];
 
   for (const data of studentData) {
@@ -75,6 +79,8 @@ async function main() {
         emailVerified: new Date(),
         university: data.university,
         year: data.year,
+        sex: data.sex as any,
+        phoneNumber: data.phoneNumber,
       },
     });
     students.push(student);
@@ -880,90 +886,7 @@ async function main() {
     }
   ];
 
-  // Create lesson quizzes for all 3rd year lessons (extensive coverage)
-  for (let i = 0; i < lessons.length && i < 25; i++) { // First 25 lessons (mostly 3rd year)
-    const lesson = lessons[i];
-    let quizQuestions = [];
-    
-    // Select appropriate questions based on lesson content
-    if (lesson.title.toLowerCase().includes('pharmacol') || lesson.title.toLowerCase().includes('récepteur') || lesson.title.toLowerCase().includes('neurotransmett')) {
-      quizQuestions = pharmacologyQuestions.slice(0, 3);
-    } else if (lesson.title.toLowerCase().includes('chimie') || lesson.title.toLowerCase().includes('structure') || lesson.title.toLowerCase().includes('antibiotique')) {
-      quizQuestions = chemotherapyQuestions.slice(0, 3);
-    } else if (lesson.title.toLowerCase().includes('toxicol')) {
-      quizQuestions = toxicologyQuestions;
-    } else {
-      // Generic questions for other lessons
-      quizQuestions = [
-        {
-          text: `Concept clé de ${lesson.title} - Quelle est la définition correcte ?`,
-          options: [
-            { text: 'Définition correcte basée sur le cours', isCorrect: true },
-            { text: 'Définition incorrecte A', isCorrect: false },
-            { text: 'Définition incorrecte B', isCorrect: false },
-            { text: 'Définition incorrecte C', isCorrect: false },
-          ]
-        },
-        {
-          text: `Application pratique de ${lesson.title} - Comment l'utiliser en pharmacie ?`,
-          options: [
-            { text: 'Application incorrecte A', isCorrect: false },
-            { text: 'Application correcte en pratique pharmaceutique', isCorrect: true },
-            { text: 'Application incorrecte B', isCorrect: false },
-            { text: 'Application incorrecte C', isCorrect: false },
-          ]
-        },
-        {
-          text: `Cas clinique lié à ${lesson.title} - Quelle est la meilleure approche ?`,
-          options: [
-            { text: 'Approche incorrecte A', isCorrect: false },
-            { text: 'Approche incorrecte B', isCorrect: false },
-            { text: 'Approche thérapeutique optimale', isCorrect: true },
-            { text: 'Approche incorrecte C', isCorrect: false },
-          ]
-        }
-      ];
-    }
-
-    const quiz = await prisma.quiz.create({
-      data: {
-        id: createId(),
-        title: `Quiz: ${lesson.title}`,
-        description: `Évaluation approfondie du cours "${lesson.title}" avec questions théoriques et pratiques`,
-        type: QuizType.QUIZ,
-        lessonId: lesson.id,
-        order: 1,
-        timeLimit: 20, // 20 minutes
-      },
-    });
-
-    for (let qIndex = 0; qIndex < quizQuestions.length; qIndex++) {
-      const qData = quizQuestions[qIndex];
-      const question = await prisma.question.create({
-        data: {
-          id: createId(),
-          text: qData.text,
-          questionType: QuestionType.QCMA,
-          quizId: quiz.id,
-          order: qIndex + 1,
-        },
-      });
-
-      for (const opt of qData.options) {
-        await prisma.answerOption.create({
-          data: {
-            id: createId(),
-            text: opt.text,
-            isCorrect: opt.isCorrect,
-            questionId: question.id,
-          },
-        });
-      }
-    }
-
-    quizzes.push(quiz);
-    console.log(`✅ Lesson Quiz: ${quiz.title}`);
-  }
+  // Lesson quizzes removed - only EXAM type quizzes are supported
 
   // Module Exams (Focus on all 3rd year modules)
   const thirdYearModuleIndexes = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21]; // 3rd year modules
@@ -1315,97 +1238,9 @@ async function main() {
     console.log(`✅ Specialized Exam: ${exam.title}`);
   }
 
-  // Multiple Session Quizzes (revision quizzes) for different topics
-  const sessionQuizData = [
-    {
-      title: 'Quiz de Révision - Pharmacologie Générale',
-      description: 'Révision complète des concepts de pharmacologie générale',
-      lessonRange: [0, 7], // First 8 lessons (pharmacology)
-      questionCount: 25
-    },
-    {
-      title: 'Quiz de Révision - Chimie Thérapeutique',
-      description: 'Révision des mécanismes d\'action et structures chimiques',
-      lessonRange: [8, 14], // Chemistry lessons
-      questionCount: 20
-    },
-    {
-      title: 'Quiz de Révision - Pharmacognosie',
-      description: 'Révision des substances naturelles et métabolites',
-      lessonRange: [15, 21], // Pharmacognosy lessons
-      questionCount: 18
-    },
-    {
-      title: 'Quiz de Révision - Sciences Analytiques',
-      description: 'Révision des méthodes d\'analyse pharmaceutique',
-      lessonRange: [22, 26], // Analytical chemistry lessons
-      questionCount: 15
-    },
-    {
-      title: 'Quiz de Révision - Toxicologie',
-      description: 'Révision des mécanismes toxiques et antidotes',
-      lessonRange: [29, 35], // Toxicology lessons
-      questionCount: 22
-    },
-    {
-      title: 'Quiz de Révision - Biochimie Clinique',
-      description: 'Révision des analyses biologiques et interprétations',
-      lessonRange: [35, 41], // Clinical biochemistry lessons
-      questionCount: 20
-    },
-    {
-      title: 'Quiz de Révision - Microbiologie',
-      description: 'Révision de la microbiologie pharmaceutique',
-      lessonRange: [41, 47], // Microbiology lessons
-      questionCount: 18
-    },
-    {
-      title: 'Quiz de Révision Intégrative - 3ème Année S1',
-      description: 'Révision globale du premier semestre de 3ème année',
-      lessonRange: [0, 26], // All first semester lessons
-      questionCount: 30
-    },
-    {
-      title: 'Quiz de Révision Intégrative - 3ème Année S2',
-      description: 'Révision globale du second semestre de 3ème année',
-      lessonRange: [27, 47], // All second semester lessons
-      questionCount: 35
-    },
-    {
-      title: 'Quiz de Révision - Préparation aux Examens',
-      description: 'Quiz intensif de préparation aux examens finaux',
-      lessonRange: [0, 47], // All 3rd year lessons
-      questionCount: 50
-    }
-  ];
+  // Session quizzes removed - only EXAM type quizzes are supported
 
-  for (const sessionData of sessionQuizData) {
-    const sessionQuiz = await prisma.quiz.create({
-      data: {
-        id: createId(),
-        title: sessionData.title,
-        description: sessionData.description,
-        type: QuizType.SESSION,
-        questionCount: sessionData.questionCount,
-        timeLimit: Math.ceil(sessionData.questionCount * 1.5), // 1.5 minutes per question
-      },
-    });
 
-    // Link lessons to the session quiz
-    const [startIdx, endIdx] = sessionData.lessonRange;
-    for (let i = startIdx; i <= endIdx && i < lessons.length; i++) {
-      await prisma.sessionQuizLesson.create({
-        data: {
-          id: createId(),
-          quizId: sessionQuiz.id,
-          lessonId: lessons[i].id,
-        },
-      });
-    }
-
-    quizzes.push(sessionQuiz);
-    console.log(`✅ Session Quiz: ${sessionQuiz.title} (${sessionData.questionCount} questions)`);
-  }
 
   // 6. Create sample quiz attempts for students
   console.log('\n📊 Creating sample quiz attempts...');
@@ -1575,9 +1410,7 @@ async function main() {
   console.log(`📝 Lessons: ${lessons.length} (Extensive 3rd year content)`);
   console.log(`❓ Question Bank: ${questionBank.length} comprehensive questions (3rd year focus)`);
   console.log(`🧭 Quizzes: ${quizzes.length} total assessments including:`);
-  console.log(`   📋 Lesson Quizzes: ~25 (detailed per lesson)`);
-  console.log(`   📊 Module Exams: ${thirdYearModuleIndexes.length} (comprehensive 3rd year)`);
-  console.log(`   🔄 Session Quizzes: ${sessionQuizData.length} (revision & integration)`);
+  console.log(`    Module Exams: ${thirdYearModuleIndexes.length} (comprehensive 3rd year)`);
   console.log(`   🎯 Specialized Exams: 2 (integrative assessments)`);
   console.log(`🎫 Student Licenses: ${students.length} (Annual - Year-specific access)`);
   console.log(`🏛️ Universities: ${universities.length} (Algerian pharmacy faculties)`);

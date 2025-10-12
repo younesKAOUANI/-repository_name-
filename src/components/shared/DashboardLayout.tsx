@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
 import { IconType } from 'react-icons';
+import AnimatedBackground from '@/components/ui/AnimatedBackground';
 
 interface MenuItem {
   label: string;
@@ -48,8 +49,21 @@ export default function DashboardLayout({
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center relative">
+        <AnimatedBackground
+          particleCount={150}
+          colors={[
+            "bg-blue-300",
+            "bg-purple-300",
+            "bg-pink-300",
+            "bg-indigo-300",
+            "bg-violet-300",
+            "bg-cyan-300",
+            "bg-emerald-300",
+            "bg-yellow-300",
+          ]}
+        />
+        <div className="text-center relative z-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Chargement...</p>
         </div>
@@ -62,9 +76,22 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-indigo-100 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-indigo-100 flex flex-col relative">
+      <AnimatedBackground
+        particleCount={50}
+        colors={[
+          "bg-blue-300",
+          "bg-purple-300",
+          "bg-pink-300",
+          "bg-indigo-300",
+          "bg-violet-300",
+          "bg-cyan-300",
+          "bg-emerald-300",
+          "bg-yellow-300",
+        ]}
+      />
       {/* Header */}
-      <header className="shadow-sm border-b bg-white">
+      <header className="shadow-sm border-b bg-white relative z-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             {/* Logo and Title */}
@@ -129,12 +156,12 @@ export default function DashboardLayout({
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <main className="container mx-auto py-6 px-4 sm:px-6 lg:px-8 relative z-20">
         {children}
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t mt-auto">
+      <footer className="bg-white border-t mt-auto relative z-20">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-4">

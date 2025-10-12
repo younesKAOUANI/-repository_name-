@@ -11,6 +11,9 @@ interface CreateUserRequest {
   role: Role;
   year?: number;
   university?: string;
+  universityId?: string;
+  sex?: 'MALE' | 'FEMALE';
+  phoneNumber?: string;
 }
 
 export async function GET(request: NextRequest) {
@@ -50,9 +53,18 @@ export async function GET(request: NextRequest) {
           role: true,
           year: true,
           university: true,
+          universityId: true,
+          sex: true,
+          phoneNumber: true,
           createdAt: true,
           emailVerified: true,
           image: true,
+          universityRelation: {
+            select: {
+              id: true,
+              name: true,
+            }
+          },
         },
         orderBy: { createdAt: 'desc' },
         skip,
@@ -87,7 +99,7 @@ export async function POST(request: NextRequest) {
     const session = await requireRole(["ADMIN"]);
     const body: CreateUserRequest = await request.json();
     
-    const { name, email, password, role, year, university } = body;
+    const { name, email, password, role, year, university, universityId, sex, phoneNumber } = body;
 
     // Validation
     if (!name || !email || !password || !role) {
@@ -127,12 +139,20 @@ export async function POST(request: NextRequest) {
 
     // Validate role-specific fields
     if (role === Role.STUDENT) {
-      if (!university?.trim()) {
+      if (!universityId?.trim()) {
         return NextResponse.json(
           { message: "L'université est requise pour les étudiants" },
           { status: 400 }
         );
       }
+    }
+
+    // Validate phone number format if provided
+    if (phoneNumber && !/^\+\d{1,3}\d{8,14}$/.test(phoneNumber)) {
+      return NextResponse.json(
+        { message: "Format de téléphone invalide" },
+        { status: 400 }
+      );
     }
 
     // Hash password
@@ -147,6 +167,9 @@ export async function POST(request: NextRequest) {
         role,
         year: role === Role.STUDENT ? year : null,
         university: role === Role.STUDENT ? university?.trim() : null,
+        universityId: role === Role.STUDENT ? universityId?.trim() : null,
+        sex: sex || null,
+        phoneNumber: phoneNumber?.trim() || null,
       },
       select: {
         id: true,
@@ -155,7 +178,16 @@ export async function POST(request: NextRequest) {
         role: true,
         year: true,
         university: true,
+        universityId: true,
+        sex: true,
+        phoneNumber: true,
         createdAt: true,
+        universityRelation: {
+          select: {
+            id: true,
+            name: true,
+          }
+        },
       },
     });
 

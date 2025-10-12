@@ -4,12 +4,12 @@
  */
 
 export interface Lesson {
-  id: number;
+  id: string;
   title: string;
   description?: string;
   content?: string;
   order: number;
-  moduleId: number;
+  moduleId: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -18,7 +18,7 @@ export interface CreateLessonData {
   title: string;
   description?: string;
   content?: string;
-  moduleId: number;
+  moduleId: string;
 }
 
 export interface UpdateLessonData {
@@ -34,7 +34,7 @@ class LessonService {
   /**
    * Get all lessons for a module
    */
-  async getLessonsByModule(moduleId: number): Promise<Lesson[]> {
+  async getLessonsByModule(moduleId: string): Promise<Lesson[]> {
     const response = await fetch(`${this.baseUrl}?moduleId=${moduleId}`);
     
     if (!response.ok) {
@@ -47,7 +47,7 @@ class LessonService {
   /**
    * Get a single lesson by ID
    */
-  async getLessonById(id: number): Promise<Lesson> {
+  async getLessonById(id: string): Promise<Lesson> {
     const response = await fetch(`${this.baseUrl}/${id}`);
     
     if (!response.ok) {
@@ -80,7 +80,7 @@ class LessonService {
   /**
    * Update an existing lesson
    */
-  async updateLesson(id: number, data: UpdateLessonData): Promise<Lesson> {
+  async updateLesson(id: string, data: UpdateLessonData): Promise<Lesson> {
     const response = await fetch(`${this.baseUrl}/${id}`, {
       method: 'PUT',
       headers: {
@@ -100,7 +100,7 @@ class LessonService {
   /**
    * Delete a lesson
    */
-  async deleteLesson(id: number): Promise<void> {
+  async deleteLesson(id: string): Promise<void> {
     const response = await fetch(`${this.baseUrl}/${id}`, {
       method: 'DELETE',
     });
@@ -114,7 +114,7 @@ class LessonService {
   /**
    * Reorder lessons within a module
    */
-  async reorderLessons(moduleId: number, lessonIds: number[]): Promise<void> {
+  async reorderLessons(moduleId: string, lessonIds: string[]): Promise<void> {
     const response = await fetch(`${this.baseUrl}/reorder`, {
       method: 'PUT',
       headers: {

@@ -11,6 +11,9 @@ interface UpdateUserRequest {
   role?: Role;
   year?: number;
   university?: string;
+  universityId?: string;
+  sex?: 'MALE' | 'FEMALE';
+  phoneNumber?: string;
 }
 
 export async function PUT(
@@ -125,6 +128,7 @@ export async function PUT(
       if (body.role !== Role.STUDENT) {
         updateData.year = null;
         updateData.university = null;
+        updateData.universityId = null;
       }
     }
 
@@ -132,14 +136,18 @@ export async function PUT(
     const finalRole = body.role !== undefined ? body.role : existingUser.role;
     
     if (finalRole === Role.STUDENT) {
-      if (body.university !== undefined) {
-        if (!body.university?.trim()) {
+      if (body.universityId !== undefined) {
+        if (!body.universityId?.trim()) {
           return NextResponse.json(
             { message: "L'université est requise pour les étudiants" },
             { status: 400 }
           );
         }
-        updateData.university = body.university.trim();
+        updateData.universityId = body.universityId.trim();
+      }
+
+      if (body.university !== undefined) {
+        updateData.university = body.university?.trim() || null;
       }
 
       if (body.year !== undefined) {
@@ -149,6 +157,22 @@ export async function PUT(
       // If not a student, clear student fields
       updateData.year = null;
       updateData.university = null;
+      updateData.universityId = null;
+    }
+
+    // Handle general fields (available for all roles)
+    if (body.sex !== undefined) {
+      updateData.sex = body.sex;
+    }
+
+    if (body.phoneNumber !== undefined) {
+      if (body.phoneNumber && !/^\+\d{1,3}\d{8,14}$/.test(body.phoneNumber)) {
+        return NextResponse.json(
+          { message: "Format de téléphone invalide" },
+          { status: 400 }
+        );
+      }
+      updateData.phoneNumber = body.phoneNumber?.trim() || null;
     }
 
     // Update the user
@@ -162,9 +186,18 @@ export async function PUT(
         role: true,
         year: true,
         university: true,
+        universityId: true,
+        sex: true,
+        phoneNumber: true,
         createdAt: true,
         emailVerified: true,
         image: true,
+        universityRelation: {
+          select: {
+            id: true,
+            name: true,
+          }
+        },
       },
     });
 

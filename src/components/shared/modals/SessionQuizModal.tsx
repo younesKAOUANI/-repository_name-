@@ -41,10 +41,10 @@ export default function SessionQuizModal({
   const [step, setStep] = useState<'selection' | 'preview' | 'create'>('selection');
   const [quizTitle, setQuizTitle] = useState('');
   const [quizDescription, setQuizDescription] = useState('');
-  const [selectedStudyYears, setSelectedStudyYears] = useState<number[]>([]);
-  const [selectedSemesters, setSelectedSemesters] = useState<number[]>([]);
-  const [selectedModules, setSelectedModules] = useState<number[]>([]);
-  const [selectedLessons, setSelectedLessons] = useState<number[]>([]);
+  const [selectedStudyYears, setSelectedStudyYears] = useState<string[]>([]);
+  const [selectedSemesters, setSelectedSemesters] = useState<string[]>([]);
+  const [selectedModules, setSelectedModules] = useState<string[]>([]);
+  const [selectedLessons, setSelectedLessons] = useState<string[]>([]);
 
   // Update session options when selections change
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function SessionQuizModal({
     });
   }, [selectedStudyYears, selectedSemesters, selectedModules, selectedLessons, setSessionOptions]);
 
-  const handleStudyYearToggle = (studyYearId: number) => {
+  const handleStudyYearToggle = (studyYearId: string) => {
     const isSelected = selectedStudyYears.includes(studyYearId);
     if (isSelected) {
       setSelectedStudyYears(prev => prev.filter(id => id !== studyYearId));
@@ -80,7 +80,7 @@ export default function SessionQuizModal({
     }
   };
 
-  const handleSemesterToggle = (semesterId: number) => {
+  const handleSemesterToggle = (semesterId: string) => {
     const isSelected = selectedSemesters.includes(semesterId);
     if (isSelected) {
       setSelectedSemesters(prev => prev.filter(id => id !== semesterId));
@@ -102,7 +102,7 @@ export default function SessionQuizModal({
     }
   };
 
-  const handleModuleToggle = (moduleId: number) => {
+  const handleModuleToggle = (moduleId: string) => {
     const isSelected = selectedModules.includes(moduleId);
     if (isSelected) {
       setSelectedModules(prev => prev.filter(id => id !== moduleId));
@@ -120,7 +120,7 @@ export default function SessionQuizModal({
     }
   };
 
-  const handleLessonToggle = (lessonId: number) => {
+  const handleLessonToggle = (lessonId: string) => {
     const isSelected = selectedLessons.includes(lessonId);
     if (isSelected) {
       setSelectedLessons(prev => prev.filter(id => id !== lessonId));

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -93,7 +93,7 @@ function SortableLessonItem({ lesson, onEdit, onDelete }: SortableLessonItemProp
 
 export default function AdminModuleLessonsClient() {
   const params = useParams();
-  const moduleId = parseInt(params.moduleId as string, 10);
+  const moduleId = params.moduleId as string;
   
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [module, setModule] = useState<Module | null>(null);
@@ -117,13 +117,7 @@ export default function AdminModuleLessonsClient() {
     })
   );
 
-  useEffect(() => {
-    if (moduleId) {
-      loadModuleAndLessons();
-    }
-  }, [moduleId]);
-
-  const loadModuleAndLessons = async () => {
+  const loadModuleAndLessons = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -143,7 +137,13 @@ export default function AdminModuleLessonsClient() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [moduleId]);
+
+  useEffect(() => {
+    if (moduleId) {
+      loadModuleAndLessons();
+    }
+  }, [moduleId, loadModuleAndLessons]);
 
   const handleCreateLesson = () => {
     setLessonForm({ title: '', description: '', content: '' });
@@ -246,30 +246,28 @@ export default function AdminModuleLessonsClient() {
     }
   };
 
-  if (loading) {
-    return (
-      <AdminLayout title="Gestion des leçons" subtitle="Chargement...">
+  return (
+    <AdminLayout
+      title={module ? `Leçons - ${module.name}` : 'Leçons'}
+      subtitle="Gérer les leçons du module"
+    >
+      {loading ? (
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
-      </AdminLayout>
-    );
-  }
-
-  return (
-    <div>
-      <div className="space-y-6">
-        {/* Back Button */}
-        <div className="flex items-center space-x-4">
-          <Link href="/admin/modules">
-            <Button variant="secondary" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour aux modules
-            </Button>
-          </Link>
-        </div>
-
-        {/* Header Actions */}
+      ) : (
+        <div className="space-y-6">
+          {/* Back Button */}
+          <div className="flex items-center space-x-4">
+            <Link href="/admin/modules">
+              <Button variant="secondary" size="sm">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Retour aux modules
+              </Button>
+            </Link>
+          </div>
+          
+          {/* Header Actions */}
         <div className="flex justify-between items-center">
           <div className="text-sm text-gray-600">
             {lessons.length} leçon{lessons.length !== 1 ? 's' : ''}
@@ -400,7 +398,8 @@ export default function AdminModuleLessonsClient() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+        </div>
+      )}
+    </AdminLayout>
   );
 }

@@ -53,7 +53,7 @@ export interface UseQuizAdminActions {
   loadQuizzes: () => Promise<void>;
   loadStats: () => Promise<void>;
   loadResources: () => Promise<void>;
-  loadQuizById: (id: number) => Promise<void>;
+  loadQuizById: (id: string) => Promise<void>;
   
   // Pagination and filtering
   handleSearch: (query: string) => void;
@@ -238,7 +238,7 @@ export function useQuizAdmin(): UseQuizAdminState & UseQuizAdminActions {
     }
   }, []);
 
-  const loadQuizById = useCallback(async (id: number) => {
+  const loadQuizById = useCallback(async (id: string) => {
     try {
       setLoading(true);
       const quiz = await quizAdminService.getQuizById(id);

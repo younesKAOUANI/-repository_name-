@@ -62,6 +62,8 @@ interface ProfileData {
     email: string;
     year?: number;
     university?: string;
+    sex?: string;
+    phoneNumber?: string;
     createdAt: string;
   };
   licenses: License[];
@@ -83,6 +85,8 @@ export default function StudentProfileClient() {
     name: '',
     year: '',
     universityId: '',
+    sex: '',
+    phoneNumber: '',
   });
 
   // Password form state
@@ -120,6 +124,8 @@ export default function StudentProfileClient() {
         name: data.user.name || '',
         year: data.user.year?.toString() || '',
         universityId: matchingUniversity?.id || '',
+        sex: data.user.sex || '',
+        phoneNumber: data.user.phoneNumber || '',
       });
       
     } catch (err) {
@@ -145,6 +151,8 @@ export default function StudentProfileClient() {
           name: profileForm.name,
           year: profileForm.year ? parseInt(profileForm.year) : null,
           universityId: profileForm.universityId || null,
+          sex: profileForm.sex || null,
+          phoneNumber: profileForm.phoneNumber || null,
         }),
       });
 
@@ -396,6 +404,31 @@ export default function StudentProfileClient() {
                           </option>
                         ))}
                       </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="sex">Sexe</Label>
+                      <select
+                        id="sex"
+                        value={profileForm.sex}
+                        onChange={(e) => setProfileForm(prev => ({ ...prev, sex: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Sélectionner</option>
+                        <option value="MALE">Homme</option>
+                        <option value="FEMALE">Femme</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="phoneNumber">Numéro de téléphone</Label>
+                      <Input
+                        id="phoneNumber"
+                        type="tel"
+                        value={profileForm.phoneNumber}
+                        onChange={(e) => setProfileForm(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                        placeholder="+213 XXX XXX XXX"
+                      />
                     </div>
                   </div>
 
