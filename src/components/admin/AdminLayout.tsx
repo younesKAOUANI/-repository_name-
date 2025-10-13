@@ -25,7 +25,7 @@ const adminMenuItems = [
   { label: 'Modules', href: '/admin/modules', icon: MdMenuBook },
   { label: 'Examens', href: '/admin/quizzes', icon: MdQuiz },
   { label: 'Licences', href: '/admin/licenses', icon: MdCardMembership },
-  { label: 'Contact', href: '/admin/contact', icon: MdContactSupport },
+  { label: 'Contacts', href: '/admin/contacts', icon: MdContactSupport },
   { label: 'Paramètres', href: '/admin/settings', icon: MdSettings },
 ];
 

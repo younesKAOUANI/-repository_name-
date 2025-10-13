@@ -444,3 +444,36 @@ enum Sex {
   MALE
   FEMALE
 }
+
+model Contact {
+  id        String      @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String
+  subject   String
+  message   String      @db.Text
+  type      ContactType @default(SUPPORT)
+  status    ContactStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  adminNotes String?    @db.Text
+  respondedAt DateTime?
+  respondedBy String?
+
+  @@map("contacts")
+}
+
+enum ContactType {
+  SUPPORT
+  BILLING
+  FEATURE
+  PARTNERSHIP
+  OTHER
+}
+
+enum ContactStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}

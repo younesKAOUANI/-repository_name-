@@ -209,7 +209,7 @@ export class AuthService {
       });
 
       logger.info('Password changed successfully', { userId });
-      return { message: 'Password changed successfully.' };
+      return { message: 'Mot de passe changé avec succès' };
     } catch (error) {
       logger.error('Error changing password', { userId, error });
       throw error;

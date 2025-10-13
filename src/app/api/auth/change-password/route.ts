@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const session = await requireRole(['ADMIN', 'INSTRUCTOR', 'STUDENT']);
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
+        { success: false, message: 'Non autorisé' },
         { status: 401 }
       );
     }
@@ -16,14 +16,14 @@ export async function POST(request: NextRequest) {
 
     if (!currentPassword || !newPassword) {
       return NextResponse.json(
-        { success: false, error: 'Current password and new password are required' },
+        { success: false, message: 'Le mot de passe actuel et le nouveau mot de passe sont requis' },
         { status: 400 }
       );
     }
 
-    if (newPassword.length < 8) {
+    if (newPassword.length < 6) {
       return NextResponse.json(
-        { success: false, error: 'New password must be at least 8 characters' },
+        { success: false, message: 'Le nouveau mot de passe doit contenir au moins 6 caractères' },
         { status: 400 }
       );
     }
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         success: false, 
-        error: error instanceof Error ? error.message : 'Failed to change password' 
+        message: error instanceof Error ? error.message : 'Erreur lors du changement de mot de passe' 
       },
       { status: 500 }
     );

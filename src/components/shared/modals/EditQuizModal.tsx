@@ -29,8 +29,8 @@ const QuizTypeOptions = [
 ];
 
 const QuestionTypeOptions = [
-  { value: 'QCMA', label: 'QCM - Réponse unique (tout ou rien)' },
-  { value: 'QCMP', label: 'QCM - Réponse partielle' },
+  { value: 'QCMA', label: 'QCM (Tout ou rien)' },
+  { value: 'QCMP', label: 'QCM (Points partiels)' },
   { value: 'QCS', label: 'Question à choix simple' },
   { value: 'QROC', label: 'Question à réponse ouverte courte' },
 ];
@@ -138,6 +138,49 @@ export default function EditQuizModal({
     }));
   };
 
+  const updateQuestionType = (questionIndex: number, newType: string) => {
+    setQuizData(prev => ({
+      ...prev,
+      questions: prev.questions?.map((q, i) => {
+        if (i !== questionIndex) return q;
+        
+        let newOptions = q.options;
+        
+        // Adjust options based on question type
+        if (newType === 'QROC') {
+          // Short answer - no options, just expected answer
+          newOptions = [{ text: '', isCorrect: true }];
+        } else if (newType === 'QCS') {
+          // Single choice - ensure only one is correct
+          newOptions = q.options.length > 0 
+            ? q.options.map((opt, idx) => ({ ...opt, isCorrect: idx === 0 }))
+            : [
+                { text: '', isCorrect: true },
+                { text: '', isCorrect: false },
+                { text: '', isCorrect: false },
+                { text: '', isCorrect: false },
+              ];
+        } else {
+          // QCMA or QCMP - multiple choice, keep existing options or create defaults
+          if (q.options.length === 0) {
+            newOptions = [
+              { text: '', isCorrect: false },
+              { text: '', isCorrect: false },
+              { text: '', isCorrect: false },
+              { text: '', isCorrect: false },
+            ];
+          }
+        }
+        
+        return {
+          ...q,
+          questionType: newType as QuestionType,
+          options: newOptions
+        };
+      }) || [],
+    }));
+  };
+
   const updateQuestion = (index: number, updates: Partial<QuestionCreate>) => {
     setQuizData(prev => ({
       ...prev,
@@ -155,14 +198,24 @@ export default function EditQuizModal({
   const updateOption = (questionIndex: number, optionIndex: number, updates: Partial<AnswerOptionCreate>) => {
     setQuizData(prev => ({
       ...prev,
-      questions: prev.questions?.map((q, i) => 
-        i === questionIndex 
-          ? {
-              ...q,
-              options: q.options.map((opt, oi) => oi === optionIndex ? { ...opt, ...updates } : opt)
-            }
-          : q
-      ) || [],
+      questions: prev.questions?.map((q, i) => {
+        if (i !== questionIndex) return q;
+        
+        let updatedOptions = q.options.map((opt, oi) => oi === optionIndex ? { ...opt, ...updates } : opt);
+        
+        // For QCS (single choice), only one option can be correct
+        if (q.questionType === 'QCS' && updates.isCorrect) {
+          updatedOptions = updatedOptions.map((opt, oi) => ({
+            ...opt,
+            isCorrect: oi === optionIndex
+          }));
+        }
+        
+        return {
+          ...q,
+          options: updatedOptions
+        };
+      }) || [],
     }));
   };
 
@@ -293,7 +346,7 @@ export default function EditQuizModal({
                     <div className="flex items-center gap-2">
                       <select
                         value={question.questionType}
-                        onChange={(e) => updateQuestion(qIndex, { questionType: e.target.value as QuestionType })}
+                        onChange={(e) => updateQuestionType(qIndex, e.target.value)}
                         className="text-sm border border-gray-300 rounded px-2 py-1"
                       >
                         {QuestionTypeOptions.map(type => (
@@ -325,61 +378,92 @@ export default function EditQuizModal({
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="block text-sm font-medium">Options de réponse</label>
-                      <Button
-                        type="button"
-                        onClick={() => addOption(qIndex)}
-                        size="sm"
-                        variant="ghost"
-                        className="text-sm"
-                      >
-                        <Plus className="h-3 w-3 mr-1" />
-                        Ajouter une option
-                      </Button>
+                  {/* Answer Options - Different UI based on question type */}
+                  {question.questionType === 'QROC' ? (
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Réponse attendue</label>
+                      <Input
+                        value={question.options[0]?.text || ''}
+                        onChange={(e) => updateOption(qIndex, 0, { text: e.target.value })}
+                        placeholder="Entrez la réponse correcte"
+                        className="w-full"
+                        required
+                      />
+                      <p className="text-sm text-gray-500 mt-1">
+                        La réponse de l'étudiant sera comparée à cette réponse attendue
+                      </p>
                     </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-sm font-medium">
+                          {question.questionType === 'QCS' ? 'Options de réponse (une seule correcte)' : 'Options de réponse'}
+                        </label>
+                        <Button
+                          type="button"
+                          onClick={() => addOption(qIndex)}
+                          size="sm"
+                          variant="ghost"
+                          className="text-sm"
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          Ajouter une option
+                        </Button>
+                      </div>
 
-                    {question.options.map((option, oIndex) => (
-                      <div key={oIndex} className="flex items-center gap-2">
-                        <input
-                          type={question.questionType === 'QCMP' ? 'checkbox' : 'radio'}
-                          name={`question-${qIndex}-correct`}
-                          checked={option.isCorrect}
-                          onChange={(e) => {
-                            if (question.questionType === 'QCMA' || question.questionType === 'QCS') {
-                              // For single choice, uncheck others
-                              const updatedOptions = question.options.map((opt, i) => ({
-                                ...opt,
-                                isCorrect: i === oIndex ? e.target.checked : false
-                              }));
-                              updateQuestion(qIndex, { options: updatedOptions });
-                            } else {
-                              updateOption(qIndex, oIndex, { isCorrect: e.target.checked });
-                            }
-                          }}
-                          className="h-4 w-4"
-                        />
-                        <Input
-                          value={option.text}
-                          onChange={(e) => updateOption(qIndex, oIndex, { text: e.target.value })}
-                          placeholder={`Option ${oIndex + 1}`}
-                          className="flex-1"
-                        />
-                        {question.options.length > 2 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeOption(qIndex, oIndex)}
-                            className="h-8 w-8 p-0 text-red-600"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
+                      {question.options.map((option, oIndex) => (
+                        <div key={oIndex} className="flex items-center gap-2">
+                          {question.questionType === 'QCS' ? (
+                            <input
+                              type="radio"
+                              name={`question-${qIndex}-correct`}
+                              checked={option.isCorrect}
+                              onChange={(e) => updateOption(qIndex, oIndex, { isCorrect: e.target.checked })}
+                              className="h-4 w-4"
+                            />
+                          ) : (
+                            <input
+                              type="checkbox"
+                              checked={option.isCorrect}
+                              onChange={(e) => updateOption(qIndex, oIndex, { isCorrect: e.target.checked })}
+                              className="h-4 w-4"
+                            />
+                          )}
+                          <Input
+                            value={option.text}
+                            onChange={(e) => updateOption(qIndex, oIndex, { text: e.target.value })}
+                            placeholder={`Option ${oIndex + 1}`}
+                            className="flex-1"
+                            required
+                          />
+                          {question.options.length > 2 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeOption(qIndex, oIndex)}
+                              className="h-8 w-8 p-0 text-red-600"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+
+                      {/* Helper text based on question type */}
+                      <div className="mt-2 text-sm text-gray-500">
+                        {question.questionType === 'QCMA' && (
+                          <p>📝 QCM Tout ou rien : L'étudiant doit cocher toutes les bonnes réponses pour avoir des points</p>
+                        )}
+                        {question.questionType === 'QCMP' && (
+                          <p>📊 QCM Points partiels : L'étudiant gagne des points pour chaque bonne réponse cochée</p>
+                        )}
+                        {question.questionType === 'QCS' && (
+                          <p>🎯 Choix simple : L'étudiant ne peut sélectionner qu'une seule réponse</p>
                         )}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  )}
                 </div>
               )) : (
                 <div className="text-center py-8 text-gray-500">
