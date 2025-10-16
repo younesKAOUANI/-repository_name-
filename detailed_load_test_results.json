@@ -1,0 +1,1021 @@
+{
+  "config": {
+    "base_url": "http://localhost:3000",
+    "concurrent_users": 100,
+    "total_time": 56.84702682495117
+  },
+  "metrics": {
+    "total_requests": 174,
+    "successful_requests": 100,
+    "failed_requests": 100,
+    "avg_response_time": 0.0,
+    "response_times": [
+      26.24492359161377,
+      26.237247705459595,
+      26.248232126235962,
+      26.255629062652588,
+      26.260350465774536,
+      26.253153085708618,
+      26.26416563987732,
+      26.183017015457153,
+      26.265060424804688,
+      26.280995845794678,
+      26.194613456726074,
+      26.287089824676514,
+      26.282333850860596,
+      26.29148030281067,
+      26.299809455871582,
+      26.299596309661865,
+      26.299992561340332,
+      26.30869174003601,
+      26.316673040390015,
+      26.315662145614624,
+      26.317769050598145,
+      26.324240922927856,
+      26.331964015960693,
+      26.33525037765503,
+      26.3326153755188,
+      26.344526529312134,
+      26.35271167755127,
+      26.36600160598755,
+      26.368354320526123,
+      26.37332010269165,
+      26.379387378692627,
+      26.37857699394226,
+      26.384920358657837,
+      26.38768196105957,
+      26.39015007019043,
+      26.39204502105713,
+      26.39596724510193,
+      26.400463581085205,
+      26.404112339019775,
+      26.405648708343506,
+      26.409003973007202,
+      26.411475896835327,
+      26.4163019657135,
+      26.41816782951355,
+      26.42198944091797,
+      26.424787998199463,
+      26.429380416870117,
+      26.428404092788696,
+      26.43344521522522,
+      26.440035343170166,
+      26.45211958885193,
+      26.557012796401978,
+      26.357009649276733,
+      26.35929298400879,
+      26.361953258514404,
+      26.3666775226593,
+      26.369342803955078,
+      26.37296986579895,
+      26.375614166259766,
+      26.46975541114807,
+      26.38199758529663,
+      26.38484477996826,
+      26.38777232170105,
+      26.391751766204834,
+      26.393818140029907,
+      26.397728204727173,
+      26.869044542312622,
+      26.921704530715942,
+      26.922558307647705,
+      26.92791509628296,
+      26.928903579711914,
+      26.933796644210815,
+      26.93732500076294,
+      26.940844774246216,
+      23.72903800010681,
+      23.728211879730225,
+      23.710139513015747,
+      23.728916883468628,
+      23.72431755065918,
+      23.72187876701355,
+      23.733088731765747,
+      24.324697017669678,
+      24.32326364517212,
+      24.313548803329468,
+      24.320611238479614,
+      24.32752227783203,
+      24.31679344177246,
+      24.316102504730225,
+      24.912174701690674,
+      24.910701513290405,
+      24.906129360198975,
+      24.912527084350586,
+      24.90795111656189,
+      24.905128717422485,
+      24.904088258743286,
+      25.839512586593628,
+      25.836806058883667,
+      25.813942909240723,
+      25.811652183532715,
+      25.840182781219482,
+      25.80856943130493,
+      25.81449055671692,
+      25.83838963508606,
+      25.808984518051147,
+      25.84069061279297,
+      25.810409784317017,
+      25.820926666259766,
+      25.855954885482788,
+      25.845998287200928,
+      26.18464970588684,
+      26.85824942588806,
+      26.85710096359253,
+      26.845558643341064,
+      26.836613416671753,
+      26.83160710334778,
+      26.859176874160767,
+      26.86477828025818,
+      26.85992455482483,
+      26.844610452651978,
+      26.83959650993347,
+      26.838830947875977,
+      26.863277912139893,
+      26.862197399139404,
+      27.32792329788208,
+      27.326531648635864,
+      27.312418937683105,
+      27.321439266204834,
+      27.32023000717163,
+      27.32953381538391,
+      27.829960584640503,
+      27.81437087059021,
+      27.810422658920288,
+      27.799469232559204,
+      27.808131217956543,
+      27.820478677749634,
+      27.816543340682983,
+      27.81239652633667,
+      28.256123781204224,
+      28.255093812942505,
+      28.253674507141113,
+      27.726707458496094,
+      27.788296222686768,
+      27.73553156852722,
+      27.741004467010498,
+      27.908430814743042,
+      28.66038179397583,
+      28.65918803215027,
+      25.54408574104309,
+      25.544233322143555,
+      28.662099599838257,
+      25.551039218902588,
+      25.55239224433899,
+      25.553557872772217,
+      25.553682804107666,
+      25.556859731674194,
+      25.559454202651978,
+      25.561007022857666,
+      25.56578826904297,
+      25.568333864212036,
+      25.570964813232422,
+      26.027662754058838,
+      26.029337167739868,
+      26.0323703289032,
+      26.033549785614014,
+      26.034414052963257,
+      26.038559436798096,
+      26.327021598815918,
+      26.32854914665222,
+      26.33126449584961,
+      26.422107219696045,
+      26.423338890075684,
+      26.42478084564209,
+      26.538652181625366,
+      26.569421768188477
+    ],
+    "quiz_creation_times": [],
+    "quiz_completion_times": [],
+    "errors": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ]
+  },
+  "user_stats": [
+    {
+      "user_id": "0",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.387866497039795
+    },
+    {
+      "user_id": "1",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.77947282791138
+    },
+    {
+      "user_id": "2",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.19478440284729
+    },
+    {
+      "user_id": "3",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.21291947364807
+    },
+    {
+      "user_id": "4",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.18570113182068
+    },
+    {
+      "user_id": "5",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.20665240287781
+    },
+    {
+      "user_id": "6",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.18315362930298
+    },
+    {
+      "user_id": "7",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.19773459434509
+    },
+    {
+      "user_id": "8",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.18817591667175
+    },
+    {
+      "user_id": "9",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.25833296775818
+    },
+    {
+      "user_id": "10",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.2012677192688
+    },
+    {
+      "user_id": "11",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.269639015197754
+    },
+    {
+      "user_id": "12",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.577534914016724
+    },
+    {
+      "user_id": "13",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.25497341156006
+    },
+    {
+      "user_id": "14",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.265596866607666
+    },
+    {
+      "user_id": "15",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.28015851974487
+    },
+    {
+      "user_id": "16",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.26958775520325
+    },
+    {
+      "user_id": "17",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.257699966430664
+    },
+    {
+      "user_id": "18",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.28122043609619
+    },
+    {
+      "user_id": "19",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.25977802276611
+    },
+    {
+      "user_id": "20",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.26170635223389
+    },
+    {
+      "user_id": "21",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.768797397613525
+    },
+    {
+      "user_id": "22",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.27010154724121
+    },
+    {
+      "user_id": "23",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.1941602230072
+    },
+    {
+      "user_id": "24",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 51.22544503211975
+    },
+    {
+      "user_id": "25",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 50.6092529296875
+    },
+    {
+      "user_id": "26",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 49.98556447029114
+    },
+    {
+      "user_id": "27",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 49.97493577003479
+    },
+    {
+      "user_id": "28",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.27310538291931
+    },
+    {
+      "user_id": "29",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 49.98942255973816
+    },
+    {
+      "user_id": "30",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 51.212855100631714
+    },
+    {
+      "user_id": "31",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.26876759529114
+    },
+    {
+      "user_id": "32",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 50.60164833068848
+    },
+    {
+      "user_id": "33",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.169695138931274
+    },
+    {
+      "user_id": "34",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.1761908531189
+    },
+    {
+      "user_id": "35",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.287166357040405
+    },
+    {
+      "user_id": "36",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.183913469314575
+    },
+    {
+      "user_id": "37",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 51.21563911437988
+    },
+    {
+      "user_id": "38",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 49.97799205780029
+    },
+    {
+      "user_id": "39",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 49.97522330284119
+    },
+    {
+      "user_id": "40",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 50.60839104652405
+    },
+    {
+      "user_id": "41",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.16467070579529
+    },
+    {
+      "user_id": "42",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 51.22189664840698
+    },
+    {
+      "user_id": "43",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 51.21122694015503
+    },
+    {
+      "user_id": "44",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 51.22284460067749
+    },
+    {
+      "user_id": "45",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 51.213467597961426
+    },
+    {
+      "user_id": "46",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 52.189475536346436
+    },
+    {
+      "user_id": "47",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 49.966471433639526
+    },
+    {
+      "user_id": "48",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 50.600003719329834
+    },
+    {
+      "user_id": "49",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 50.5890748500824
+    },
+    {
+      "user_id": "50",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 49.97582507133484
+    },
+    {
+      "user_id": "51",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 50.50867581367493
+    },
+    {
+      "user_id": "52",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 50.51608967781067
+    },
+    {
+      "user_id": "53",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.68741321563721
+    },
+    {
+      "user_id": "54",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.68004393577576
+    },
+    {
+      "user_id": "55",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.681524991989136
+    },
+    {
+      "user_id": "56",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 53.682820081710815
+    },
+    {
+      "user_id": "57",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.19424891471863
+    },
+    {
+      "user_id": "58",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.18683457374573
+    },
+    {
+      "user_id": "59",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.184486865997314
+    },
+    {
+      "user_id": "60",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.663641929626465
+    },
+    {
+      "user_id": "61",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.64889574050903
+    },
+    {
+      "user_id": "62",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.19089484214783
+    },
+    {
+      "user_id": "63",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.6581711769104
+    },
+    {
+      "user_id": "64",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.198042154312134
+    },
+    {
+      "user_id": "65",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.65550112724304
+    },
+    {
+      "user_id": "66",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.187912464141846
+    },
+    {
+      "user_id": "67",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.597434282302856
+    },
+    {
+      "user_id": "68",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.65223836898804
+    },
+    {
+      "user_id": "69",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.59502553939819
+    },
+    {
+      "user_id": "70",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.649664878845215
+    },
+    {
+      "user_id": "71",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.659074783325195
+    },
+    {
+      "user_id": "72",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.60412621498108
+    },
+    {
+      "user_id": "73",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.63837170600891
+    },
+    {
+      "user_id": "74",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 54.838199615478516
+    },
+    {
+      "user_id": "75",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.60637879371643
+    },
+    {
+      "user_id": "76",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.49189066886902
+    },
+    {
+      "user_id": "77",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.48943257331848
+    },
+    {
+      "user_id": "78",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.4872784614563
+    },
+    {
+      "user_id": "79",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.39285922050476
+    },
+    {
+      "user_id": "80",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.39454460144043
+    },
+    {
+      "user_id": "81",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.389517307281494
+    },
+    {
+      "user_id": "82",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.09641218185425
+    },
+    {
+      "user_id": "83",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.09863233566284
+    },
+    {
+      "user_id": "84",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.09300518035889
+    },
+    {
+      "user_id": "85",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.088252782821655
+    },
+    {
+      "user_id": "86",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.09033012390137
+    },
+    {
+      "user_id": "87",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 56.08499717712402
+    },
+    {
+      "user_id": "88",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.617635011672974
+    },
+    {
+      "user_id": "89",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.60953330993652
+    },
+    {
+      "user_id": "90",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.61474323272705
+    },
+    {
+      "user_id": "91",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.61135482788086
+    },
+    {
+      "user_id": "92",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.622138023376465
+    },
+    {
+      "user_id": "93",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.62421202659607
+    },
+    {
+      "user_id": "94",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.61827850341797
+    },
+    {
+      "user_id": "95",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.605541944503784
+    },
+    {
+      "user_id": "96",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.59494376182556
+    },
+    {
+      "user_id": "97",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.60204291343689
+    },
+    {
+      "user_id": "98",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.599524974823
+    },
+    {
+      "user_id": "99",
+      "quizzes_created": 0,
+      "quizzes_completed": 0,
+      "total_score": 0.0,
+      "errors": 1,
+      "journey_time": 55.5898494720459
+    }
+  ]
+}

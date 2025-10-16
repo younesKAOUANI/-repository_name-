@@ -1,0 +1,204 @@
+2025-10-13 17:22:17,989 - INFO - 🚀 Starting load test with 100 concurrent users
+2025-10-13 17:22:17,989 - INFO - Target URL: http://localhost:3000
+2025-10-13 17:22:18,191 - INFO - ⏳ Waiting for all users to complete their journeys...
+2025-10-13 17:22:44,347 - WARNING - User 27 registration failed: 201
+2025-10-13 17:22:44,350 - WARNING - User 47 registration failed: 201
+2025-10-13 17:22:44,355 - WARNING - User 38 registration failed: 201
+2025-10-13 17:22:44,358 - WARNING - User 29 registration failed: 201
+2025-10-13 17:22:44,362 - WARNING - User 26 registration failed: 201
+2025-10-13 17:22:44,367 - WARNING - User 50 registration failed: 201
+2025-10-13 17:22:44,371 - WARNING - User 39 registration failed: 201
+2025-10-13 17:22:44,375 - WARNING - User 51 registration failed: 201
+2025-10-13 17:22:44,379 - WARNING - User 49 registration failed: 201
+2025-10-13 17:22:44,382 - WARNING - User 25 registration failed: 201
+2025-10-13 17:22:44,387 - WARNING - User 52 registration failed: 201
+2025-10-13 17:22:44,391 - WARNING - User 32 registration failed: 201
+2025-10-13 17:22:44,395 - WARNING - User 48 registration failed: 201
+2025-10-13 17:22:44,398 - WARNING - User 40 registration failed: 201
+2025-10-13 17:22:44,403 - WARNING - User 30 registration failed: 201
+2025-10-13 17:22:44,407 - WARNING - User 43 registration failed: 201
+2025-10-13 17:22:44,411 - WARNING - User 45 registration failed: 201
+2025-10-13 17:22:44,414 - WARNING - User 37 registration failed: 201
+2025-10-13 17:22:44,418 - WARNING - User 24 registration failed: 201
+2025-10-13 17:22:44,423 - WARNING - User 42 registration failed: 201
+2025-10-13 17:22:44,427 - WARNING - User 44 registration failed: 201
+2025-10-13 17:22:44,431 - WARNING - User 41 registration failed: 201
+2025-10-13 17:22:44,436 - WARNING - User 33 registration failed: 201
+2025-10-13 17:22:44,440 - WARNING - User 34 registration failed: 201
+2025-10-13 17:22:44,445 - WARNING - User 46 registration failed: 201
+2025-10-13 17:22:44,449 - WARNING - User 36 registration failed: 201
+2025-10-13 17:22:44,453 - WARNING - User 23 registration failed: 201
+2025-10-13 17:22:44,458 - WARNING - User 3 registration failed: 201
+2025-10-13 17:22:44,462 - WARNING - User 6 registration failed: 201
+2025-10-13 17:22:44,466 - WARNING - User 4 registration failed: 201
+2025-10-13 17:22:44,471 - WARNING - User 2 registration failed: 201
+2025-10-13 17:22:44,474 - WARNING - User 8 registration failed: 201
+2025-10-13 17:22:44,478 - WARNING - User 5 registration failed: 201
+2025-10-13 17:22:44,482 - WARNING - User 7 registration failed: 201
+2025-10-13 17:22:44,486 - WARNING - User 10 registration failed: 201
+2025-10-13 17:22:44,489 - WARNING - User 12 registration failed: 201
+2025-10-13 17:22:44,493 - WARNING - User 13 registration failed: 201
+2025-10-13 17:22:44,496 - WARNING - User 9 registration failed: 201
+2025-10-13 17:22:44,500 - WARNING - User 11 registration failed: 201
+2025-10-13 17:22:44,503 - WARNING - User 14 registration failed: 201
+2025-10-13 17:22:44,507 - WARNING - User 16 registration failed: 201
+2025-10-13 17:22:44,510 - WARNING - User 17 registration failed: 201
+2025-10-13 17:22:44,514 - WARNING - User 15 registration failed: 201
+2025-10-13 17:22:44,517 - WARNING - User 18 registration failed: 201
+2025-10-13 17:22:44,521 - WARNING - User 19 registration failed: 201
+2025-10-13 17:22:44,525 - WARNING - User 22 registration failed: 201
+2025-10-13 17:22:44,529 - WARNING - User 20 registration failed: 201
+2025-10-13 17:22:44,532 - WARNING - User 31 registration failed: 201
+2025-10-13 17:22:44,536 - WARNING - User 28 registration failed: 201
+2025-10-13 17:22:44,539 - WARNING - User 21 registration failed: 201
+2025-10-13 17:22:44,543 - WARNING - User 1 registration failed: 201
+2025-10-13 17:22:44,547 - WARNING - User 0 registration failed: 201
+2025-10-13 17:22:44,550 - WARNING - User 53 registration failed: 201
+2025-10-13 17:22:44,553 - WARNING - User 55 registration failed: 201
+2025-10-13 17:22:44,556 - WARNING - User 56 registration failed: 201
+2025-10-13 17:22:44,560 - WARNING - User 54 registration failed: 201
+2025-10-13 17:22:44,565 - WARNING - User 59 registration failed: 201
+2025-10-13 17:22:44,568 - WARNING - User 57 registration failed: 201
+2025-10-13 17:22:44,571 - WARNING - User 58 registration failed: 201
+2025-10-13 17:22:44,575 - WARNING - User 35 registration failed: 201
+2025-10-13 17:22:44,578 - WARNING - User 62 registration failed: 201
+2025-10-13 17:22:44,581 - WARNING - User 64 registration failed: 201
+2025-10-13 17:22:44,584 - WARNING - User 66 registration failed: 201
+2025-10-13 17:22:44,587 - WARNING - User 61 registration failed: 201
+2025-10-13 17:22:44,591 - WARNING - User 70 registration failed: 201
+2025-10-13 17:22:44,595 - WARNING - User 68 registration failed: 201
+2025-10-13 17:22:45,065 - WARNING - User 63 registration failed: 201
+2025-10-13 17:22:45,117 - WARNING - User 60 registration failed: 201
+2025-10-13 17:22:45,120 - WARNING - User 71 registration failed: 201
+2025-10-13 17:22:45,124 - WARNING - User 65 registration failed: 201
+2025-10-13 17:22:45,127 - WARNING - User 74 registration failed: 201
+2025-10-13 17:22:45,131 - WARNING - User 69 registration failed: 201
+2025-10-13 17:22:45,134 - WARNING - User 67 registration failed: 201
+2025-10-13 17:22:45,139 - WARNING - User 72 registration failed: 201
+2025-10-13 17:22:48,252 - ERROR - Error registering user 99: 
+2025-10-13 17:22:48,253 - ERROR - Error registering user 98: 
+2025-10-13 17:22:48,253 - ERROR - Error registering user 97: 
+2025-10-13 17:22:48,254 - ERROR - Error registering user 96: 
+2025-10-13 17:22:48,255 - ERROR - Error registering user 95: 
+2025-10-13 17:22:48,255 - ERROR - Error registering user 94: 
+2025-10-13 17:22:48,256 - ERROR - Error registering user 93: 
+2025-10-13 17:22:48,256 - ERROR - Error registering user 92: 
+2025-10-13 17:22:48,257 - ERROR - Error registering user 91: 
+2025-10-13 17:22:48,257 - ERROR - Error registering user 90: 
+2025-10-13 17:22:48,258 - ERROR - Error registering user 89: 
+2025-10-13 17:22:48,258 - ERROR - Error registering user 88: 
+2025-10-13 17:22:48,259 - ERROR - Error registering user 87: 
+2025-10-13 17:22:48,259 - ERROR - Error registering user 86: 
+2025-10-13 17:22:48,260 - ERROR - Error registering user 85: 
+2025-10-13 17:22:48,260 - ERROR - Error registering user 84: 
+2025-10-13 17:22:48,260 - ERROR - Error registering user 83: 
+2025-10-13 17:22:48,262 - ERROR - Error registering user 82: 
+2025-10-13 17:22:48,263 - ERROR - Error registering user 81: 
+2025-10-13 17:22:48,263 - ERROR - Error registering user 80: 
+2025-10-13 17:22:48,264 - ERROR - Error registering user 79: 
+2025-10-13 17:22:48,264 - ERROR - Error registering user 78: 
+2025-10-13 17:22:48,264 - ERROR - Error registering user 77: 
+2025-10-13 17:22:48,265 - ERROR - Error registering user 76: 
+2025-10-13 17:22:48,266 - ERROR - Error registering user 75: 
+2025-10-13 17:22:48,266 - ERROR - Error registering user 73: 
+2025-10-13 17:23:08,076 - ERROR - User 27 failed to register/login
+2025-10-13 17:23:08,079 - ERROR - User 47 failed to register/login
+2025-10-13 17:23:08,082 - ERROR - User 39 failed to register/login
+2025-10-13 17:23:08,084 - ERROR - User 38 failed to register/login
+2025-10-13 17:23:08,087 - ERROR - User 26 failed to register/login
+2025-10-13 17:23:08,089 - ERROR - User 50 failed to register/login
+2025-10-13 17:23:08,092 - ERROR - User 29 failed to register/login
+2025-10-13 17:23:08,700 - ERROR - User 51 failed to register/login
+2025-10-13 17:23:08,703 - ERROR - User 49 failed to register/login
+2025-10-13 17:23:08,705 - ERROR - User 32 failed to register/login
+2025-10-13 17:23:08,708 - ERROR - User 52 failed to register/login
+2025-10-13 17:23:08,710 - ERROR - User 25 failed to register/login
+2025-10-13 17:23:08,713 - ERROR - User 48 failed to register/login
+2025-10-13 17:23:08,715 - ERROR - User 40 failed to register/login
+2025-10-13 17:23:09,316 - ERROR - User 30 failed to register/login
+2025-10-13 17:23:09,318 - ERROR - User 43 failed to register/login
+2025-10-13 17:23:09,321 - ERROR - User 37 failed to register/login
+2025-10-13 17:23:09,324 - ERROR - User 45 failed to register/login
+2025-10-13 17:23:09,326 - ERROR - User 24 failed to register/login
+2025-10-13 17:23:09,329 - ERROR - User 42 failed to register/login
+2025-10-13 17:23:09,332 - ERROR - User 44 failed to register/login
+2025-10-13 17:23:10,271 - ERROR - User 41 failed to register/login
+2025-10-13 17:23:10,274 - ERROR - User 33 failed to register/login
+2025-10-13 17:23:10,276 - ERROR - User 6 failed to register/login
+2025-10-13 17:23:10,278 - ERROR - User 4 failed to register/login
+2025-10-13 17:23:10,280 - ERROR - User 34 failed to register/login
+2025-10-13 17:23:10,283 - ERROR - User 8 failed to register/login
+2025-10-13 17:23:10,286 - ERROR - User 2 failed to register/login
+2025-10-13 17:23:10,288 - ERROR - User 36 failed to register/login
+2025-10-13 17:23:10,292 - ERROR - User 7 failed to register/login
+2025-10-13 17:23:10,294 - ERROR - User 23 failed to register/login
+2025-10-13 17:23:10,297 - ERROR - User 10 failed to register/login
+2025-10-13 17:23:10,299 - ERROR - User 5 failed to register/login
+2025-10-13 17:23:10,302 - ERROR - User 46 failed to register/login
+2025-10-13 17:23:10,305 - ERROR - User 3 failed to register/login
+2025-10-13 17:23:10,674 - ERROR - User 12 failed to register/login
+2025-10-13 17:23:11,352 - ERROR - User 13 failed to register/login
+2025-10-13 17:23:11,354 - ERROR - User 9 failed to register/login
+2025-10-13 17:23:11,356 - ERROR - User 17 failed to register/login
+2025-10-13 17:23:11,358 - ERROR - User 19 failed to register/login
+2025-10-13 17:23:11,361 - ERROR - User 20 failed to register/login
+2025-10-13 17:23:11,363 - ERROR - User 14 failed to register/login
+2025-10-13 17:23:11,365 - ERROR - User 11 failed to register/login
+2025-10-13 17:23:11,367 - ERROR - User 16 failed to register/login
+2025-10-13 17:23:11,370 - ERROR - User 22 failed to register/login
+2025-10-13 17:23:11,372 - ERROR - User 31 failed to register/login
+2025-10-13 17:23:11,375 - ERROR - User 28 failed to register/login
+2025-10-13 17:23:11,377 - ERROR - User 15 failed to register/login
+2025-10-13 17:23:11,380 - ERROR - User 18 failed to register/login
+2025-10-13 17:23:11,868 - ERROR - User 21 failed to register/login
+2025-10-13 17:23:11,870 - ERROR - User 1 failed to register/login
+2025-10-13 17:23:11,872 - ERROR - User 54 failed to register/login
+2025-10-13 17:23:11,875 - ERROR - User 55 failed to register/login
+2025-10-13 17:23:11,877 - ERROR - User 56 failed to register/login
+2025-10-13 17:23:11,880 - ERROR - User 53 failed to register/login
+2025-10-13 17:23:12,377 - ERROR - User 0 failed to register/login
+2025-10-13 17:23:12,379 - ERROR - User 59 failed to register/login
+2025-10-13 17:23:12,382 - ERROR - User 58 failed to register/login
+2025-10-13 17:23:12,384 - ERROR - User 66 failed to register/login
+2025-10-13 17:23:12,386 - ERROR - User 62 failed to register/login
+2025-10-13 17:23:12,389 - ERROR - User 57 failed to register/login
+2025-10-13 17:23:12,391 - ERROR - User 35 failed to register/login
+2025-10-13 17:23:12,394 - ERROR - User 64 failed to register/login
+2025-10-13 17:23:12,844 - ERROR - User 61 failed to register/login
+2025-10-13 17:23:12,846 - ERROR - User 70 failed to register/login
+2025-10-13 17:23:12,849 - ERROR - User 68 failed to register/login
+2025-10-13 17:23:12,851 - ERROR - User 65 failed to register/login
+2025-10-13 17:23:12,854 - ERROR - User 63 failed to register/login
+2025-10-13 17:23:12,856 - ERROR - User 71 failed to register/login
+2025-10-13 17:23:12,859 - ERROR - User 60 failed to register/login
+2025-10-13 17:23:13,036 - ERROR - User 74 failed to register/login
+2025-10-13 17:23:13,792 - ERROR - User 69 failed to register/login
+2025-10-13 17:23:13,794 - ERROR - User 67 failed to register/login
+2025-10-13 17:23:13,797 - ERROR - User 99 failed to register/login
+2025-10-13 17:23:13,799 - ERROR - User 96 failed to register/login
+2025-10-13 17:23:13,801 - ERROR - User 72 failed to register/login
+2025-10-13 17:23:13,804 - ERROR - User 98 failed to register/login
+2025-10-13 17:23:13,806 - ERROR - User 97 failed to register/login
+2025-10-13 17:23:13,809 - ERROR - User 95 failed to register/login
+2025-10-13 17:23:13,812 - ERROR - User 89 failed to register/login
+2025-10-13 17:23:13,814 - ERROR - User 91 failed to register/login
+2025-10-13 17:23:13,817 - ERROR - User 90 failed to register/login
+2025-10-13 17:23:13,820 - ERROR - User 88 failed to register/login
+2025-10-13 17:23:13,822 - ERROR - User 94 failed to register/login
+2025-10-13 17:23:13,825 - ERROR - User 92 failed to register/login
+2025-10-13 17:23:13,827 - ERROR - User 93 failed to register/login
+2025-10-13 17:23:14,287 - ERROR - User 87 failed to register/login
+2025-10-13 17:23:14,289 - ERROR - User 85 failed to register/login
+2025-10-13 17:23:14,292 - ERROR - User 86 failed to register/login
+2025-10-13 17:23:14,294 - ERROR - User 84 failed to register/login
+2025-10-13 17:23:14,297 - ERROR - User 82 failed to register/login
+2025-10-13 17:23:14,299 - ERROR - User 83 failed to register/login
+2025-10-13 17:23:14,590 - ERROR - User 81 failed to register/login
+2025-10-13 17:23:14,592 - ERROR - User 79 failed to register/login
+2025-10-13 17:23:14,595 - ERROR - User 80 failed to register/login
+2025-10-13 17:23:14,686 - ERROR - User 78 failed to register/login
+2025-10-13 17:23:14,688 - ERROR - User 77 failed to register/login
+2025-10-13 17:23:14,690 - ERROR - User 76 failed to register/login
+2025-10-13 17:23:14,805 - ERROR - User 75 failed to register/login
+2025-10-13 17:23:14,836 - ERROR - User 73 failed to register/login
+2025-10-13 17:23:14,837 - INFO - Load test completed successfully!
