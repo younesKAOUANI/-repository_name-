@@ -301,28 +301,6 @@ export default function SignInClient() {
           </div>
         </div>
 
-        {/* Demo Credentials */}
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg relative z-20">
-          <h3 className="text-sm font-medium text-blue-800 mb-3">Comptes de test disponibles</h3>
-          <div className="text-xs text-blue-700 space-y-2">
-            <div className="bg-white p-2 rounded border">
-              <p><strong>👑 Administrateur:</strong></p>
-              <p>E-mail: admin@pharmapedia.com</p>
-              <p>Mot de passe: password123</p>
-            </div>
-            <div className="bg-white p-2 rounded border">
-              <p><strong>👨‍🏫 Enseignant:</strong></p>
-              <p>E-mail: teacher@pharmapedia.com</p>
-              <p>Mot de passe: password123</p>
-            </div>
-            <div className="bg-white p-2 rounded border">
-              <p><strong>👨‍🎓 Étudiant:</strong></p>
-              <p>E-mail: student1@pharmapedia.com</p>
-              <p>Mot de passe: password123</p>
-            </div>
-          </div>
-        </div>
-
         {/* Footer */}
         <div className="mt-8 text-center text-xs text-white relative z-20">
           <p>

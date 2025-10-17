@@ -53,6 +53,7 @@ export default function CreateQuestionModal({
     ],
   });
   
+  const [selectedStudyYearId, setSelectedStudyYearId] = useState<string>('');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   // Reset form when modal opens/closes
@@ -70,15 +71,34 @@ export default function CreateQuestionModal({
           { text: '', isCorrect: false },
         ],
       });
+      setSelectedStudyYearId('');
       setValidationErrors([]);
     }
   }, [isOpen]);
 
   const handleInputChange = (field: keyof QuestionBankCreate, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [field]: value,
+      };
+      
+      // When changing question type, reset options appropriately
+      if (field === 'questionType') {
+        if (value === 'QROC') {
+          // For QROC, we only need one option with isCorrect = true
+          newData.options = [{ text: '', isCorrect: true }];
+        } else if (prev.questionType === 'QROC') {
+          // When switching from QROC to other types, reset to default options
+          newData.options = [
+            { text: '', isCorrect: false },
+            { text: '', isCorrect: false },
+          ];
+        }
+      }
+      
+      return newData;
+    });
     
     // Clear validation errors when user starts typing
     if (validationErrors.length > 0) {
@@ -88,6 +108,16 @@ export default function CreateQuestionModal({
 
   const handleOptionChange = (index: number, field: keyof QuestionOption, value: any) => {
     const newOptions = [...formData.options];
+    
+    // For QCS (single choice), uncheck all other options when one is checked
+    if (formData.questionType === 'QCS' && field === 'isCorrect' && value === true) {
+      newOptions.forEach((opt, i) => {
+        if (i !== index) {
+          opt.isCorrect = false;
+        }
+      });
+    }
+    
     newOptions[index] = {
       ...newOptions[index],
       [field]: value,
@@ -122,18 +152,31 @@ export default function CreateQuestionModal({
       errors.push('Le texte de la question est requis');
     }
 
-    if (formData.options.length < 2) {
-      errors.push('Au moins 2 options sont requises');
-    }
+    // Validation for QROC type
+    if (formData.questionType === 'QROC') {
+      if (!formData.options[0]?.text?.trim()) {
+        errors.push('La réponse attendue est requise pour les questions QROC');
+      }
+    } else {
+      // Validation for other question types (QCMA, QCMP, QCS)
+      if (formData.options.length < 2) {
+        errors.push('Au moins 2 options sont requises');
+      }
 
-    const filledOptions = formData.options.filter(opt => opt.text.trim());
-    if (filledOptions.length < 2) {
-      errors.push('Au moins 2 options doivent avoir du texte');
-    }
+      const filledOptions = formData.options.filter(opt => opt.text.trim());
+      if (filledOptions.length < 2) {
+        errors.push('Au moins 2 options doivent avoir du texte');
+      }
 
-    const correctOptions = formData.options.filter(opt => opt.isCorrect && opt.text.trim());
-    if (correctOptions.length === 0) {
-      errors.push('Au moins une option doit être marquée comme correcte');
+      const correctOptions = formData.options.filter(opt => opt.isCorrect && opt.text.trim());
+      if (correctOptions.length === 0) {
+        errors.push('Au moins une option doit être marquée comme correcte');
+      }
+
+      // For QCS, ensure only one correct answer
+      if (formData.questionType === 'QCS' && correctOptions.length > 1) {
+        errors.push('Pour les questions à choix simple, une seule option peut être correcte');
+      }
     }
 
     setValidationErrors(errors);
@@ -148,8 +191,19 @@ export default function CreateQuestionModal({
     }
 
     try {
-      // Filter out empty options
-      const filteredOptions = formData.options.filter(opt => opt.text.trim());
+      // Filter out empty options (but keep QROC single option)
+      let filteredOptions;
+      if (formData.questionType === 'QROC') {
+        // For QROC, ensure the single option has isCorrect = true
+        filteredOptions = [{
+          text: formData.options[0].text.trim(),
+          isCorrect: true
+        }];
+      } else {
+        // For other types, filter out empty options
+        filteredOptions = formData.options.filter(opt => opt.text.trim());
+      }
+      
       const submitData = {
         ...formData,
         options: filteredOptions,
@@ -165,31 +219,33 @@ export default function CreateQuestionModal({
   };
 
   const getAllModules = () => {
-    if (!resources?.studyYears) return [];
+    if (!resources?.studyYears || !selectedStudyYearId) return [];
+    
+    const studyYear = resources.studyYears.find((sy: any) => sy.id === selectedStudyYearId);
+    if (!studyYear) return [];
     
     const allModules: any[] = [];
-    resources.studyYears.forEach((studyYear: any) => {
-      studyYear.semesters?.forEach((semester: any) => {
-        if (semester.modules) {
-          allModules.push(...semester.modules);
-        }
-      });
+    studyYear.semesters?.forEach((semester: any) => {
+      if (semester.modules) {
+        allModules.push(...semester.modules);
+      }
     });
     
     return allModules.sort((a: any, b: any) => a.name.localeCompare(b.name));
   };
 
   const getFilteredLessons = () => {
-    if (!resources?.studyYears || !formData.moduleId) return [];
+    if (!resources?.studyYears || !formData.moduleId || !selectedStudyYearId) return [];
+    
+    const studyYear = resources.studyYears.find((sy: any) => sy.id === selectedStudyYearId);
+    if (!studyYear) return [];
     
     const allLessons: any[] = [];
-    resources.studyYears.forEach((studyYear: any) => {
-      studyYear.semesters?.forEach((semester: any) => {
-        semester.modules?.forEach((module: any) => {
-          if (module.id === formData.moduleId) {
-            allLessons.push(...(module.lessons || []));
-          }
-        });
+    studyYear.semesters?.forEach((semester: any) => {
+      semester.modules?.forEach((module: any) => {
+        if (module.id === formData.moduleId) {
+          allLessons.push(...(module.lessons || []));
+        }
       });
     });
     
@@ -258,45 +314,53 @@ export default function CreateQuestionModal({
             />
           </div>
 
-          {/* Question Type */}
+          {/* Study Year Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Type de Question
+              Année d'étude (Optionnel)
             </label>
             <select
-              value={formData.questionType}
-              onChange={(e) => handleInputChange('questionType', e.target.value as QuestionType)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="QCMA">QCM Tout ou Rien</option>
-              <option value="QCMP">QCM Partiel</option>
-              <option value="QCS">Question à Choix Simple</option>
-              <option value="QROC">Question à Réponse Ouverte Courte</option>
-            </select>
-          </div>
-
-          {/* Module Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Module (Optionnel)
-            </label>
-            <select
-              value={formData.moduleId || ''}
+              value={selectedStudyYearId}
               onChange={(e) => {
-                const moduleId = e.target.value ? parseInt(e.target.value) : undefined;
-                handleInputChange('moduleId', moduleId);
-                handleInputChange('lessonId', undefined); // Clear lesson when module changes
+                setSelectedStudyYearId(e.target.value);
+                handleInputChange('moduleId', undefined);
+                handleInputChange('lessonId', undefined);
               }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Sélectionner un module...</option>
-              {getAllModules().map((module: any) => (
-                <option key={module.id} value={module.id}>
-                  {module.name}
+              <option value="">Sélectionner une année...</option>
+              {resources?.studyYears?.map((studyYear: any) => (
+                <option key={studyYear.id} value={studyYear.id}>
+                  {studyYear.name}
                 </option>
               ))}
             </select>
           </div>
+
+          {/* Module Selection */}
+          {selectedStudyYearId && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Module (Optionnel)
+              </label>
+              <select
+                value={formData.moduleId || ''}
+                onChange={(e) => {
+                  const moduleId = e.target.value || undefined;
+                  handleInputChange('moduleId', moduleId);
+                  handleInputChange('lessonId', undefined); // Clear lesson when module changes
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Sélectionner un module...</option>
+                {getAllModules().map((module: any) => (
+                  <option key={module.id} value={module.id}>
+                    {module.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Lesson Selection */}
           {formData.moduleId && (
@@ -307,7 +371,7 @@ export default function CreateQuestionModal({
               <select
                 value={formData.lessonId || ''}
                 onChange={(e) => {
-                  const lessonId = e.target.value ? parseInt(e.target.value) : undefined;
+                  const lessonId = e.target.value || undefined;
                   handleInputChange('lessonId', lessonId);
                 }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -321,6 +385,23 @@ export default function CreateQuestionModal({
               </select>
             </div>
           )}
+
+          {/* Question Type */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Type de Question *
+            </label>
+            <select
+              value={formData.questionType}
+              onChange={(e) => handleInputChange('questionType', e.target.value as QuestionType)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="QCMA">QCM Tout ou Rien</option>
+              <option value="QCMP">QCM Partiel</option>
+              <option value="QCS">Question à Choix Simple</option>
+              <option value="QROC">Question à Réponse Ouverte Courte</option>
+            </select>
+          </div>
 
           {/* Difficulty */}
           <div>
@@ -339,56 +420,95 @@ export default function CreateQuestionModal({
             </select>
           </div>
 
-          {/* Options */}
+          {/* Options - Different UI based on question type */}
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Options de Réponse *
-              </label>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={addOption}
-                className="flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Ajouter Option
-              </Button>
-            </div>
-            
-            <div className="space-y-3">
-              {formData.options.map((option, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
-                  <input
-                    type="checkbox"
-                    checked={option.isCorrect}
-                    onChange={(e) => handleOptionChange(index, 'isCorrect', e.target.checked)}
-                    className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
-                  />
-                  <Input
-                    value={option.text}
-                    onChange={(e) => handleOptionChange(index, 'text', e.target.value)}
-                    placeholder={`Option ${index + 1}...`}
-                    className="flex-1"
-                  />
-                  {formData.options.length > 2 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeOption(index)}
-                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+            {formData.questionType === 'QROC' ? (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Réponse attendue *
+                </label>
+                <Input
+                  value={formData.options[0]?.text || ''}
+                  onChange={(e) => handleOptionChange(0, 'text', e.target.value)}
+                  placeholder="Entrez la réponse correcte"
+                  className="w-full"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  La réponse de l'étudiant sera comparée à cette réponse attendue
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {formData.questionType === 'QCS' ? 'Options de réponse (une seule correcte) *' : 'Options de Réponse *'}
+                  </label>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={addOption}
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Ajouter Option
+                  </Button>
+                </div>
+                
+                <div className="space-y-3">
+                  {formData.options.map((option, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
+                      {formData.questionType === 'QCS' ? (
+                        <input
+                          type="radio"
+                          name="correct_answer"
+                          checked={option.isCorrect}
+                          onChange={(e) => handleOptionChange(index, 'isCorrect', e.target.checked)}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                        />
+                      ) : (
+                        <input
+                          type="checkbox"
+                          checked={option.isCorrect}
+                          onChange={(e) => handleOptionChange(index, 'isCorrect', e.target.checked)}
+                          className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+                        />
+                      )}
+                      <Input
+                        value={option.text}
+                        onChange={(e) => handleOptionChange(index, 'text', e.target.value)}
+                        placeholder={`Option ${index + 1}...`}
+                        className="flex-1"
+                      />
+                      {formData.options.length > 2 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeOption(index)}
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Helper text based on question type */}
+                <div className="mt-2 text-xs text-gray-500">
+                  {formData.questionType === 'QCMA' && (
+                    <p>📝 QCM Tout ou rien : L'étudiant doit cocher toutes les bonnes réponses pour avoir des points</p>
+                  )}
+                  {formData.questionType === 'QCMP' && (
+                    <p>📊 QCM Points partiels : L'étudiant gagne des points pour chaque bonne réponse cochée</p>
+                  )}
+                  {formData.questionType === 'QCS' && (
+                    <p>🎯 Choix simple : L'étudiant ne peut sélectionner qu'une seule réponse</p>
                   )}
                 </div>
-              ))}
-            </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Cochez les cases pour marquer les bonnes réponses
-            </p>
+              </>
+            )}
           </div>
 
           {/* Explanation */}

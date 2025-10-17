@@ -121,9 +121,17 @@ export async function POST(request: NextRequest) {
     const { text, questionType, studyYearId, lessonId, moduleId, difficulty, explanation, options } = body;
 
     // Validation
-    if (!text || !questionType || !options || options.length < 2) {
+    if (!text || !questionType || !options || options.length < 1) {
       return NextResponse.json(
-        { error: 'Le texte de la question, le type et au moins 2 options sont requis' },
+        { error: 'Le texte de la question, le type et au moins 1 option sont requis' },
+        { status: 400 }
+      );
+    }
+
+    // For non-QROC questions, check minimum options
+    if (questionType !== 'QROC' && options.length < 2) {
+      return NextResponse.json(
+        { error: 'Au moins 2 options sont requises pour ce type de question' },
         { status: 400 }
       );
     }
