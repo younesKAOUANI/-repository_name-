@@ -52,8 +52,9 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
-# Copy seed dependencies
+# Copy seed dependencies and their transitive dependencies
 COPY --from=builder /app/node_modules/@paralleldrive ./node_modules/@paralleldrive
+COPY --from=builder /app/node_modules/@noble ./node_modules/@noble
 COPY --from=builder /app/node_modules/bcrypt ./node_modules/bcrypt
 
 USER nextjs
