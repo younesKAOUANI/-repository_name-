@@ -152,7 +152,32 @@ if [ ! -f "${ENV_FILE}" ]; then
   REDIS_PASS=$(openssl rand -base64 24 || head -c 32 /dev/urandom | base64)
   NEXTAUTH_SECRET=$(openssl rand -base64 32 || head -c 48 /dev/urandom | base64)
 
-  cat > "${ENV_FILE}" <<EOF
+  # Check if we need sudo for file creation
+  if [ ! -w "." ]; then
+    log "Directory not writable, using sudo to create .env"
+    sudo bash -c "cat > \"${ENV_FILE}\" <<EOF
+# Generated on $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+# Edit the values below before going to production (especially NEXTAUTH_URL, SMTP settings and domain).
+
+# Database
+POSTGRES_PASSWORD=${POSTGRES_PASS}
+DATABASE_URL=postgresql://${DB_USER}:${POSTGRES_PASS}@${DB_SERVICE_NAME}:5432/${DB_NAME}
+
+# Redis
+REDIS_PASSWORD=${REDIS_PASS}
+REDIS_URL=redis://:${REDIS_PASS}@redis:6379
+
+# NextAuth
+NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+NEXTAUTH_URL=http://localhost
+
+# Application
+NODE_ENV=production
+EOF"
+    sudo chmod 600 "${ENV_FILE}"
+    sudo chown "${USER}:${USER}" "${ENV_FILE}" 2>/dev/null || true
+  else
+    cat > "${ENV_FILE}" <<EOF
 # Generated on $(date -u +"%Y-%m-%dT%H:%M:%SZ")
 # Edit the values below before going to production (especially NEXTAUTH_URL, SMTP settings and domain).
 
@@ -171,8 +196,9 @@ NEXTAUTH_URL=http://localhost
 # Application
 NODE_ENV=production
 EOF
+    chmod 600 "${ENV_FILE}"
+  fi
 
-  chmod 600 "${ENV_FILE}"
   log "${ENV_FILE} created and chmod 600 applied."
 
   if [ "$AUTO" = false ]; then
