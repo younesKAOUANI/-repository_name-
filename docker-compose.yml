@@ -44,12 +44,6 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://pharmapedia:pharmapedia_password@postgres:5432/pharmapedia
-      - REDIS_URL=redis://:redis_password@redis:6379
-      - NEXTAUTH_SECRET=your-super-secret-key-change-in-production
-      - NEXTAUTH_URL=http://localhost:3000
     depends_on:
       postgres:
         condition: service_healthy
