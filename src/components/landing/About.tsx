@@ -49,7 +49,7 @@ const About: React.FC = () => (
         transition={{ duration: 0.8, delay: 0.8 }}
         viewport={{ once: true }}
       >
-        Depuis plusieurs années, nous accompagnons les étudiants vers la
+        Nous accompagnons les étudiants vers la
         réussite
       </motion.h2>
       <motion.p 
@@ -72,7 +72,7 @@ const About: React.FC = () => (
       {[
         "Parcours de révision structuré",
         "Suivi de progression détaillé", 
-        "QCM et sujets par spécialité",
+        "QCM et sujets par année d'étude",
         "Accompagnement personnalisé"
       ].map((item, index) => (
         <motion.div 

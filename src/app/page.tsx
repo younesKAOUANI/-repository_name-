@@ -43,10 +43,11 @@ export default function Home() {
         <Hero />
         <About />
         <Features />
-        <Reviews />
-        <Pricing />
+        {/* <Reviews /> */}
+        {/* <Pricing /> */}
+        <div className="my-6"></div>
         <CTA />
-        <Subscription />
+        {/* <Subscription /> */}
         <Footer />
       </div>
     </div>

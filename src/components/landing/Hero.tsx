@@ -64,8 +64,7 @@ const Hero: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.4 }}
           >
-            La plateforme incontournable pour réussir vos examens en médecine,
-            pharmacie et sciences de la santé.
+            La plateforme incontournable pour réussir vos examens en pharmacie.
           </motion.p>
           <motion.div 
             className="mt-8 flex flex-col sm:flex-row gap-4"
@@ -87,7 +86,7 @@ const Hero: React.FC = () => {
                 Commencer ma révision
               </Link>
             </motion.div>
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 2.0 }}
@@ -100,7 +99,7 @@ const Hero: React.FC = () => {
               >
                 Découvrir
               </Link>
-            </motion.div>
+            </motion.div> */}
           </motion.div>
           <motion.div 
             className="mt-12 grid grid-cols-2 gap-8 text-gray-700"
@@ -123,7 +122,7 @@ const Hero: React.FC = () => {
               >
                 20+
               </motion.strong>
-              <span className="text-gray-600">Années d'expérience</span>
+              <span className="text-gray-600">Questions</span>
             </motion.div>
             <motion.div 
               className="flex flex-col pl-6 border-l-4 border-pharmapedia-primary-600"
@@ -138,9 +137,9 @@ const Hero: React.FC = () => {
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 2.7, type: "spring", stiffness: 200 }}
               >
-                10K+
+                1K+
               </motion.strong>
-              <span className="text-gray-600">Étudiants actifs</span>
+              <span className="text-gray-600">Examens</span>
             </motion.div>
           </motion.div>
         </motion.div>

@@ -205,10 +205,10 @@ export default function SignUpClient() {
               className="mx-auto"
             />
           </Link>
-          <h2 className="mt-6 text-3xl font-extrabold text-white">
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900 drop-shadow-sm">
             Créer un compte
           </h2>
-          <p className="mt-2 text-sm text-gray-100">
+          <p className="mt-2 text-sm text-gray-700 font-medium">
             Rejoignez Pharmapedia pour accéder aux ressources pédagogiques
           </p>
         </div>
@@ -470,13 +470,13 @@ export default function SignUpClient() {
         </form>
 
         <div className="text-center relative z-20">
-          <p className="text-xs text-white">
+          <p className="text-xs text-gray-800 font-medium">
             En créant un compte, vous acceptez nos{" "}
-            <Link href="/terms" className="text-white hover:text-gray-200 underline">
+            <Link href="/terms" className="text-gray-900 hover:text-blue-600 underline font-semibold">
               Conditions d'utilisation
             </Link>{" "}
             et notre{" "}
-            <Link href="/privacy" className="text-white hover:text-gray-200 underline">
+            <Link href="/privacy" className="text-gray-900 hover:text-blue-600 underline font-semibold">
               Politique de confidentialité
             </Link>
           </p>

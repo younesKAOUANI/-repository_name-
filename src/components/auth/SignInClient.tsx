@@ -194,8 +194,8 @@ export default function SignInClient() {
              className="object-contain"
            />
           </div>
-          <h1 className="text-3xl font-bold text-white">Bon retour</h1>
-          <p className="text-gray-100 mt-2">Connectez-vous à votre compte Pharmapedia</p>
+          <h1 className="text-3xl font-bold text-gray-900 drop-shadow-sm">Bon retour</h1>
+          <p className="text-gray-700 mt-2 font-medium">Connectez-vous à votre compte Pharmapedia</p>
         </div>
 
         {/* Sign In Form */}
@@ -302,14 +302,14 @@ export default function SignInClient() {
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-center text-xs text-white relative z-20">
-          <p>
+        <div className="mt-8 text-center text-xs text-gray-800 relative z-20">
+          <p className="font-medium">
             En vous connectant, vous acceptez nos{' '}
-            <Link href="/terms" className="text-white hover:text-gray-200 underline">
+            <Link href="/terms" className="text-gray-900 hover:text-blue-600 underline font-semibold">
               Conditions d'utilisation
             </Link>{' '}
             et notre{' '}
-            <Link href="/privacy" className="text-white hover:text-gray-200 underline">
+            <Link href="/privacy" className="text-gray-900 hover:text-blue-600 underline font-semibold">
               Politique de confidentialité
             </Link>
           </p>

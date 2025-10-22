@@ -8,19 +8,19 @@ export default function CTA() {
   const benefits = [
     {
       icon: <BookOpen className="w-6 h-6" />,
-      text: "Accès à plus de 50,000 questions"
+      text: "Accès à plus de 20,000 questions"
     },
-    {
-      icon: <Users className="w-6 h-6" />,
-      text: "Rejoignez 10,000+ étudiants"
-    },
-    {
-      icon: <Trophy className="w-6 h-6" />,
-      text: "95% de taux de réussite"
-    },
+    // {
+    //   icon: <Users className="w-6 h-6" />,
+    //   text: "Rejoignez 10,000+ étudiants"
+    // },
+    // {
+    //   icon: <Trophy className="w-6 h-6" />,
+    //   text: "95% de taux de réussite"
+    // },
     {
       icon: <CheckCircle className="w-6 h-6" />,
-      text: "Suivi personnalisé de vos progrès"
+      text: "Suivi de vos progrès"
     }
   ];
 
@@ -96,7 +96,7 @@ export default function CTA() {
               transition={{ duration: 0.6, delay: 0.6 }}
               viewport={{ once: true }}
             >
-              apprentissage médical ?
+              apprentissage?
             </motion.span>
           </motion.h2>
 
@@ -113,7 +113,7 @@ export default function CTA() {
 
           {/* Benefits Grid */}
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+            className="flex items-center justify-center gap-6 mb-12"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.0 }}
@@ -184,7 +184,7 @@ export default function CTA() {
           </motion.div>
 
           {/* Trust Indicators */}
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8 text-pharmapedia-secondary-100">
+          {/* <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8 text-pharmapedia-secondary-100">
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-5 h-5 text-green-300" />
               <span className="text-sm">Essai gratuit de 14 jours</span>
@@ -197,15 +197,15 @@ export default function CTA() {
               <CheckCircle className="w-5 h-5 text-green-300" />
               <span className="text-sm">Annulation à tout moment</span>
             </div>
-          </div>
+          </div> */}
 
           {/* Urgency Element */}
-          <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-lg p-4 max-w-md mx-auto">
+          {/* <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-lg p-4 max-w-md mx-auto">
             <p className="text-white text-sm">
               🔥 <strong>Offre limitée:</strong> Les 100 premiers inscrits bénéficient 
               d&apos;un accès premium gratuit pendant 1 mois !
             </p>
-          </div>
+          </div> */}
         </div>
       </motion.div>
     </motion.section>
