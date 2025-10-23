@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bientôt disponible - Pharmapedia</title>
+    <meta name="description" content="Pharmapedia arrive bientôt - La plateforme d'apprentissage pour les étudiants en pharmacie. Cours, quiz interactifs et suivi des progrès.">
+    <meta name="keywords" content="pharmacie, étudiants, apprentissage, quiz, cours, Algérie, formation pharmaceutique">
+    <meta name="author" content="Pharmapedia">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pharmapedia-dz.com/">
+    <meta property="og:title" content="Bientôt disponible - Pharmapedia">
+    <meta property="og:description" content="La plateforme d'apprentissage pour les étudiants en pharmacie arrive bientôt. Cours, quiz interactifs et suivi des progrès.">
+    <meta property="og:image" content="https://pharmapedia-dz.com/assets/pharmapedia-logo.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://pharmapedia-dz.com/">
+    <meta property="twitter:title" content="Bientôt disponible - Pharmapedia">
+    <meta property="twitter:description" content="La plateforme d'apprentissage pour les étudiants en pharmacie arrive bientôt.">
+    <meta property="twitter:image" content="https://pharmapedia-dz.com/assets/pharmapedia-logo.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#667eea">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background particles */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0) scale(1);
+                opacity: 0.6;
+            }
+            25% {
+                transform: translateY(-100px) translateX(50px) scale(1.1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translateY(-50px) translateX(-50px) scale(0.9);
+                opacity: 0.4;
+            }
+            75% {
+                transform: translateY(-150px) translateX(100px) scale(1.2);
+                opacity: 0.7;
+            }
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+            z-index: 10;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-container {
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-out 0.3s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .logo {
+            max-width: 280px;
+            height: auto;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-out 0.5s both;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: #4b5563;
+            margin-bottom: 30px;
+            font-weight: 500;
+            animation: fadeIn 1s ease-out 0.7s both;
+        }
+
+        .description {
+            font-size: 18px;
+            color: #6b7280;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-out 0.9s both;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+            animation: fadeIn 1s ease-out 1.1s both;
+        }
+
+        .feature {
+            padding: 24px;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-icon svg {
+            width: 72px;
+            height: 72px;
+            color: #667eea;
+        }
+
+        .feature-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .feature-text {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+
+
+        .social-links {
+            margin-top: 40px;
+            animation: fadeIn 1s ease-out 1.7s both;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            color: #667eea;
+            transition: all 0.3s ease;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .social-links a:hover {
+            transform: translateY(-3px) scale(1.1);
+            background: rgba(102, 126, 234, 0.2);
+            color: #764ba2;
+        }
+
+        .social-links svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 24px;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+
+            .subtitle {
+                font-size: 20px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .countdown {
+                flex-wrap: wrap;
+            }
+
+            .countdown-item {
+                min-width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background particles -->
+    <script>
+        // Create floating particles
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 100 + 20 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.background = ['#667eea', '#764ba2', '#4f46e5', '#7c3aed'][Math.floor(Math.random() * 4)];
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            document.body.appendChild(particle);
+        }
+    </script>
+
+    <div class="container">
+        <div class="logo-container">
+            <img src="./assets/pharmapedia-logo.png" alt="Pharmapedia Logo" class="logo" onerror="this.style.display='none'">
+        </div>
+
+        <h1>🚀 Bientôt disponible</h1>
+        <p class="subtitle">Quelque chose d'incroyable arrive...</p>
+        <p class="description">
+            Nous travaillons dur pour vous apporter une expérience exceptionnelle. 
+            Pharmapedia sera bientôt là pour révolutionner votre apprentissage en pharmacie.
+        </p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7.333 5.5a2.25 2.25 0 0 1 2.25-2.25h1.583a2.25 2.25 0 0 1 2.25 2.196c.227-.175.492-.308.786-.387l2.253-.604a2.25 2.25 0 0 1 2.756 1.591L21.93 16.19a2.25 2.25 0 0 1-1.591 2.755l-2.254.604a2.25 2.25 0 0 1-2.756-1.59l-1.912-7.136v6.428a2.25 2.25 0 0 1-2.25 2.25H9.583a2.24 2.24 0 0 1-1.5-.573a2.24 2.24 0 0 1-1.5.573H4.25A2.25 2.25 0 0 1 2 17.25v-9.5A2.25 2.25 0 0 1 4.25 5.5h2.333c.263 0 .516.045.75.128zm0 11.75V7.728A.75.75 0 0 0 6.583 7H4.25a.75.75 0 0 0-.75.75v9.5c0 .414.336.75.75.75h2.333a.75.75 0 0 0 .75-.73zm2.25.75h1.583a.75.75 0 0 0 .75-.75V5.5a.75.75 0 0 0-.75-.75H9.583a.75.75 0 0 0-.75.75v11.77a.75.75 0 0 0 .75.73M14.06 7.427l2.717 10.142a.75.75 0 0 0 .919.53l2.253-.604a.75.75 0 0 0 .53-.918L17.763 6.435a.75.75 0 0 0-.918-.53l-2.254.603a.75.75 0 0 0-.53.919"/></svg>
+                </div>
+                <div class="feature-title">Contenu de qualité</div>
+                <div class="feature-text">Cours et ressources pédagogiques complets</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.5 23.25v-3.739l1.007.168A3 3 0 0 0 20 16.72v-2.458l.935-.234a1.5 1.5 0 0 0 .884-2.287L20 9.011v-.75c0-4.426-4.479-7.96-9.818-7.46A8.994 8.994 0 0 0 6.5 17.546v5.7"/><path stroke-linecap="round" stroke-linejoin="round" d="M8.572 8.25a3 3 0 1 1 4 2.829a1.5 1.5 0 0 0-1 1.415v.256"/><path d="M11.572 16.5a.375.375 0 0 1 0-.75m0 .75a.375.375 0 0 0 0-.75"/></g></svg>
+                </div>
+                <div class="feature-title">Quiz interactifs</div>
+                <div class="feature-text">Testez vos connaissances en temps réel</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M1.75 13.25V1.5H.5v12a1.24 1.24 0 0 0 1.22 1H15.5v-1.25z"/><path fill="currentColor" d="M3.15 8H4.4v3.9H3.15zm3.26-4h1.26v7.9H6.41zm3.27 2h1.25v5.9H9.68zm3.27-3.5h1.25v9.4h-1.25z"/></svg>
+                </div>
+                <div class="feature-title">Suivi des progrès</div>
+                <div class="feature-text">Analysez votre évolution</div>
+            </div>
+        </div>
+
+        <div class="social-links">
+            <p style="font-size: 18px; color: #4b5563; margin-bottom: 20px; font-weight: 500;">
+                Suivez-nous sur Instagram pour les dernières actualités et contenus exclusifs ! 📱✨
+            </p>
+            <a href="https://instagram.com/pharmapedia_dz" target="_blank" aria-label="Instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024"><path fill="currentColor" d="M511 4c138 0 155 1 209 3c53 2 90 11 123 24c34 13 62 30 90 58s45 56 58 90c13 33 22 70 24 123c2 54 3 71 3 209s-1 155-3 209c-2 53-11 90-24 123c-13 34-30 62-58 90s-56 45-90 58c-33 13-70 22-123 24c-54 2-71 3-209 3s-155-1-209-3c-53-2-90-11-123-24c-34-13-62-30-90-58s-45-56-58-90C18 810 9 773 7 720c-2-54-3-71-3-209s1-155 3-209c2-53 11-90 24-123c13-34 30-62 58-90s56-45 90-58c33-13 70-22 123-24c54-2 71-3 209-3m0 66c-144 0-161 1-217 3c-52 2-81 12-100 19c-49 20-82 53-102 102c-7 19-17 48-19 100c-2 56-3 73-3 217s1 161 3 217c2 52 12 81 19 100c20 49 53 82 102 102c19 7 48 17 100 19c56 2 73 3 217 3s161-1 217-3c52-2 81-12 100-19c49-20 82-53 102-102c7-19 17-48 19-100c2-56 3-73 3-217s-1-161-3-217c-2-52-12-81-19-100c-20-49-53-82-102-102c-19-7-48-17-100-19c-56-2-73-3-217-3m0 644c112 0 203-91 203-203s-91-203-203-203s-203 91-203 203s91 203 203 203m0-463c144 0 260 116 260 260S655 771 511 771S251 655 251 511s116-260 260-260m332-10c0 34-28 60-62 60s-60-26-60-60s26-62 60-62s62 28 62 62"/></svg>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 100 + 20 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.background = ['#667eea', '#764ba2', '#4f46e5', '#7c3aed'][Math.floor(Math.random() * 4)];
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            document.body.appendChild(particle);
+        }
+    </script>
+</body>
+</html>
