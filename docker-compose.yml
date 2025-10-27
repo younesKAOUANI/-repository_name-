@@ -50,7 +50,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - ./uploads:/app/uploads
+      - ./public/uploads:/app/public/uploads
     env_file:
       - .env
     healthcheck:

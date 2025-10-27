@@ -6,8 +6,7 @@ import { requireRole } from '@/lib/auth-utils';
 
 export const runtime = 'nodejs';
 
-const UPLOAD_DIR = path.join(process.cwd(), 'uploads', 'schemas');
-const PUBLIC_UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'schemas');
+const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'schemas');
 
 function sanitizeFilename(name: string) {
   // Remove any path separators and return a basename
@@ -30,9 +29,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ file
 
     const safeName = sanitizeFilename(filename);
 
-    // Check both public and private upload locations
+    // Check upload location
     const candidatePaths = [
-      path.join(PUBLIC_UPLOAD_DIR, safeName),
       path.join(UPLOAD_DIR, safeName),
     ];
 
