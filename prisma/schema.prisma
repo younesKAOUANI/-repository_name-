@@ -197,7 +197,7 @@ model Question {
   @@index([quizId])
 }
 
-model dank {
+model QuestionBank {
   id            String                  @id @default(cuid())
   text          String
   questionType  QuestionType
