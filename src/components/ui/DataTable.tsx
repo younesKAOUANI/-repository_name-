@@ -23,10 +23,10 @@ export interface TableColumn<T = any> {
 }
 
 export interface TableAction<T = any> {
-  label: string;
-  icon?: React.ReactNode;
+  label: string | ((row: T) => string);
+  icon?: React.ReactNode | ((row: T) => React.ReactNode);
   onClick: (row: T) => void;
-  variant?: 'default' | 'danger';
+  variant?: 'default' | 'danger' | 'success' | ((row: T) => 'default' | 'danger' | 'success');
   show?: (row: T) => boolean;
 }
 
@@ -252,25 +252,33 @@ export default function DataTable<T extends Record<string, any>>({
                             <div className="py-1">
                               {actions
                                 .filter(action => !action.show || action.show(row))
-                                .map((action, actionIndex) => (
-                                  <button
-                                    key={actionIndex}
-                                    onClick={() => {
-                                      action.onClick(row);
-                                      setShowActionsFor(null);
-                                    }}
-                                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                                      action.variant === 'danger' 
-                                        ? 'text-red-700 hover:bg-red-50' 
-                                        : 'text-gray-700'
-                                    }`}
-                                  >
-                                    <div className="flex items-center space-x-2">
-                                      {action.icon}
-                                      <span>{action.label}</span>
-                                    </div>
-                                  </button>
-                                ))}
+                                .map((action, actionIndex) => {
+                                  const label = typeof action.label === 'function' ? action.label(row) : action.label;
+                                  const icon = typeof action.icon === 'function' ? action.icon(row) : action.icon;
+                                  const variant = typeof action.variant === 'function' ? action.variant(row) : action.variant;
+                                  
+                                  return (
+                                    <button
+                                      key={actionIndex}
+                                      onClick={() => {
+                                        action.onClick(row);
+                                        setShowActionsFor(null);
+                                      }}
+                                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                                        variant === 'danger' 
+                                          ? 'text-red-700 hover:bg-red-50' 
+                                          : variant === 'success'
+                                          ? 'text-green-700 hover:bg-green-50'
+                                          : 'text-gray-700'
+                                      }`}
+                                    >
+                                      <div className="flex items-center space-x-2">
+                                        {icon}
+                                        <span>{label}</span>
+                                      </div>
+                                    </button>
+                                  );
+                                })}
                             </div>
                           </div>
                         )}

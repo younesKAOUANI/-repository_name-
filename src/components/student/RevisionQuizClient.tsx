@@ -144,15 +144,6 @@ export default function RevisionQuizClient() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour au tableau de bord
-          </Button>
-
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Quiz de Révision
           </h1>

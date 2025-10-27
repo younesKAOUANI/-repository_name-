@@ -1,5 +1,7 @@
 generator client {
   provider = "prisma-client-js"
+  // Include the container runtime binary target so Prisma can find the correct query engine
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -180,6 +182,7 @@ model Quiz {
 model Question {
   id             String              @id @default(cuid())
   text           String
+  questionImage  String?
   quizId         String
   questionType   QuestionType
   order          Int?
@@ -200,9 +203,9 @@ model QuestionBank {
   questionType  QuestionType
   lessonId      String?
   moduleId      String?
-  difficulty    String?
   explanation   String?                 // Text explanation for the correct answer
   explanationImg String?                // Image URL for schema/diagram explanation
+  questionImage String?                 // Image URL for question image
   isActive      Boolean                 @default(true)
   createdAt     DateTime                @default(now())
   updatedAt     DateTime                @updatedAt

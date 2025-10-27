@@ -45,8 +45,9 @@ export default function CreateQuestionModal({
     questionType: 'QCMA',
     lessonId: undefined,
     moduleId: undefined,
-    difficulty: undefined,
     explanation: '',
+    questionImage: null,
+    explanationImg: null,
     options: [
       { text: '', isCorrect: false },
       { text: '', isCorrect: false },
@@ -55,6 +56,10 @@ export default function CreateQuestionModal({
   
   const [selectedStudyYearId, setSelectedStudyYearId] = useState<string>('');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [selectedQuestionFile, setSelectedQuestionFile] = useState<File | null>(null);
+  const [selectedExplanationFile, setSelectedExplanationFile] = useState<File | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -64,7 +69,8 @@ export default function CreateQuestionModal({
         questionType: 'QCMA',
         lessonId: undefined,
         moduleId: undefined,
-        difficulty: undefined,
+        questionImage: null,
+        explanationImg: null,
         explanation: '',
         options: [
           { text: '', isCorrect: false },
@@ -108,16 +114,7 @@ export default function CreateQuestionModal({
 
   const handleOptionChange = (index: number, field: keyof QuestionOption, value: any) => {
     const newOptions = [...formData.options];
-    
-    // For QCS (single choice), uncheck all other options when one is checked
-    if (formData.questionType === 'QCS' && field === 'isCorrect' && value === true) {
-      newOptions.forEach((opt, i) => {
-        if (i !== index) {
-          opt.isCorrect = false;
-        }
-      });
-    }
-    
+    // (No special QCS handling anymore)
     newOptions[index] = {
       ...newOptions[index],
       [field]: value,
@@ -172,11 +169,6 @@ export default function CreateQuestionModal({
       if (correctOptions.length === 0) {
         errors.push('Au moins une option doit être marquée comme correcte');
       }
-
-      // For QCS, ensure only one correct answer
-      if (formData.questionType === 'QCS' && correctOptions.length > 1) {
-        errors.push('Pour les questions à choix simple, une seule option peut être correcte');
-      }
     }
 
     setValidationErrors(errors);
@@ -204,10 +196,53 @@ export default function CreateQuestionModal({
         filteredOptions = formData.options.filter(opt => opt.text.trim());
       }
       
-      const submitData = {
+      const submitData: any = {
         ...formData,
         options: filteredOptions,
       };
+
+      // If files are selected, upload them first (question image and explanation image)
+      const uploadSingleFile = async (file: File) => {
+        try {
+          setUploading(true);
+          setUploadError(null);
+
+          const fd = new FormData();
+          fd.append('file', file as any);
+
+          const resp = await fetch('/api/admin/question-bank/upload', {
+            method: 'POST',
+            body: fd,
+          });
+
+          if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            setUploadError(err?.error || 'Erreur lors de l\'upload du fichier');
+            return null;
+          }
+
+          const data = await resp.json();
+          return data.url || data.filename || null;
+        } catch (err) {
+          console.error('Upload failed', err);
+          setUploadError('Erreur lors de l\'upload du fichier');
+          return null;
+        } finally {
+          setUploading(false);
+        }
+      };
+
+      if (selectedQuestionFile) {
+        const qUrl = await uploadSingleFile(selectedQuestionFile);
+        if (!qUrl && uploadError) return; // stop on upload error
+        submitData.questionImage = qUrl;
+      }
+
+      if (selectedExplanationFile) {
+        const eUrl = await uploadSingleFile(selectedExplanationFile);
+        if (!eUrl && uploadError) return;
+        submitData.explanationImg = eUrl;
+      }
       
       console.log('Creating question with data:', submitData);
       await onSubmit(submitData);
@@ -216,6 +251,39 @@ export default function CreateQuestionModal({
     } catch (err) {
       console.error('Error creating question:', err);
     }
+  };
+
+  const validateSelectedFile = (f: File | null) => {
+    if (!f) return { ok: true };
+    const allowed = ['image/png', 'image/jpeg', 'image/svg+xml', 'application/pdf', 'application/json'];
+    if (!allowed.includes(f.type)) return { ok: false, error: 'Type de fichier non autorisé' };
+    const max = 5 * 1024 * 1024; // 5MB
+    if (f.size > max) return { ok: false, error: 'Taille du fichier trop grande (max 5MB)' };
+    return { ok: true };
+  };
+
+  const handleQuestionFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUploadError(null);
+    const f = e.target.files?.[0] ?? null;
+    const res = validateSelectedFile(f);
+    if (!res.ok) {
+      setUploadError(res.error as string);
+      setSelectedQuestionFile(null);
+      return;
+    }
+    setSelectedQuestionFile(f);
+  };
+
+  const handleExplanationFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUploadError(null);
+    const f = e.target.files?.[0] ?? null;
+    const res = validateSelectedFile(f);
+    if (!res.ok) {
+      setUploadError(res.error as string);
+      setSelectedExplanationFile(null);
+      return;
+    }
+    setSelectedExplanationFile(f);
   };
 
   const getAllModules = () => {
@@ -398,27 +466,10 @@ export default function CreateQuestionModal({
             >
               <option value="QCMA">QCM Tout ou Rien</option>
               <option value="QCMP">QCM Partiel</option>
-              <option value="QCS">Question à Choix Simple</option>
               <option value="QROC">Question à Réponse Ouverte Courte</option>
             </select>
           </div>
 
-          {/* Difficulty */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Difficulté (Optionnel)
-            </label>
-            <select
-              value={formData.difficulty || ''}
-              onChange={(e) => handleInputChange('difficulty', e.target.value || undefined)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Sélectionner une difficulté...</option>
-              <option value="EASY">Facile</option>
-              <option value="MEDIUM">Moyen</option>
-              <option value="HARD">Difficile</option>
-            </select>
-          </div>
 
           {/* Options - Different UI based on question type */}
           <div>
@@ -440,9 +491,7 @@ export default function CreateQuestionModal({
             ) : (
               <>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {formData.questionType === 'QCS' ? 'Options de réponse (une seule correcte) *' : 'Options de Réponse *'}
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700">Options de Réponse *</label>
                   <Button
                     type="button"
                     variant="secondary"
@@ -458,22 +507,12 @@ export default function CreateQuestionModal({
                 <div className="space-y-3">
                   {formData.options.map((option, index) => (
                     <div key={index} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
-                      {formData.questionType === 'QCS' ? (
-                        <input
-                          type="radio"
-                          name="correct_answer"
-                          checked={option.isCorrect}
-                          onChange={(e) => handleOptionChange(index, 'isCorrect', e.target.checked)}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500"
-                        />
-                      ) : (
-                        <input
-                          type="checkbox"
-                          checked={option.isCorrect}
-                          onChange={(e) => handleOptionChange(index, 'isCorrect', e.target.checked)}
-                          className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                      )}
+                      <input
+                        type="checkbox"
+                        checked={option.isCorrect}
+                        onChange={(e) => handleOptionChange(index, 'isCorrect', e.target.checked)}
+                        className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+                      />
                       <Input
                         value={option.text}
                         onChange={(e) => handleOptionChange(index, 'text', e.target.value)}
@@ -503,9 +542,7 @@ export default function CreateQuestionModal({
                   {formData.questionType === 'QCMP' && (
                     <p>📊 QCM Points partiels : L'étudiant gagne des points pour chaque bonne réponse cochée</p>
                   )}
-                  {formData.questionType === 'QCS' && (
-                    <p>🎯 Choix simple : L'étudiant ne peut sélectionner qu'une seule réponse</p>
-                  )}
+                  
                 </div>
               </>
             )}
@@ -523,6 +560,37 @@ export default function CreateQuestionModal({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Explication de la réponse correcte..."
             />
+          </div>
+
+          {/* Question Image */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Image de la question (Optionnel)</label>
+            <input
+              type="file"
+              accept=".png,.jpg,.jpeg,.svg,.pdf,.json"
+              onChange={handleQuestionFileChange}
+              className="w-full"
+            />
+            {selectedQuestionFile && (
+              <p className="text-sm text-gray-600 mt-2">Fichier sélectionné: {selectedQuestionFile.name}</p>
+            )}
+          </div>
+
+          {/* Explanation Image / Schema Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Schéma / Image explicative (Optionnel)</label>
+            <input
+              type="file"
+              accept=".png,.jpg,.jpeg,.svg,.pdf,.json"
+              onChange={handleExplanationFileChange}
+              className="w-full"
+            />
+            {uploadError && (
+              <p className="text-sm text-red-600 mt-2">{uploadError}</p>
+            )}
+            {selectedExplanationFile && (
+              <p className="text-sm text-gray-600 mt-2">Fichier sélectionné: {selectedExplanationFile.name}</p>
+            )}
           </div>
 
           {/* Actions */}

@@ -184,20 +184,12 @@ export default function StudentCoursesClient() {
         </div>
       </div>
       
-      <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-gray-600">
-              {selectedUniversityId ? 'Sélectionnez une année d\'études pour voir les cours' : 'Choisissez votre université pour accéder aux cours'}
-            </p>
-          </div>
           {selectedUniversityId && (
             <Button variant="secondary" onClick={goBackToUniversities}>
               ← Retour aux universités
             </Button>
           )}
-        </div>
-      </div>
+
 
 
       {!selectedUniversityId ? (
@@ -215,27 +207,27 @@ export default function StudentCoursesClient() {
                 onClick={() => handleUniversitySelect(university.id)}
               >
                 <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-3">
                     <CardTitle className="text-lg flex items-center group-hover:text-blue-600 transition-colors">
-                      <University className="h-5 w-5 mr-2 text-blue-600" />
-                      {university.name}
+                      <University className="h-8 w-8 mr-3 text-blue-600" />
+                      <span className="text-base sm:text-lg">{university.name}</span>
                     </CardTitle>
-                    <Badge variant="secondary">
+                    <Badge variant="secondary" className="mt-2 sm:mt-0">
                       {university._count.driveLinks} cours
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    <p className="text-sm text-gray-600">
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-600 text-center sm:text-left">
                       Accédez aux cours et ressources pédagogiques de cette université.
                     </p>
                     <Button
                       variant="primary"
-                      className="w-full group-hover:bg-blue-700 transition-colors"
+                      className="w-full py-3 text-base group-hover:bg-blue-700 transition-colors flex items-center justify-center"
                     >
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      Voir les Cours
+                      <BookOpen className="h-6 w-6 mr-2" />
+                      <span className="text-sm sm:text-base">Voir les Cours</span>
                     </Button>
                   </div>
                 </CardContent>
@@ -267,9 +259,9 @@ export default function StudentCoursesClient() {
             </div>
           ) : (
             <div>
-              <h2 className="text-xl font-semibold mb-6 flex items-center">
-                <BookOpen className="h-5 w-5 mr-2 text-green-600" />
-                Cours - {universities.find(u => u.id === selectedUniversityId)?.name}
+              <h2 className="text-xl font-semibold mb-6 flex items-center gap-4">
+                <BookOpen className="h-14 w-14 text-green-600" />
+                <span>Cours - {universities.find(u => u.id === selectedUniversityId)?.name}</span>
               </h2>
 
               {Object.keys(groupCoursesByStudyYear()).length > 0 ? (
@@ -306,13 +298,13 @@ export default function StudentCoursesClient() {
                               .map((course) => (
                                 <Card key={course.id} className="hover:shadow-md transition-shadow cursor-pointer group bg-white">
                                   <CardHeader className="pb-3">
-                                    <div className="flex justify-between items-start">
-                                      <div className="flex-1">
+                                    <div className="flex flex-col gap-2 sm:flex-row justify-between items-center">
+                                      <div className="flex-1 flex flex-col items-center sm:items-start">
                                         <CardTitle className="text-base flex items-center group-hover:text-blue-600 transition-colors">
-                                          <Calendar className="h-4 w-4 mr-2 text-blue-600" />
-                                          Année {course.year}
+                                          <Calendar className="h-7 w-7 mr-3 text-blue-600" />
+                                          <span className="text-base">Année {course.year}</span>
                                         </CardTitle>
-                                        <CardDescription className="text-sm text-gray-500 mt-1">
+                                        <CardDescription className="text-sm text-gray-500 mt-1 text-center sm:text-left">
                                           {studyYear} - {course.year}
                                         </CardDescription>
                                       </div>
@@ -325,18 +317,18 @@ export default function StudentCoursesClient() {
                                         }}
                                         className="opacity-0 group-hover:opacity-100 transition-opacity"
                                       >
-                                        <ExternalLink className="h-4 w-4" />
+                                        <ExternalLink className="h-5 w-5" />
                                       </Button>
                                     </div>
                                   </CardHeader>
                                   <CardContent>
                                     <Button
                                       variant="primary"
-                                      className="w-full text-sm"
+                                      className="w-full py-3 text-base flex items-center justify-center"
                                       onClick={() => openCourse(course.link, universities.find(u => u.id === selectedUniversityId)?.name || '', studyYear, course.year)}
                                     >
-                                      <ExternalLink className="h-4 w-4 mr-2" />
-                                      Accéder au Cours
+                                      <ExternalLink className="h-6 w-6 mr-2" />
+                                      <span className="text-sm sm:text-base">Accéder au Cours</span>
                                     </Button>
                                   </CardContent>
                                 </Card>

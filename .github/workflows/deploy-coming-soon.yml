@@ -1,0 +1,37 @@
+name: Deploy Coming Soon Page
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'coming-soon/**'  # Only trigger when coming-soon folder changes
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy Coming Soon to VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            # Create coming-soon directory if it doesn't exist
+            mkdir -p /var/www/pharmapedia/coming-soon
+            
+            cd /var/www/pharmapedia/pharmapedia
+            
+            # Pull latest changes
+            git pull origin main
+            
+            # Copy coming-soon files to web directory
+            cp -r coming-soon/* /var/www/pharmapedia/coming-soon/
+            
+            echo "Coming soon page deployed successfully!"

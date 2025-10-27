@@ -14,6 +14,7 @@ const About: React.FC = () => (
     viewport={{ once: true }}
   >
     <motion.div
+      className="order-2 md:order-1"
       initial={{ opacity: 0, x: -50 }}
       whileInView={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
@@ -28,13 +29,14 @@ const About: React.FC = () => (
       />
     </motion.div>
     <motion.div
+      className="order-1 md:order-2 text-center md:text-left"
       initial={{ opacity: 0, x: 50 }}
       whileInView={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.8, delay: 0.4 }}
       viewport={{ once: true }}
     >
         <motion.span 
-          className="uppercase text-pharmapedia-primary-600 font-semibold"
+          className="inline-block uppercase text-pharmapedia-primary-600 font-semibold"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
@@ -63,7 +65,7 @@ const About: React.FC = () => (
         de haute qualité.
       </motion.p>
     <motion.div 
-      className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+      className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 justify-items-center md:justify-items-start"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       transition={{ duration: 0.6, delay: 1.2 }}
@@ -90,7 +92,7 @@ const About: React.FC = () => (
     </motion.div>
       <motion.a 
         href="#features" 
-        className="mt-8 inline-flex items-center text-pharmapedia-primary-600 font-semibold hover:text-pharmapedia-primary-700 transition-colors duration-300"
+        className="mt-8 inline-flex items-center text-pharmapedia-primary-600 font-semibold hover:text-pharmapedia-primary-700 transition-colors duration-300 mx-auto md:mx-0"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 1.8 }}

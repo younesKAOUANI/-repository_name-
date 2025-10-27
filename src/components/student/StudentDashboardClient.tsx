@@ -118,6 +118,8 @@ export default function StudentDashboardClient() {
   };
 
   return (
+
+
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-lg">
@@ -144,6 +146,7 @@ export default function StudentDashboardClient() {
           </div>
         </div>
       </div>
+
 
       {/* Overview Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -176,7 +179,7 @@ export default function StudentDashboardClient() {
             <div className="flex items-center">
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-600">Score Moyen</p>
-                <p className={`text-2xl font-bold ${getScoreColor(parseFloat(stats?.overview.averageScore || '0'))}`}>
+                <p className={`text-2xl font-bold ${getScoreColor(parseFloat(stats?.overview.averageScore || '0'))}`}> 
                   {stats?.overview.averageScore || '0'}%
                 </p>
               </div>
@@ -198,72 +201,7 @@ export default function StudentDashboardClient() {
         </Card>
       </div>
 
-      {/* Progress Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Activity className="h-5 w-5 mr-2 text-blue-600" />
-              Statut des Quiz
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Non commencés</span>
-              <Badge variant="secondary">{stats?.progress.NOT_STARTED || 0}</Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">En cours</span>
-              <Badge variant="outline">{stats?.progress.IN_PROGRESS || 0}</Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Complétés</span>
-              <Badge variant="default">{stats?.progress.COMPLETED || 0}</Badge>
-            </div>
-            <div className="mt-4">
-              <div className="bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  style={{
-                    width: `${((stats?.progress.COMPLETED || 0) / Math.max((stats?.progress.COMPLETED || 0) + (stats?.progress.IN_PROGRESS || 0) + (stats?.progress.NOT_STARTED || 0), 1)) * 100}%`
-                  }}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <User className="h-5 w-5 mr-2 text-blue-600" />
-              Informations Personnelles
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Nom:</span>
-              <span className="text-sm font-medium">{session?.user?.name}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Email:</span>
-              <span className="text-sm font-medium">{session?.user?.email}</span>
-            </div>
-            {session?.user?.year && (
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Année:</span>
-                <span className="text-sm font-medium">{session.user.year}ème année</span>
-              </div>
-            )}
-            {session?.user?.university && (
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Université:</span>
-                <span className="text-sm font-medium">{session.user.university}</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      {/* Progress Overview - Personal Info card removed */}
 
       {/* Recent Activity & Performance */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -373,43 +311,6 @@ export default function StudentDashboardClient() {
         </Card>
       ) : null}
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Zap className="h-5 w-5 mr-2 text-blue-600" />
-            Actions Rapides
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button variant="primary" onClick={() => router.push('/student/courses')} className="h-auto p-4">
-              <div className="text-center">
-                <BookOpen className="h-6 w-6 mx-auto mb-2" />
-                <div className="text-sm font-medium">Mes Cours</div>
-              </div>
-            </Button>
-            <Button variant="secondary" onClick={() => router.push('/student/quizzes')} className="h-auto p-4">
-              <div className="text-center">
-                <Target className="h-6 w-6 mx-auto mb-2" />
-                <div className="text-sm font-medium">Quiz Disponibles</div>
-              </div>
-            </Button>
-            <Button variant="secondary" onClick={() => router.push('/student/revision-quiz')} className="h-auto p-4">
-              <div className="text-center">
-                <Activity className="h-6 w-6 mx-auto mb-2" />
-                <div className="text-sm font-medium">Quiz de Révision</div>
-              </div>
-            </Button>
-            <Button variant="ghost" onClick={() => router.push('/student/results')} className="h-auto p-4">
-              <div className="text-center">
-                <BarChart3 className="h-6 w-6 mx-auto mb-2" />
-                <div className="text-sm font-medium">Mes Résultats</div>
-              </div>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

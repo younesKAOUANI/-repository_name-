@@ -68,8 +68,8 @@ export async function PUT(
 
     const questionId = id;
 
-    const body = await request.json();
-    const { text, questionType, studyYearId, lessonId, moduleId, difficulty, explanation, options } = body;
+  const body = await request.json();
+  const { text, questionType, studyYearId, lessonId, moduleId, explanation, explanationImg, questionImage, options } = body;
 
     // Validation
     if (!text || !questionType || !options || options.length < 2) {
@@ -101,59 +101,68 @@ export async function PUT(
     }
 
     // Update question with options (delete old options and create new ones)
-    const updatedQuestion = await db.$transaction(async (tx) => {
-      // Delete existing options
-      await tx.questionBankOption.deleteMany({
-        where: { questionBankId: questionId },
-      });
+    try {
+      const updatedQuestion = await db.$transaction(async (tx) => {
+        // Delete existing options
+        await tx.questionBankOption.deleteMany({
+          where: { questionBankId: questionId },
+        });
 
-      // Update question and create new options
-      return await tx.questionBank.update({
-        where: { id: questionId },
-        data: {
-          text,
-          questionType,
-          studyYearId: studyYearId || null,
-          lessonId: lessonId || null,
-          moduleId: moduleId || null,
-          difficulty: difficulty || null,
-          explanation: explanation || null,
-          options: {
-            create: options.map((option: any) => ({
-              text: option.text,
-              isCorrect: option.isCorrect,
-            })),
+        // Update question and create new options
+        return await tx.questionBank.update({
+          where: { id: questionId },
+          data: {
+            text,
+            questionType,
+            studyYearId: studyYearId || null,
+            lessonId: lessonId || null,
+            moduleId: moduleId || null,
+            explanation: explanation || null,
+            explanationImg: explanationImg || null,
+            // NOTE: questionImage update intentionally omitted until Prisma client is confirmed up-to-date
+            options: {
+              create: options.map((option: any) => ({
+                text: option.text,
+                isCorrect: option.isCorrect,
+              })),
+            },
           },
-        },
-        include: {
-          lesson: {
-            include: {
-              module: {
-                include: {
-                  semester: {
-                    include: {
-                      studyYear: true,
+          include: {
+            lesson: {
+              include: {
+                module: {
+                  include: {
+                    semester: {
+                      include: {
+                        studyYear: true,
+                      },
                     },
                   },
                 },
               },
             },
-          },
-          module: {
-            include: {
-              semester: {
-                include: {
-                  studyYear: true,
+            module: {
+              include: {
+                semester: {
+                  include: {
+                    studyYear: true,
+                  },
                 },
               },
             },
+            options: true,
           },
-          options: true,
-        },
+        });
       });
-    });
 
-    return NextResponse.json(updatedQuestion);
+      return NextResponse.json(updatedQuestion);
+    } catch (dbErr: any) {
+      console.error('DB update error:', dbErr);
+      return NextResponse.json(
+        { error: 'Échec de la mise à jour de la question', detail: dbErr?.message || String(dbErr) },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error('Erreur lors de la mise à jour de la question:', error);
     return NextResponse.json(

@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
     const studyYearId = searchParams.get('studyYearId');
     const moduleId = searchParams.get('moduleId');
     const lessonId = searchParams.get('lessonId');
-    const difficulty = searchParams.get('difficulty');
     const isActive = searchParams.get('isActive');
 
     const where: any = {};
@@ -48,10 +47,7 @@ export async function GET(request: NextRequest) {
       where.lessonId = lessonId;
     }
 
-    // Difficulty filter
-    if (difficulty) {
-      where.difficulty = difficulty;
-    }
+    // (difficulty removed from schema)
 
     // Active status filter
     if (isActive !== null) {
@@ -117,8 +113,8 @@ export async function POST(request: NextRequest) {
   try {
     await requireRole(['ADMIN', 'INSTRUCTOR']);
 
-    const body = await request.json();
-    const { text, questionType, studyYearId, lessonId, moduleId, difficulty, explanation, options } = body;
+  const body = await request.json();
+  const { text, questionType, studyYearId, lessonId, moduleId, explanation, explanationImg, questionImage, options } = body;
 
     // Validation
     if (!text || !questionType || !options || options.length < 1) {
@@ -146,50 +142,60 @@ export async function POST(request: NextRequest) {
     }
 
     // Create question with options
-    const question = await db.questionBank.create({
-      data: {
-        text,
-        questionType,
-        studyYearId: studyYearId || null,
-        lessonId: lessonId || null,
-        moduleId: moduleId || null,
-        difficulty: difficulty || null,
-        explanation: explanation || null,
-        options: {
-          create: options.map((option: any) => ({
-            text: option.text,
-            isCorrect: option.isCorrect,
-          })),
+    try {
+      const question = await db.questionBank.create({
+        data: {
+          text,
+          questionType,
+          studyYearId: studyYearId || null,
+          lessonId: lessonId || null,
+          moduleId: moduleId || null,
+          explanation: explanation || null,
+          explanationImg: explanationImg || null,
+          // NOTE: questionImage write is intentionally omitted to avoid runtime Prisma client/schema mismatch errors
+          options: {
+            create: options.map((option: any) => ({
+              text: option.text,
+              isCorrect: option.isCorrect,
+            })),
+          },
         },
-      },
-      include: {
-        lesson: {
-          include: {
-            module: {
-              include: {
-                semester: {
-                  include: {
-                    studyYear: true,
+        include: {
+          lesson: {
+            include: {
+              module: {
+                include: {
+                  semester: {
+                    include: {
+                      studyYear: true,
+                    },
                   },
                 },
               },
             },
           },
-        },
-        module: {
-          include: {
-            semester: {
-              include: {
-                studyYear: true,
+          module: {
+            include: {
+              semester: {
+                include: {
+                  studyYear: true,
+                },
               },
             },
           },
+          options: true,
         },
-        options: true,
-      },
-    });
+      });
 
-    return NextResponse.json(question, { status: 201 });
+      return NextResponse.json(question, { status: 201 });
+    } catch (dbErr: any) {
+      console.error('DB create error:', dbErr);
+      return NextResponse.json(
+        { error: 'Échec de la création de la question', detail: dbErr?.message || String(dbErr) },
+        { status: 500 }
+      );
+    }
+    
   } catch (error) {
     console.error('Erreur lors de la création de la question:', error);
     return NextResponse.json(

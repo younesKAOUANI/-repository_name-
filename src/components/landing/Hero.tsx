@@ -16,13 +16,13 @@ const Hero: React.FC = () => {
         transition={{ duration: 0.8 }}
       >
         <motion.div 
-          className="flex-1"
+          className="flex-1 text-center lg:text-left"
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <motion.span 
-            className="text-pharmapedia-primary-600 bg-pharmapedia-primary-50 px-4 py-2 rounded-full text-sm font-semibold"
+            className="inline-block text-pharmapedia-primary-600 bg-pharmapedia-primary-50 px-4 py-2 rounded-full text-sm font-semibold"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -102,13 +102,13 @@ const Hero: React.FC = () => {
             </motion.div> */}
           </motion.div>
           <motion.div 
-            className="mt-12 grid grid-cols-2 gap-8 text-gray-700"
+            className="mt-12 grid grid-cols-2 gap-8 text-gray-700 justify-items-center lg:justify-items-start"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 2.2 }}
           >
             <motion.div 
-              className="flex flex-col pl-6 border-l-4 border-pharmapedia-primary-600"
+              className="flex flex-col pl-6 border-l-4 border-pharmapedia-primary-600 text-center lg:text-left"
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 2.4 }}
@@ -125,7 +125,7 @@ const Hero: React.FC = () => {
               <span className="text-gray-600">Questions</span>
             </motion.div>
             <motion.div 
-              className="flex flex-col pl-6 border-l-4 border-pharmapedia-primary-600"
+              className="flex flex-col pl-6 border-l-4 border-pharmapedia-primary-600 text-center lg:text-left"
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 2.5 }}

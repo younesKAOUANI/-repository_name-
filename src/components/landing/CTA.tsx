@@ -113,7 +113,7 @@ export default function CTA() {
 
           {/* Benefits Grid */}
           <motion.div 
-            className="flex items-center justify-center gap-6 mb-12"
+            className="flex flex-col sm:flex-row items-center sm:items-start justify-center gap-6 mb-12"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.0 }}
@@ -136,14 +136,14 @@ export default function CTA() {
                 >
                   {benefit.icon}
                 </motion.div>
-                <span className="text-sm md:text-base">{benefit.text}</span>
+                <span className="text-sm md:text-base text-left">{benefit.text}</span>
               </motion.div>
             ))}
           </motion.div>
 
           {/* CTA Buttons */}
           <motion.div 
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8"
+            className="flex flex-col sm:flex-row gap-6 sm:gap-4 justify-center items-center mb-8"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.6 }}

@@ -75,8 +75,8 @@ export default function Footer() {
           viewport={{ once: true }}
         >
           {/* Company Info */}
-          <div className="lg:col-span-1">
-            <div className="flex items-center space-x-2 mb-6">
+          <div className="lg:col-span-1 text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start space-x-2 mb-6">
 <Image src="/pharmapedia-logo.png" alt="Pharmapedia Logo" width={280} height={60} className="h-auto" />
             </div>
 
@@ -87,24 +87,24 @@ export default function Footer() {
 
             {/* Contact Info */}
             <div className="space-y-3 mb-6">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-center md:justify-start space-x-3">
                 <MapPin className="w-4 h-4 text-blue-600" />
                 <span className="text-sm text-gray-600">
                   Alger, 16000 Algérie
                 </span>
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-center md:justify-start space-x-3">
                 <Phone className="w-4 h-4 text-blue-600" />
                 <span className="text-sm text-gray-600">+213 21 23 45 67</span>
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-center md:justify-start space-x-3">
                 <Mail className="w-4 h-4 text-blue-600" />
                 <span className="text-sm text-gray-600">contact@pharmapedia-dz.com</span>
               </div>
             </div>
 
             {/* Social Links */}
-            <div className="flex space-x-4">
+            <div className="flex justify-center md:justify-start space-x-4">
               {socialLinks.map((social) => (
                 <Link
                   key={social.name}
@@ -120,7 +120,7 @@ export default function Footer() {
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className="text-center md:text-left">
             <h3 className="text-gray-900 font-bold text-lg mb-6">Navigation</h3>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
@@ -179,11 +179,11 @@ export default function Footer() {
       <div className="border-t border-gray-200 bg-white/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-gray-600 text-sm mb-4 md:mb-0 font-medium">
+            <div className="text-gray-600 text-sm mb-4 md:mb-0 font-medium text-center md:text-left">
               © {currentYear} Pharmapedia. Tous droits réservés.
             </div>
 
-            <div className="flex items-center space-x-6 text-sm text-gray-600">
+            <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-6 text-sm text-gray-600">
               <div className="flex items-center space-x-2">
                 <Shield className="w-4 h-4 text-blue-600" />
                 <span className="font-medium">Données sécurisées</span>

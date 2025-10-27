@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
       selectedLessons = [], 
       questionCount = 10, 
       questionTypes,
-      difficulty,
       timeLimit,
       title = 'Quiz de révision'
     } = body;
@@ -72,15 +71,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Add additional filters
-    if (difficulty) {
-      where.difficulty = difficulty;
-    }
-
-    if (questionTypes && questionTypes.length > 0) {
-      where.questionType = {
-        in: questionTypes
-      };
+    // Exclude QCS (questions à réponse spécifique) from generated revision quizzes.
+    const filteredQuestionTypes = (questionTypes || []).filter((t: any) => t !== 'QCS');
+    if (filteredQuestionTypes.length > 0) {
+      where.questionType = { in: filteredQuestionTypes };
+    } else {
+      where.questionType = { not: 'QCS' };
     }
 
     // Get all matching questions

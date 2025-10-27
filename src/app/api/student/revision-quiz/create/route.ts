@@ -20,7 +20,6 @@ export async function POST(request: NextRequest) {
       selectedLessons = [], 
       questionCount = 10, 
       questionTypes,
-      difficulty,
       timeLimit = 15,
       title = 'Quiz de révision'
     } = body;
@@ -71,15 +70,14 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Add additional filters
-    if (difficulty) {
-      where.difficulty = difficulty;
-    }
-
-    if (questionTypes && questionTypes.length > 0) {
-      where.questionType = {
-        in: questionTypes
-      };
+    // Exclude QCS (questions à réponse spécifique) from revision quizzes.
+    // If questionTypes provided, filter out QCS; otherwise exclude QCS by default.
+    const filteredQuestionTypes = (questionTypes || []).filter((t: any) => t !== 'QCS');
+    if (filteredQuestionTypes.length > 0) {
+      where.questionType = { in: filteredQuestionTypes };
+    } else {
+      // No explicit types requested: exclude QCS from results
+      where.questionType = { not: 'QCS' };
     }
 
     // Get all matching questions

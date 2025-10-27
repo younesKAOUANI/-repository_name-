@@ -14,8 +14,9 @@ export interface QuestionBankCreate {
   studyYearId?: string;
   lessonId?: string;
   moduleId?: string;
-  difficulty?: string;
   explanation?: string;
+  explanationImg?: string | null;
+  questionImage?: string | null;
   options: {
     text: string;
     isCorrect: boolean;

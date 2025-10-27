@@ -5,7 +5,6 @@ export interface RevisionQuizOptions {
   selectedLessons: string[];
   questionCount: number;
   questionTypes?: QuestionType[];
-  difficulty?: string;
   timeLimit?: number;
   title?: string;
 }
@@ -52,7 +51,6 @@ export interface LessonInfo {
 
 export interface QuestionCountInfo {
   totalQuestions: number;
-  byDifficulty: Record<string, number>;
   byType: Record<QuestionType, number>;
 }
 
@@ -69,41 +67,42 @@ class StudentRevisionQuizService {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'same-origin',
       body: JSON.stringify(options),
     });
 
+    const data = await response.json();
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Échec de la création de la session de révision');
+      throw new Error(data?.error || 'Échec de la création de la session de révision');
     }
 
-    return response.json();
+    return data as RevisionQuizSession;
   }
 
   /**
    * Get available modules for revision
    */
   async getAvailableModules(): Promise<ModuleInfo[]> {
-    const response = await fetch('/api/student/modules');
-    
+    const response = await fetch('/api/student/modules', { credentials: 'same-origin' });
+    const data = await response.json();
     if (!response.ok) {
-      throw new Error('Échec de la récupération des modules');
+      throw new Error(data?.error || 'Échec de la récupération des modules');
     }
 
-    return response.json();
+    return data as ModuleInfo[];
   }
 
   /**
    * Get available lessons for a module
    */
   async getLessonsForModule(moduleId: string): Promise<LessonInfo[]> {
-    const response = await fetch(`/api/student/modules/${moduleId}/lessons`);
-    
+    const response = await fetch(`/api/student/modules/${moduleId}/lessons`, { credentials: 'same-origin' });
+    const data = await response.json();
     if (!response.ok) {
-      throw new Error('Échec de la récupération des leçons');
+      throw new Error(data?.error || 'Échec de la récupération des leçons');
     }
 
-    return response.json();
+    return data as LessonInfo[];
   }
 
   /**
@@ -112,28 +111,23 @@ class StudentRevisionQuizService {
   async getAvailableQuestionCount(
     lessonIds: string[], 
     moduleIds: string[],
-    difficulties?: string[],
     questionTypes?: QuestionType[]
   ): Promise<QuestionCountInfo> {
     const params = new URLSearchParams();
     lessonIds.forEach(id => params.append('lessonIds', id));
     moduleIds.forEach(id => params.append('moduleIds', id));
     
-    if (difficulties && difficulties.length > 0) {
-      difficulties.forEach(diff => params.append('difficulties', diff));
-    }
-    
     if (questionTypes && questionTypes.length > 0) {
       questionTypes.forEach(type => params.append('questionTypes', type));
     }
 
-    const response = await fetch(`${this.questionBankUrl}/count?${params}`);
-    
+  const response = await fetch(`${this.questionBankUrl}/count?${params}`, { credentials: 'same-origin' });
+    const data = await response.json();
     if (!response.ok) {
-      throw new Error('Échec de la récupération du nombre de questions disponibles');
+      throw new Error(data?.error || 'Échec de la récupération du nombre de questions disponibles');
     }
 
-    return response.json();
+    return data as QuestionCountInfo;
   }
 
   /**
@@ -150,6 +144,7 @@ class StudentRevisionQuizService {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'same-origin',
       body: JSON.stringify({
         attemptId: sessionId,
         answers

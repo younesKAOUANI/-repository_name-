@@ -13,8 +13,9 @@ export interface QuestionBankItem {
   studyYearId?: string;
   lessonId?: string;
   moduleId?: string;
-  difficulty?: string;
   explanation?: string;
+  explanationImg?: string | null;
+  questionImage?: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -49,8 +50,9 @@ export interface QuestionBankCreate {
   studyYearId?: string;
   lessonId?: string;
   moduleId?: string;
-  difficulty?: string;
   explanation?: string;
+  explanationImg?: string | null;
+  questionImage?: string | null;
   options: QuestionBankOptionCreate[];
 }
 
@@ -235,7 +237,6 @@ class QuestionBankService {
    */
   async getAvailableQuestionsCount(lessonIds: string[], moduleIds: string[]): Promise<{
     totalQuestions: number;
-    byDifficulty: Record<string, number>;
     byType: Record<QuestionType, number>;
   }> {
     const params = new URLSearchParams();

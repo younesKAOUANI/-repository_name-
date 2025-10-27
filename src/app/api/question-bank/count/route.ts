@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireRole } from '@/lib/auth-utils';
 import { db } from '@/lib/db';
-import { QuestionType } from '@prisma/client';
+
+type QuestionType = 'QCMA' | 'QCMP' | 'QCS' | 'QROC';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,8 +11,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const lessonIds = searchParams.getAll('lessonIds');
     const moduleIds = searchParams.getAll('moduleIds');
-    const difficulties = searchParams.getAll('difficulties');
-    const questionTypes = searchParams.getAll('questionTypes') as QuestionType[];
+  const questionTypes = searchParams.getAll('questionTypes') as QuestionType[];
 
     if (lessonIds.length === 0 && moduleIds.length === 0) {
       return NextResponse.json(
@@ -26,18 +26,13 @@ export async function GET(request: NextRequest) {
       OR: []
     };
 
-    // Add difficulty filters if specified
-    if (difficulties.length > 0) {
-      where.difficulty = {
-        in: difficulties
-      };
-    }
-
-    // Add question type filters if specified
-    if (questionTypes.length > 0) {
-      where.questionType = {
-        in: questionTypes
-      };
+    // Exclude QCS (questions à réponse spécifique) from counts by default.
+    // If questionTypes provided, filter out QCS; otherwise exclude QCS.
+    const filteredQuestionTypes = questionTypes.filter(t => t !== 'QCS');
+    if (filteredQuestionTypes.length > 0) {
+      where.questionType = { in: filteredQuestionTypes };
+    } else {
+      where.questionType = { not: 'QCS' };
     }
 
     if (lessonIds.length > 0) {
@@ -65,14 +60,9 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Get total count and group by difficulty and type
-    const [totalCount, difficultyGroups, typeGroups] = await Promise.all([
+    // Get total count and group by type
+    const [totalCount, typeGroups] = await Promise.all([
       db.questionBank.count({ where }),
-      db.questionBank.groupBy({
-        by: ['difficulty'],
-        where,
-        _count: { id: true }
-      }),
       db.questionBank.groupBy({
         by: ['questionType'],
         where,
@@ -81,21 +71,13 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Process the results
-    const byDifficulty: Record<string, number> = {};
-    difficultyGroups.forEach(group => {
-      if (group.difficulty) {
-        byDifficulty[group.difficulty] = group._count.id;
-      }
-    });
-
     const byType: Record<QuestionType, number> = {} as Record<QuestionType, number>;
-    typeGroups.forEach(group => {
+    typeGroups.forEach((group: { questionType: QuestionType; _count: { id: number } }) => {
       byType[group.questionType] = group._count.id;
     });
 
     return NextResponse.json({
       totalQuestions: totalCount,
-      byDifficulty,
       byType
     });
   } catch (error) {

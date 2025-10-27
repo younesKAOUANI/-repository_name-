@@ -40,15 +40,6 @@ export const questionBankColumns: TableColumn<QuestionBankItem>[] = [
                item.questionType === 'QCS' ? 'Choix Simple' :
                'Réponse Ouverte'}
             </span>
-            {item.difficulty && (
-              <span className={`px-2 py-1 text-xs rounded-full ${
-                item.difficulty === 'EASY' ? 'bg-green-100 text-green-800' :
-                item.difficulty === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-red-100 text-red-800'
-              }`}>
-                {item.difficulty}
-              </span>
-            )}
           </div>
         </div>
       );

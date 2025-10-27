@@ -18,8 +18,7 @@ const RevisionQuizCreator: React.FC<RevisionQuizCreatorProps> = ({
   const [lessonsByModule, setLessonsByModule] = useState<Record<string, LessonInfo[]>>({});
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
   const [questionCount, setQuestionCount] = useState(10);
-  const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>(['EASY', 'MEDIUM', 'HARD']);
-  const [questionTypes, setQuestionTypes] = useState<QuestionType[]>(['QCMA', 'QCMP', 'QCS', 'QROC']);
+  const [questionTypes, setQuestionTypes] = useState<QuestionType[]>(['QCMA', 'QCMP', 'QROC']);
   const [timeLimit, setTimeLimit] = useState(15);
   const [title, setTitle] = useState('Quiz de révision');
   
@@ -37,7 +36,7 @@ const RevisionQuizCreator: React.FC<RevisionQuizCreatorProps> = ({
     } else {
       setAvailableQuestions(null);
     }
-  }, [selectedModules, selectedLessons, selectedDifficulties, questionTypes]);
+  }, [selectedModules, selectedLessons, questionTypes]);
 
   const loadModules = async () => {
     try {
@@ -100,7 +99,6 @@ const RevisionQuizCreator: React.FC<RevisionQuizCreatorProps> = ({
       const count = await studentRevisionQuizService.getAvailableQuestionCount(
         selectedLessons,
         selectedModules,
-        selectedDifficulties.length > 0 ? selectedDifficulties : undefined,
         questionTypes.length > 0 ? questionTypes : undefined
       );
       setAvailableQuestions(count);
@@ -149,13 +147,7 @@ const RevisionQuizCreator: React.FC<RevisionQuizCreatorProps> = ({
     }
   };
 
-  const handleDifficultyChange = (difficulty: string, checked: boolean) => {
-    if (checked) {
-      setSelectedDifficulties(prev => [...prev, difficulty]);
-    } else {
-      setSelectedDifficulties(prev => prev.filter(d => d !== difficulty));
-    }
-  };
+  // ...existing code...
 
   const handleCreateSession = async () => {
     if (selectedModules.length === 0 && selectedLessons.length === 0) {
@@ -176,7 +168,6 @@ const RevisionQuizCreator: React.FC<RevisionQuizCreatorProps> = ({
         selectedModules,
         selectedLessons,
         questionCount,
-        difficulty: selectedDifficulties.length > 0 ? selectedDifficulties[0] : undefined, // For backward compatibility, use first difficulty
         questionTypes: questionTypes.length > 0 ? questionTypes : undefined,
         timeLimit,
         title
@@ -401,44 +392,7 @@ const RevisionQuizCreator: React.FC<RevisionQuizCreatorProps> = ({
             </div>
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-700">
-                Niveaux de Difficulté
-              </label>
-              <div className="flex space-x-1">
-                <button
-                  onClick={() => setSelectedDifficulties(['EASY', 'MEDIUM', 'HARD'])}
-                  className="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50"
-                >
-                  Tout
-                </button>
-                <button
-                  onClick={() => setSelectedDifficulties([])}
-                  className="text-xs text-gray-600 hover:text-gray-800 px-2 py-1 rounded hover:bg-gray-100"
-                >
-                  Aucun
-                </button>
-              </div>
-            </div>
-            <div className="space-y-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
-              {[
-                { value: 'EASY', label: 'Facile', color: 'text-green-600' },
-                { value: 'MEDIUM', label: 'Moyen', color: 'text-yellow-600' },
-                { value: 'HARD', label: 'Difficile', color: 'text-red-600' }
-              ].map(diff => (
-                <label key={diff.value} className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={selectedDifficulties.includes(diff.value)}
-                    onChange={(e) => handleDifficultyChange(diff.value, e.target.checked)}
-                    className="rounded text-blue-600 h-4 w-4"
-                  />
-                  <span className={`text-sm font-medium ${diff.color}`}>{diff.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+          {/* Difficulty filter removed (no longer supported) */}
 
           <div>
             <div className="flex items-center justify-between mb-2">
@@ -447,7 +401,7 @@ const RevisionQuizCreator: React.FC<RevisionQuizCreatorProps> = ({
               </label>
               <div className="flex space-x-1">
                 <button
-                  onClick={() => setQuestionTypes(['QCMA', 'QCMP', 'QCS', 'QROC'])}
+                  onClick={() => setQuestionTypes(['QCMA', 'QCMP', 'QROC'])}
                   className="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50"
                 >
                   Tout
@@ -461,10 +415,9 @@ const RevisionQuizCreator: React.FC<RevisionQuizCreatorProps> = ({
               </div>
             </div>
             <div className="space-y-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
-              {([
+                {([
                 { value: 'QCMA' as QuestionType, label: 'QCM à Réponse Unique', description: 'Une seule bonne réponse' },
                 { value: 'QCMP' as QuestionType, label: 'QCM à Réponses Multiples', description: 'Plusieurs bonnes réponses' },
-                { value: 'QCS' as QuestionType, label: 'Questions Cas Spécifiques', description: 'Cas cliniques ou pratiques' },
                 { value: 'QROC' as QuestionType, label: 'Questions à Réponse Ouverte Courte', description: 'Réponses textuelles brèves' }
               ]).map(type => (
                 <label key={type.value} className="flex items-start space-x-2 cursor-pointer p-2 rounded hover:bg-white transition-colors">
@@ -497,25 +450,7 @@ const RevisionQuizCreator: React.FC<RevisionQuizCreatorProps> = ({
                   </span>
                 </div>
                 
-                {/* Difficulty breakdown */}
-                {Object.keys(availableQuestions.byDifficulty).length > 0 && (
-                  <div className="pt-2 border-t border-blue-200">
-                    <div className="text-xs text-blue-600 mb-2">Répartition par difficulté:</div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {Object.entries(availableQuestions.byDifficulty).map(([key, value]) => {
-                        const isSelected = selectedDifficulties.includes(key);
-                        const diffColor = key === 'EASY' ? 'bg-green-100 text-green-800' : 
-                                         key === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' : 
-                                         'bg-red-100 text-red-800';
-                        return (
-                          <div key={key} className={`text-xs px-2 py-1 rounded border ${isSelected ? diffColor : 'bg-gray-100 text-gray-500'}`}>
-                            {key === 'EASY' ? 'Facile' : key === 'MEDIUM' ? 'Moyen' : 'Difficile'}: {value}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                {/* Difficulty breakdown removed (no longer supported) */}
                 
                 {/* Question type breakdown */}
                 {Object.keys(availableQuestions.byType).length > 0 && (

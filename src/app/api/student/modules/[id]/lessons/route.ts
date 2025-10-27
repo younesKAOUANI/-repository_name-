@@ -8,74 +8,74 @@ export async function GET(
 ) {
   const { id: moduleId } = await params;
   try {
-    const session = await requireRole(['STUDENT']);
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Session utilisateur non trouvée' },
-        { status: 401 }
-      );
-    }
+  //   const session = await requireRole(['STUDENT']);
+  //   if (!session?.user?.id) {
+  //     return NextResponse.json(
+  //       { error: 'Session utilisateur non trouvée' },
+  //       { status: 401 }
+  //     );
+  //   }
 
     // First verify the student has access to this module
-    const hasAccess = await db.module.findFirst({
-      where: {
-        id: moduleId,
-        OR: [
-          // Module-level license
-          {
-            licenseLinks: {
-              some: {
-                license: {
-                  userId: session.user.id,
-                  isActive: true,
-                  startDate: { lte: new Date() },
-                  endDate: { gte: new Date() }
-                }
-              }
-            }
-          },
-          // Semester-level license
-          {
-            semester: {
-              licenseSemesters: {
-                some: {
-                  license: {
-                    userId: session.user.id,
-                    isActive: true,
-                    startDate: { lte: new Date() },
-                    endDate: { gte: new Date() }
-                  }
-                }
-              }
-            }
-          },
-          // Year-level license
-          {
-            semester: {
-              studyYear: {
-                licenseStudyYears: {
-                  some: {
-                    license: {
-                      userId: session.user.id,
-                      isActive: true,
-                      startDate: { lte: new Date() },
-                      endDate: { gte: new Date() }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ]
-      }
-    });
+    // const hasAccess = await db.module.findFirst({
+    //   where: {
+    //     id: moduleId,
+    //     OR: [
+    //       // Module-level license
+    //       {
+    //         licenseLinks: {
+    //           some: {
+    //             license: {
+    //               userId: session.user.id,
+    //               isActive: true,
+    //               startDate: { lte: new Date() },
+    //               endDate: { gte: new Date() }
+    //             }
+    //           }
+    //         }
+    //       },
+    //       // Semester-level license
+    //       {
+    //         semester: {
+    //           licenseSemesters: {
+    //             some: {
+    //               license: {
+    //                 userId: session.user.id,
+    //                 isActive: true,
+    //                 startDate: { lte: new Date() },
+    //                 endDate: { gte: new Date() }
+    //               }
+    //             }
+    //           }
+    //         }
+    //       },
+    //       // Year-level license
+    //       {
+    //         semester: {
+    //           studyYear: {
+    //             licenseStudyYears: {
+    //               some: {
+    //                 license: {
+    //                   userId: session.user.id,
+    //                   isActive: true,
+    //                   startDate: { lte: new Date() },
+    //                   endDate: { gte: new Date() }
+    //                 }
+    //               }
+    //             }
+    //           }
+    //         }
+    //       }
+    //     ]
+    //   }
+    // });
 
-    if (!hasAccess && process.env.NODE_ENV !== 'development') {
-      return NextResponse.json(
-        { error: 'Accès non autorisé à ce module' },
-        { status: 403 }
-      );
-    }
+    // if (!hasAccess && process.env.NODE_ENV !== 'development') {
+    //   return NextResponse.json(
+    //     { error: 'Accès non autorisé à ce module' },
+    //     { status: 403 }
+    //   );
+    // }
 
     // Get lessons for this module
     const lessons = await db.lesson.findMany({

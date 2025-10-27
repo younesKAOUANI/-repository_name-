@@ -83,6 +83,8 @@ export default function AdminUsersClient() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [verifyAction, setVerifyAction] = useState<'verify' | 'unverify'>('verify');
 
   // Form state
   const [formData, setFormData] = useState<UserFormData>({
@@ -299,6 +301,38 @@ export default function AdminUsersClient() {
     }
   };
 
+  const handleVerifyUser = async () => {
+    if (!selectedUser) return;
+
+    try {
+      setIsSubmitting(true);
+      
+      const method = verifyAction === 'verify' ? 'POST' : 'DELETE';
+      const response = await fetch(`/api/admin/users/${selectedUser.id}/verify`, {
+        method,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Échec de ${verifyAction === 'verify' ? 'vérification' : 'annulation de vérification'} de l'utilisateur`);
+      }
+
+      setShowVerifyModal(false);
+      setSelectedUser(null);
+      loadUsers();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : `Échec de ${verifyAction === 'verify' ? 'vérification' : 'annulation de vérification'} de l'utilisateur`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const openVerifyModal = (user: User, action: 'verify' | 'unverify') => {
+    setSelectedUser(user);
+    setVerifyAction(action);
+    setShowVerifyModal(true);
+  };
+
   const openCreateModal = () => {
     resetForm();
     setShowCreateModal(true);
@@ -416,6 +450,12 @@ export default function AdminUsersClient() {
       label: 'Voir',
       icon: <Eye className="h-4 w-4" />,
       onClick: openViewModal,
+    },
+    {
+      label: (user: User) => user.emailVerified ? 'Annuler vérification' : 'Vérifier',
+      icon: (user: User) => user.emailVerified ? <Mail className="h-4 w-4" /> : <MailCheck className="h-4 w-4" />,
+      onClick: (user: User) => openVerifyModal(user, user.emailVerified ? 'unverify' : 'verify'),
+      variant: (user: User) => user.emailVerified ? 'default' : 'success',
     },
     {
       label: 'Modifier',
@@ -903,6 +943,51 @@ export default function AdminUsersClient() {
                 </Button>
                 <Button variant="destructive" onClick={handleDeleteUser} disabled={isSubmitting}>
                   {isSubmitting ? 'Suppression...' : 'Supprimer'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Verify User Modal */}
+        {showVerifyModal && selectedUser && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h2 className={`text-xl font-semibold mb-4 ${verifyAction === 'verify' ? 'text-green-600' : 'text-orange-600'}`}>
+                {verifyAction === 'verify' ? 'Vérifier l\'utilisateur' : 'Annuler la vérification'}
+              </h2>
+              
+              <p className="mb-4">
+                {verifyAction === 'verify' ? (
+                  <>
+                    Êtes-vous sûr de vouloir marquer <strong>{selectedUser.name}</strong> comme vérifié ?
+                    L'utilisateur pourra accéder à toutes les fonctionnalités de la plateforme.
+                  </>
+                ) : (
+                  <>
+                    Êtes-vous sûr de vouloir annuler la vérification de <strong>{selectedUser.name}</strong> ?
+                    L'utilisateur devra vérifier son email à nouveau.
+                  </>
+                )}
+              </p>
+
+              <div className="flex justify-end space-x-4">
+                <Button 
+                  variant="secondary" 
+                  onClick={() => {
+                    setShowVerifyModal(false);
+                    setSelectedUser(null);
+                  }}
+                  disabled={isSubmitting}
+                >
+                  Annuler
+                </Button>
+                <Button 
+                  onClick={handleVerifyUser} 
+                  disabled={isSubmitting}
+                  className={verifyAction === 'verify' ? 'bg-green-600 hover:bg-green-700' : 'bg-orange-600 hover:bg-orange-700'}
+                >
+                  {isSubmitting ? 'Traitement...' : verifyAction === 'verify' ? 'Vérifier' : 'Annuler la vérification'}
                 </Button>
               </div>
             </div>

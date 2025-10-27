@@ -82,7 +82,7 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                 transition={{ delay: 0.1 }}
             >
                 <div className="mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center my-4 text-sm">
+                    <div className="flex justify-between items-center py-4 text-sm">
                         {/* Logo */}
                         <motion.div 
                             className="flex-shrink-0"
